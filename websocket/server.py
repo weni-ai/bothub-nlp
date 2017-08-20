@@ -3,12 +3,13 @@ from tornado.websocket import WebSocketHandler
 from tornado.web import Application
 from tornado.web import url
 import tornado.ioloop
+from rasabot import RasaBot
 
 
-class Bot():
-    def ask(self, question):
-        print('A new question arrived to bot: ', question)
-        return "I'm Alfred Pennyworth, at your service Sir!"
+# class Bot():
+#     def ask(self, question):
+#         print('A new question arrived to bot: ', question)
+#         return "I'm Alfred Pennyworth, at your service Sir!"
 
 
 class BotManager():
@@ -50,7 +51,9 @@ class BotManager():
         if bot_id in self._pool:
             bot = self._pool[bot_id]['bot_instance']
         else:
-            bot = Bot()
+            # bot = Bot()
+            bot = RasaBot('../etc/spacy/config.json')
+            bot.trainning('../etc/spacy/data/demo-rasa.json', '../etc/spacy/models/')
             bot_data = {
                 'bot_instance': bot
             }
