@@ -3,3 +3,7 @@ ipython
 jupyter
 rasa-nlu
 tornado
+spacy
+scipy
+sklearn
+sklearn_crfsuite
