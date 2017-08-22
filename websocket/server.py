@@ -4,6 +4,7 @@ from tornado.web import Application
 from tornado.web import url
 import tornado.ioloop
 from rasabot import RasaBot
+from rasabot import RasaBotProcess
 
 
 # class Bot():
@@ -49,11 +50,19 @@ class BotManager():
     def _get_bot_instance(self, bot_id):
         bot = None
         if bot_id in self._pool:
+            print('Reusing an instance...')
             bot = self._pool[bot_id]['bot_instance']
         else:
-            # bot = Bot()
-            bot = RasaBot('../etc/spacy/config.json')
-            bot.trainning('../etc/spacy/data/demo-rasa.json', '../etc/spacy/models/')
+            print('Creating a new instance...')
+            ####################### V1
+            # bot = RasaBot('../etc/spacy/config.json')
+            # bot.trainning('../etc/spacy/data/demo-rasa.json', '../etc/spacy/models/')
+            ####################### V2
+            rasa_config = '../etc/spacy/config.json'
+            model_dir = '../etc/spacy/models/'
+            data_file = '../etc/spacy/data/demo-rasa.json'
+            bot = RasaBotProcess(rasa_config, model_dir, data_file)
+            bot.start()
             bot_data = {
                 'bot_instance': bot
             }
@@ -62,7 +71,11 @@ class BotManager():
 
     def ask(self, question, bot_id):
         bot = self._get_bot_instance(bot_id)
+        print(bot)
         return bot.ask(question)
+
+    def start_bot_process(self, bot_id):
+        self._get_bot_instance(bot_id)
 
 
 class BotWebSocket(WebSocketHandler):
@@ -75,6 +88,8 @@ class BotWebSocket(WebSocketHandler):
 
     def open(self):
         print('Web socket opened.')
+        bot_id = str(self.request.query_arguments['botId'][0])
+        self.bm.start_bot_process(bot_id)
 
     def on_message(self, message):
         print(message)
