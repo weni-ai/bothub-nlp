@@ -1,10 +1,12 @@
 import json
+import time
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application
 from tornado.web import url
 import tornado.ioloop
 from rasabot import RasaBot
 from rasabot import RasaBotProcess
+from multiprocessing import Queue
 
 
 # class Bot():
@@ -47,11 +49,11 @@ class BotManager():
     '''
     _pool = {}
 
-    def _get_bot_instance(self, bot_id):
-        bot = None
+    def _get_bot_data(self, bot_id):
+        bot_data = {}
         if bot_id in self._pool:
             print('Reusing an instance...')
-            bot = self._pool[bot_id]['bot_instance']
+            bot_data = self._pool[bot_id]
         else:
             print('Creating a new instance...')
             ####################### V1
@@ -61,21 +63,35 @@ class BotManager():
             rasa_config = '../etc/spacy/config.json'
             model_dir = '../etc/spacy/models/'
             data_file = '../etc/spacy/data/demo-rasa.json'
-            bot = RasaBotProcess(rasa_config, model_dir, data_file)
+            answers_queue = Queue()
+            questions_queue = Queue()
+            bot = RasaBotProcess(questions_queue, answers_queue, rasa_config, model_dir, data_file)
+            bot.daemon = True
             bot.start()
-            bot_data = {
-                'bot_instance': bot
-            }
+            bot_data['bot_instance'] = bot
+            bot_data['answers_queue'] = answers_queue
+            bot_data['questions_queue'] = questions_queue
             self._pool[bot_id] = bot_data
-        return bot
+        return bot_data
+
+    def _get_questions_queue(self, bot_id):
+        return self._get_bot_data(bot_id)['questions_queue']
+
+    def _get_answers_queue(self, bot_id):
+        return self._get_bot_data(bot_id)['answers_queue']
 
     def ask(self, question, bot_id):
-        bot = self._get_bot_instance(bot_id)
-        print(bot)
-        return bot.ask(question)
+        questions_queue = self._get_questions_queue(bot_id)
+        answers_queue = self._get_answers_queue(bot_id)
+        questions_queue.put(question)
+        # Wait for answer...
+        # This is not the best aproach! But works for now. ;)
+        while answers_queue.empty():
+            time.sleep(0.001)
+        return answers_queue.get()
 
     def start_bot_process(self, bot_id):
-        self._get_bot_instance(bot_id)
+        self._get_questions_queue(bot_id)
 
 
 class BotWebSocket(WebSocketHandler):
