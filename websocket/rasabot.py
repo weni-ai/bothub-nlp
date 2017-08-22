@@ -122,11 +122,13 @@ class RasaBotV2():
 
 
 class RasaBotProcess(Process):
-    def __init__(self, questions_queue, answers_queue, rasa_config, model_dir, data_file, *args, **kwargs):
+    def __init__(self, questions_queue, answers_queue, new_question_event, new_answer_event, rasa_config, model_dir, data_file, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bot = None
         self.questions_queue = questions_queue
         self.answers_queue = answers_queue
+        self.new_question_event = new_question_event
+        self.new_answer_event = new_answer_event
         self.rasa_config = rasa_config
         self.model_dir = model_dir
         self.data_file = data_file
@@ -136,8 +138,11 @@ class RasaBotProcess(Process):
         self._bot = RasaBotV2(self.rasa_config, self.model_dir, self.data_file)
         while True:
             # This is not the best aproach! But works for now. ;)
-            while self.questions_queue.empty():
-                time.sleep(0.001)
+            # while self.questions_queue.empty():
+            #     time.sleep(0.001)
+            self.new_question_event.wait()
+            self.new_question_event.clear()
             print('A new question arrived!')
             answer = self._bot.ask(self.questions_queue.get())
             self.answers_queue.put(answer)
+            self.new_answer_event.set()
