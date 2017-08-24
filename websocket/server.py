@@ -110,7 +110,7 @@ class BotWebSocket(WebSocketHandler):
         message_data = json.loads(message)
         question = message_data['question']
         bot_id = message_data['botId']
-        self.write_message('Your question was: ', question)
+        # self.write_message('Your question was: ', question)
         answer = self.bm.ask(question, bot_id)
         answer_data = {
             'botId': bot_id,

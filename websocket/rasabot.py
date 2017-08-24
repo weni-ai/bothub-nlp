@@ -70,7 +70,7 @@ class RasaBot():
 
     @property
     def model_directory(self):
-        return '../etc/spacy/models/model_20170820-174910'
+        return '../etc/spacy/models/model_20170824-164817'
 
 
 class RasaBotV2():
@@ -118,7 +118,7 @@ class RasaBotV2():
 
     @property
     def model_directory(self):
-        return '../etc/spacy/models/model_20170820-174910'
+        return '../etc/spacy/models/model_20170824-164817'
 
 
 class RasaBotProcess(Process):
