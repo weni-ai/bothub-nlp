@@ -18,26 +18,7 @@ from multiprocessing import Event
 
 class BotManager():
     '''
-    Essa é uma versão minimalista do bot manager.
-
-    Desafios a serem superados:
-
-    * - Transformar cada bot em um processo separado.
-    * - Implementar mecanismo para troca de mensagens entre o processo pai(BotManager) e seus processos filhos.
-    * - Precisaremos de um "bot killer" para matar processos que ultrapassarem o max_lifetime.
-
-    O pacote multiprocessing pode ajudar nessa tarefa.
-
-    Algumas alternativas para essa comunicação são: Pipe, Queue, shared memory e socket
-
-    Qualquer que seja a alternativa escolhida ela deve garantir:
-    * - baixa latência
-    * - acesso concorrente(mais de um usuário interagindo com o mesmo bot)
-    * - sincronismo(pergunta => resposta)
-
-    https://docs.python.org/3.6/library/multiprocessing.html
-
-    Cliente javascript:
+    javascript client:
     var ws = new WebSocket('ws://localhost:8888/ws');
     ws.onmessage = (evt) => {
         console.log(JSON.parse(evt.data));
