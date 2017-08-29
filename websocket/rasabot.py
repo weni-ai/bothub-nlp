@@ -90,3 +90,17 @@ class RasaBotProcess(Process):
             answer = self._bot.ask(self.questions_queue.get())
             self.answers_queue.put(answer)
             self.new_answer_event.set()
+
+
+class RasaBotTrainProcess(Process):
+    def __init__(self, train_queue, language, data, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._bot = None
+        self.train_queue = train_queue
+        self.language = language
+        self.data = data
+
+    def run(self):
+        self._bot = RasaBot(trainning=True)
+        uuid = self._bot.trainning(self.language, self.data)
+        self.train_queue.put(uuid)

@@ -9,7 +9,7 @@ import os
 from tornado.web import Application
 from tornado.web import url
 from rasabot import RasaBot
-from rasabot import RasaBotProcess
+from rasabot import RasaBotProcess, RasaBotTrainProcess
 
 
 class BotManager():
@@ -75,6 +75,13 @@ class BotManager():
         new_answer_event.clear()
         return answers_queue.get()
 
+    def trainning(self, language, data):
+        train_queue = Queue()
+        bot = RasaBotTrainProcess(train_queue, language, data)
+        bot.daemon = True
+        bot.start()
+        return train_queue.get()
+
     def start_bot_process(self, bot_uuid):
         self._get_questions_queue(bot_uuid)
 
@@ -104,8 +111,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
 
         language = json_body.get("language", None)
         data = json.dumps(json_body.get("data", None))
-        bot = RasaBot(trainning=True)
-        uuid = bot.trainning(language, data)
+        uuid = self.bm.trainning(language, data)
         self.write(json.dumps(uuid))
         self.finish()
 
