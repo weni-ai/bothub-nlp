@@ -1,15 +1,16 @@
+""" This module start server """
+from multiprocessing import Queue, Event
+
+import tornado.ioloop
+import tornado.escape
+import json
+import os
+
 from tornado.web import Application
 from tornado.web import url
 from rasabot import RasaBot
 from rasabot import RasaBotProcess
-from multiprocessing import Queue
-from multiprocessing import Event
 
-import psycopg2
-import momoko
-import json
-import time
-import tornado.ioloop
 
 class BotManager():
     '''
@@ -33,8 +34,8 @@ class BotManager():
             bot_data = self._pool[bot_uuid]
         else:
             print('Creating a new instance...')
-            rasa_config = '../etc/spacy/%s/config-rasa.json' % bot_uuid
-            model_dir = '../etc/spacy/%s/model' % bot_uuid
+            rasa_config = '../etc/spacy/%s/config.json' % bot_uuid
+            model_dir = os.path.abspath('../etc/spacy/%s/model/%s' % (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
             data_file = '../etc/spacy/%s/data.json' % bot_uuid
             answers_queue = Queue()
             questions_queue = Queue()
@@ -69,10 +70,6 @@ class BotManager():
         questions_queue.put(question)
         new_question_event = self._get_new_question_event(bot_uuid)
         new_question_event.set()
-        # Wait for answer...
-        # This is not the best aproach! But works for now. ;)
-        # while answers_queue.empty():
-        #     time.sleep(0.001)
         new_answer_event = self._get_new_answer_event(bot_uuid)
         new_answer_event.wait()
         new_answer_event.clear()
@@ -102,6 +99,15 @@ class BotRequestHandler(tornado.web.RequestHandler):
             self.write(answer_data)
             self.finish()
 
+    def post(self):
+        json_body = tornado.escape.json_decode(self.request.body)
+
+        language = json_body.get("language", None)
+        data = json.dumps(json_body.get("data", None))
+        bot = RasaBot(trainning=True)
+        uuid = bot.trainning(language, data)
+        self.write(json.dumps(uuid))
+        self.finish()
 
 def make_app():
     return Application([
