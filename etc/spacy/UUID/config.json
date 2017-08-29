@@ -1,6 +1,6 @@
 {
   "pipeline": "spacy_sklearn",
   "path" : "./models",
-  "data" : "./data/data-zika.json",
+  "data" : "./data.json",
   "language": "en_core_web_sm"
 }
