@@ -6,8 +6,9 @@ import tornado.escape
 import json
 import os
 
-from tornado.web import Application
+from tornado.web import Application, asynchronous
 from tornado.web import url
+from tornado.gen import coroutine
 from rasabot import RasaBot
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 
@@ -75,13 +76,6 @@ class BotManager():
         new_answer_event.clear()
         return answers_queue.get()
 
-    def trainning(self, language, data):
-        train_queue = Queue()
-        bot = RasaBotTrainProcess(train_queue, language, data)
-        bot.daemon = True
-        bot.start()
-        return train_queue.get()
-
     def start_bot_process(self, bot_uuid):
         self._get_questions_queue(bot_uuid)
 
@@ -94,6 +88,8 @@ class BotRequestHandler(tornado.web.RequestHandler):
     def check_origin(self, origin):
         return True
 
+    @asynchronous
+    @coroutine
     def get(self):
         uuid = self.get_argument('uuid', None)
         message = self.get_argument('msg', None)
@@ -104,23 +100,22 @@ class BotRequestHandler(tornado.web.RequestHandler):
                 'answer': answer
             }
             self.write(answer_data)
-            self.finish()
+        self.finish()
 
 
 class BotTrainerRequestHandler(tornado.web.RequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.bm = BotManager()
 
-    def check_origin(self, origin):
-        return True
-
+    @asynchronous
     def post(self):
         json_body = tornado.escape.json_decode(self.request.body)
 
         language = json_body.get("language", None)
         data = json.dumps(json_body.get("data", None))
-        uuid = self.bm.trainning(language, data)
+        bot = RasaBotTrainProcess(language, data, self.callback)
+        bot.daemon = True
+        bot.start()
+
+    def callback(self, uuid):
         self.write(json.dumps(uuid))
         self.finish()
 

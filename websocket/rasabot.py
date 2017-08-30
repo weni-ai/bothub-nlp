@@ -93,14 +93,14 @@ class RasaBotProcess(Process):
 
 
 class RasaBotTrainProcess(Process):
-    def __init__(self, train_queue, language, data, *args, **kwargs):
+    def __init__(self, language, data, callback, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bot = None
-        self.train_queue = train_queue
         self.language = language
         self.data = data
+        self.callback = callback
 
     def run(self):
         self._bot = RasaBot(trainning=True)
         uuid = self._bot.trainning(self.language, self.data)
-        self.train_queue.put(uuid)
+        self.callback(uuid)
