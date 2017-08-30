@@ -106,6 +106,15 @@ class BotRequestHandler(tornado.web.RequestHandler):
             self.write(answer_data)
             self.finish()
 
+
+class BotTrainerRequestHandler(tornado.web.RequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bm = BotManager()
+
+    def check_origin(self, origin):
+        return True
+
     def post(self):
         json_body = tornado.escape.json_decode(self.request.body)
 
@@ -115,9 +124,11 @@ class BotRequestHandler(tornado.web.RequestHandler):
         self.write(json.dumps(uuid))
         self.finish()
 
+
 def make_app():
     return Application([
-        url(r'/bots', BotRequestHandler)
+        url(r'/bots', BotRequestHandler),
+        url(r'/train-bot', BotTrainerRequestHandler)
     ])
 
 if __name__ == '__main__':
