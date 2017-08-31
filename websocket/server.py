@@ -1,16 +1,19 @@
 """ This module start server """
-from multiprocessing import Queue, Event
+from multiprocessing import Queue, Event, Manager
 
 import tornado.ioloop
 import tornado.escape
 import json
 import os
+import time
 
+from threading import Timer, Lock
 from tornado.web import Application, asynchronous
 from tornado.web import url
 from tornado.gen import coroutine
 from rasabot import RasaBot
 from rasabot import RasaBotProcess, RasaBotTrainProcess
+from datetime import datetime, timedelta
 
 
 class BotManager():
@@ -27,6 +30,9 @@ class BotManager():
     ws.send(JSON.stringify(bot_message))
     '''
     _pool = {}
+
+    def __init__(self):
+        self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
         bot_data = {}
@@ -50,6 +56,7 @@ class BotManager():
             bot_data['questions_queue'] = questions_queue
             bot_data['new_question_event'] = new_question_event
             bot_data['new_answer_event'] = new_answer_event
+            bot_data['last_time_update'] = datetime.now()
             self._pool[bot_uuid] = bot_data
         return bot_data
 
@@ -66,12 +73,15 @@ class BotManager():
         return self._get_bot_data(bot_uuid)['answers_queue']
 
     def ask(self, question, bot_uuid):
+
         questions_queue = self._get_questions_queue(bot_uuid)
         answers_queue = self._get_answers_queue(bot_uuid)
         questions_queue.put(question)
         new_question_event = self._get_new_question_event(bot_uuid)
         new_question_event.set()
         new_answer_event = self._get_new_answer_event(bot_uuid)
+
+        self._pool[bot_uuid]['last_time_update'] = datetime.now()
         new_answer_event.wait()
         new_answer_event.clear()
         return answers_queue.get()
@@ -79,14 +89,21 @@ class BotManager():
     def start_bot_process(self, bot_uuid):
         self._get_questions_queue(bot_uuid)
 
+    def start_garbage_collector(self):
+        Timer(5*60.0, self.garbage_collector).start()
+
+    def garbage_collector(self):
+        with Lock():
+            new_pool = {}
+            for uuid, bot_instance in self._pool.items():
+                if not (datetime.now()-bot_instance['last_time_update']) >= timedelta(minutes=5):
+                    new_pool[uuid] = bot_instance
+            self._pool = new_pool
+        print("garbage collected...")
+        self.start_garbage_collector()
+
 
 class BotRequestHandler(tornado.web.RequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.bm = BotManager()
-
-    def check_origin(self, origin):
-        return True
 
     @asynchronous
     @coroutine
@@ -94,7 +111,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
         uuid = self.get_argument('uuid', None)
         message = self.get_argument('msg', None)
         if message and uuid:
-            answer = self.bm.ask(message, uuid)
+            answer = bm.ask(message, uuid)
             answer_data = {
                 'botId': uuid,
                 'answer': answer
@@ -127,6 +144,7 @@ def make_app():
     ])
 
 if __name__ == '__main__':
+    bm = BotManager()
     app = make_app()
     app.listen(4000)
     tornado.ioloop.IOLoop.current().start()
