@@ -1,17 +1,15 @@
 """ This module start server """
-from multiprocessing import Queue, Event, Manager
+from multiprocessing import Queue, Event
 
 import tornado.ioloop
 import tornado.escape
 import json
 import os
-import time
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
 from tornado.web import url
 from tornado.gen import coroutine
-from rasabot import RasaBot
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
 
@@ -42,13 +40,16 @@ class BotManager():
         else:
             print('Creating a new instance...')
             rasa_config = '../etc/spacy/%s/config.json' % bot_uuid
-            model_dir = os.path.abspath('../etc/spacy/%s/model/%s' % (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
+            model_dir = os.path.abspath('../etc/spacy/%s/model/%s' %
+                                        (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
             data_file = '../etc/spacy/%s/data.json' % bot_uuid
             answers_queue = Queue()
             questions_queue = Queue()
             new_question_event = Event()
             new_answer_event = Event()
-            bot = RasaBotProcess(questions_queue, answers_queue, new_question_event, new_answer_event, rasa_config, model_dir, data_file)
+            bot = RasaBotProcess(questions_queue, answers_queue,
+                                 new_question_event, new_answer_event,
+                                 rasa_config, model_dir, data_file)
             bot.daemon = True
             bot.start()
             bot_data['bot_instance'] = bot
@@ -142,6 +143,7 @@ def make_app():
         url(r'/bots', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])
+
 
 if __name__ == '__main__':
     bm = BotManager()

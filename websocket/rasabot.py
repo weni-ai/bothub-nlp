@@ -19,7 +19,8 @@ class RasaBot():
 
     This version load interpreter on initialization.
     '''
-    def __init__(self, config_file=None, model_dir=None, data_file=None, trainning=False):
+    def __init__(self, config_file=None, model_dir=None, data_file=None,
+                 trainning=False):
         self.data_file = data_file
         self.model_dir = model_dir
         self.config_file = config_file
@@ -33,11 +34,6 @@ class RasaBot():
     def trainning(self, language, data):
         '''
         Creates a new trainning for the bot.
-        This method only makes a new training if the .trainning_hash file does not
-        exist, or, if the data_file hash is changed.
-
-        When force is True we force a new trainning.
-        Even though there is already one for the current data file.
         '''
 
         bot_uuid = uuid.uuid4()
@@ -51,7 +47,9 @@ class RasaBot():
             self.data_file = "%s/data.json" % bot_path
 
             with open(self.data_file, 'w') as data_file, open(self.config_file, 'w') as config_file:
-                config_file.write('{"pipeline": "spacy_sklearn", "path" : "./models", "data" : "./data.json", "language": "%s"}' % language)
+                config_file.write('{"pipeline": "spacy_sklearn", \
+                                   "path" : "./models", "data" : "./data.json", \
+                                   "language": "%s"}' % language)
 
                 data_file.write(data)
 
