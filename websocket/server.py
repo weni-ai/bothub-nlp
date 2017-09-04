@@ -99,6 +99,8 @@ class BotManager():
             for uuid, bot_instance in self._pool.items():
                 if not (datetime.now()-bot_instance['last_time_update']) >= timedelta(minutes=5):
                     new_pool[uuid] = bot_instance
+                else:
+                    bot_instance['bot_instance'].terminate()
             self._pool = new_pool
         print("garbage collected...")
         self.start_garbage_collector()
