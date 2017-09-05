@@ -4,7 +4,7 @@ import os
 import uuid
 
 from multiprocessing import Process
-from rasa_nlu.converters import load_data
+from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
@@ -19,14 +19,11 @@ class RasaBot():
 
     This version load interpreter on initialization.
     '''
-    def __init__(self, config_file=None, model_dir=None, data_file=None,
-                 trainning=False):
-        self.data_file = data_file
+    def __init__(self, model_dir=None, trainning=False):
         self.model_dir = model_dir
-        self.config_file = config_file
         if not trainning:
-            metadata = Metadata.load(self.model_dir)
-            self.interpreter = Interpreter.load(metadata, RasaNLUConfig(self.config_file))
+            metadata = Metadata(self.model_dir, None)
+            self.interpreter = Interpreter.load(metadata, None)
 
     def ask(self, question):
         return self.interpreter.parse(question)
@@ -43,20 +40,14 @@ class RasaBot():
             os.makedirs("%s/model" % bot_path)
 
             self.model_dir = "%s/model" % bot_path
-            self.config_file = "%s/config.json" % bot_path
-            self.data_file = "%s/data.json" % bot_path
-
-            with open(self.data_file, 'w') as data_file, open(self.config_file, 'w') as config_file:
-                config_file.write('{"pipeline": "spacy_sklearn", \
+            config = '{"pipeline": "spacy_sklearn", \
                                    "path" : "./models", "data" : "./data.json", \
-                                   "language": "%s"}' % language)
-
-                data_file.write(data)
+                                   "language": "%s"}' % language
+            
 
             model_dir = Path(self.model_dir)
-            data_file = Path(self.data_file)
-            training_data = load_data(data_file)
-            trainer = Trainer(RasaNLUConfig(self.config_file))
+            training_data = load_rasa_data(data)
+            trainer = Trainer(RasaNLUConfig(config))
             trainer.train(training_data)
             trainer.persist(model_dir)
             return dict(uuid=str(bot_uuid))
@@ -67,20 +58,18 @@ class RasaBotProcess(Process):
     This class is instantied when start a process bot and does all data process
     '''
     def __init__(self, questions_queue, answers_queue, new_question_event, new_answer_event,
-                 rasa_config, model_dir, data_file, *args, **kwargs):
+                 model_dir, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bot = None
         self.questions_queue = questions_queue
         self.answers_queue = answers_queue
         self.new_question_event = new_question_event
         self.new_answer_event = new_answer_event
-        self.rasa_config = rasa_config
         self.model_dir = model_dir
-        self.data_file = data_file
 
     def run(self):
         print('run')
-        self._bot = RasaBot(self.rasa_config, self.model_dir, self.data_file)
+        self._bot = RasaBot(self.model_dir)
         while True:
             self.new_question_event.wait()
             self.new_question_event.clear()

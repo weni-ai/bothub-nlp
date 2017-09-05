@@ -5,6 +5,7 @@ import tornado.ioloop
 import tornado.escape
 import json
 import os
+import cloudpickle
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -39,17 +40,18 @@ class BotManager():
             bot_data = self._pool[bot_uuid]
         else:
             print('Creating a new instance...')
-            rasa_config = '../etc/spacy/%s/config.json' % bot_uuid
-            model_dir = os.path.abspath('../etc/spacy/%s/model/%s' %
+            model_dir = os.path.abspath('../etc/spacy/%s/model/%s' % # this path is will be changed to get bot in db
                                         (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
-            data_file = '../etc/spacy/%s/data.json' % bot_uuid
+
+            with open("%s/metadata.pkl" % model_dir, 'rb') as metadata:
+                model = cloudpickle.load(metadata)
+            print(model)
             answers_queue = Queue()
             questions_queue = Queue()
             new_question_event = Event()
             new_answer_event = Event()
             bot = RasaBotProcess(questions_queue, answers_queue,
-                                 new_question_event, new_answer_event,
-                                 rasa_config, model_dir, data_file)
+                                 new_question_event, new_answer_event, model)
             bot.daemon = True
             bot.start()
             bot_data['bot_instance'] = bot
