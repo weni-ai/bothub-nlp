@@ -44,21 +44,9 @@ class BotManager():
         else:
             redis_bot = self._get_bot_redis(bot_uuid)
             if redis_bot is not None:
+                print('Reusing from redis...')
                 redis_bot = cloudpickle.loads(redis_bot)
-                answers_queue = Queue()
-                questions_queue = Queue()
-                new_question_event = Event()
-                new_answer_event = Event()
-                bot = RasaBotProcess(questions_queue, answers_queue,
-                                    new_question_event, new_answer_event, redis_bot)
-                bot.daemon = True
-                bot.start()
-                bot_data['bot_instance'] = bot
-                bot_data['answers_queue'] = answers_queue
-                bot_data['questions_queue'] = questions_queue
-                bot_data['new_question_event'] = new_question_event
-                bot_data['new_answer_event'] = new_answer_event
-                bot_data['last_time_update'] = datetime.now()
+                bot_data = self._start_bot_process(redis_bot)
                 self._pool[bot_uuid] = bot_data
             else:
                 print('Creating a new instance...')
@@ -66,24 +54,11 @@ class BotManager():
                                             (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
 
                 with open("%s/metadata.pkl" % model_dir, 'rb') as metadata:
-                    model = cloudpickle.load(metadata)
-                    self._set_bot_redis(bot_uuid, cloudpickle.dumps(model))
-
-                answers_queue = Queue()
-                questions_queue = Queue()
-                new_question_event = Event()
-                new_answer_event = Event()
-                bot = RasaBotProcess(questions_queue, answers_queue,
-                                    new_question_event, new_answer_event, model)
-                bot.daemon = True
-                bot.start()
-                bot_data['bot_instance'] = bot
-                bot_data['answers_queue'] = answers_queue
-                bot_data['questions_queue'] = questions_queue
-                bot_data['new_question_event'] = new_question_event
-                bot_data['new_answer_event'] = new_answer_event
-                bot_data['last_time_update'] = datetime.now()
+                    bot = cloudpickle.load(metadata)
+                    self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
+                bot_data = self._start_bot_process(bot)
                 self._pool[bot_uuid] = bot_data
+
         return bot_data
 
     def _get_new_answer_event(self, bot_uuid):
@@ -134,7 +109,26 @@ class BotManager():
         return redis.Redis(connection_pool=self.redis).get(bot_uuid)
     
     def _set_bot_redis(self, bot_uuid, bot):
-        return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)    
+        return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
+    
+    def _start_bot_process(self, bot):
+        bot_data = {}
+        answers_queue = Queue()
+        questions_queue = Queue()
+        new_question_event = Event()
+        new_answer_event = Event()
+        bot = RasaBotProcess(questions_queue, answers_queue,
+                            new_question_event, new_answer_event, bot)
+        bot.daemon = True
+        bot.start()
+        bot_data['bot_instance'] = bot
+        bot_data['answers_queue'] = answers_queue
+        bot_data['questions_queue'] = questions_queue
+        bot_data['new_question_event'] = new_question_event
+        bot_data['new_answer_event'] = new_answer_event
+        bot_data['last_time_update'] = datetime.now()
+
+        return bot_data
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
