@@ -2,7 +2,7 @@ cytoolz
 Momoko
 numpy
 psycopg2
-rasa-nlu
+https://github.com/push-flow/rasa_nlu.git@feature/direct_json_data
 scikit-learn
 scipy
 sklearn-crfsuite
