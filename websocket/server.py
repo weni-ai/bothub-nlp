@@ -6,6 +6,7 @@ import tornado.escape
 import json
 import os
 import cloudpickle
+import redis
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -31,6 +32,8 @@ class BotManager():
     _pool = {}
 
     def __init__(self):
+
+        self.redis = redis.ConnectionPool(host='localhost', port=6379, db=2)
         self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
@@ -39,28 +42,48 @@ class BotManager():
             print('Reusing an instance...')
             bot_data = self._pool[bot_uuid]
         else:
-            print('Creating a new instance...')
-            model_dir = os.path.abspath('../etc/spacy/%s/model/%s' % # this path is will be changed to get bot in db
-                                        (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
+            redis_bot = self._get_bot_redis(bot_uuid)
+            if redis_bot is not None:
+                redis_bot = cloudpickle.loads(redis_bot)
+                answers_queue = Queue()
+                questions_queue = Queue()
+                new_question_event = Event()
+                new_answer_event = Event()
+                bot = RasaBotProcess(questions_queue, answers_queue,
+                                    new_question_event, new_answer_event, redis_bot)
+                bot.daemon = True
+                bot.start()
+                bot_data['bot_instance'] = bot
+                bot_data['answers_queue'] = answers_queue
+                bot_data['questions_queue'] = questions_queue
+                bot_data['new_question_event'] = new_question_event
+                bot_data['new_answer_event'] = new_answer_event
+                bot_data['last_time_update'] = datetime.now()
+                self._pool[bot_uuid] = bot_data
+            else:
+                print('Creating a new instance...')
+                model_dir = os.path.abspath('../etc/spacy/%s/model/%s' % # this path is will be changed to get bot in db
+                                            (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
 
-            with open("%s/metadata.pkl" % model_dir, 'rb') as metadata:
-                model = cloudpickle.load(metadata)
-            print(model)
-            answers_queue = Queue()
-            questions_queue = Queue()
-            new_question_event = Event()
-            new_answer_event = Event()
-            bot = RasaBotProcess(questions_queue, answers_queue,
-                                 new_question_event, new_answer_event, model)
-            bot.daemon = True
-            bot.start()
-            bot_data['bot_instance'] = bot
-            bot_data['answers_queue'] = answers_queue
-            bot_data['questions_queue'] = questions_queue
-            bot_data['new_question_event'] = new_question_event
-            bot_data['new_answer_event'] = new_answer_event
-            bot_data['last_time_update'] = datetime.now()
-            self._pool[bot_uuid] = bot_data
+                with open("%s/metadata.pkl" % model_dir, 'rb') as metadata:
+                    model = cloudpickle.load(metadata)
+                    self._set_bot_redis(bot_uuid, cloudpickle.dumps(model))
+
+                answers_queue = Queue()
+                questions_queue = Queue()
+                new_question_event = Event()
+                new_answer_event = Event()
+                bot = RasaBotProcess(questions_queue, answers_queue,
+                                    new_question_event, new_answer_event, model)
+                bot.daemon = True
+                bot.start()
+                bot_data['bot_instance'] = bot
+                bot_data['answers_queue'] = answers_queue
+                bot_data['questions_queue'] = questions_queue
+                bot_data['new_question_event'] = new_question_event
+                bot_data['new_answer_event'] = new_answer_event
+                bot_data['last_time_update'] = datetime.now()
+                self._pool[bot_uuid] = bot_data
         return bot_data
 
     def _get_new_answer_event(self, bot_uuid):
@@ -106,6 +129,12 @@ class BotManager():
             self._pool = new_pool
         print("garbage collected...")
         self.start_garbage_collector()
+    
+    def _get_bot_redis(self, bot_uuid):
+        return redis.Redis(connection_pool=self.redis).get(bot_uuid)
+    
+    def _set_bot_redis(self, bot_uuid, bot):
+        return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)    
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
