@@ -1,5 +1,5 @@
 from peewee import *
-from base_models import BaseModel
+from models.base_models import BaseModel
 from datetime import datetime
 
 import uuid
@@ -7,7 +7,7 @@ import uuid
 
 class Bot(BaseModel):
     uuid = UUIDField(primary_key=True, default=uuid.uuid4)
-    bot = TextField()
+    bot = BlobField()
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField()
 
