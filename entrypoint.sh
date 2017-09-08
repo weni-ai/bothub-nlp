@@ -1,13 +1,10 @@
 #!/bin/bash
-WEBAPP_HOME=/home/bothub/app
-PYTHON_VENV=/home/bothub/env
+WEBAPP_HOME=/home/app/webapp
+PYTHON_VENV=/home/app/env
 PYTHON=$PYTHON_VENV/bin/python
 git clone $APP_REPOSITORY_URL bothub
-if [ -n "$APP_CHECKOUT_SHA1" ]; then
-    cd app
-    git checkout $APP_CHECKOUT_SHA1
-    cd -
-fi
+cd bothub
+chmod +x app/server.py
 
 # Configure timezone
 if [ "$CONTAINER_TIMEZONE" ]; then
@@ -17,5 +14,5 @@ if [ "$CONTAINER_TIMEZONE" ]; then
 fi
 
 source $PYTHON_VENV/bin/activate
-pip install -r $WEBAPP_HOME/requirements.txt
+pip install -r $WEBAPP_HOME/bothub/requirements.txt
 supervisord -n

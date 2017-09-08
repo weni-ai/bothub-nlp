@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
-MAINTAINER eltonplima
-ENV BASE_PATH=/home/bothub/app
+MAINTAINER vctrferreira
+ENV BASE_PATH=/home/app/webapp
 ENV CONTAINER_TIMEZONE=America/Sao_Paulo
 WORKDIR ${BASE_PATH}
 
@@ -18,6 +18,7 @@ RUN apt-get install -y supervisor
 RUN apt-get install -y libpq-dev
 RUN pip3 install -U pip setuptools
 RUN pip3 install virtualenv
+RUN pip3 install redis
 RUN virtualenv -p python3 env
 RUN env/bin/pip install psycopg2
 
