@@ -4,7 +4,6 @@ from multiprocessing import Queue, Event
 import tornado.ioloop
 import tornado.escape
 import json
-import os
 import cloudpickle
 import redis
 
@@ -15,6 +14,7 @@ from tornado.gen import coroutine
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
 from models.models import Bot
+
 
 class BotManager():
     '''
@@ -94,20 +94,20 @@ class BotManager():
         with Lock():
             new_pool = {}
             for uuid, bot_instance in self._pool.items():
-                if not (datetime.now()-bot_instance['last_time_update']) >= timedelta(minutes=5):
+                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=5):
                     new_pool[uuid] = bot_instance
                 else:
                     bot_instance['bot_instance'].terminate()
             self._pool = new_pool
         print("garbage collected...")
         self.start_garbage_collector()
-    
+
     def _get_bot_redis(self, bot_uuid):
         return redis.Redis(connection_pool=self.redis).get(bot_uuid)
-    
+
     def _set_bot_redis(self, bot_uuid, bot):
         return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
-    
+
     def _start_bot_process(self, bot):
         bot_data = {}
         answers_queue = Queue()
@@ -115,7 +115,7 @@ class BotManager():
         new_question_event = Event()
         new_answer_event = Event()
         bot = RasaBotProcess(questions_queue, answers_queue,
-                            new_question_event, new_answer_event, bot)
+                             new_question_event, new_answer_event, bot)
         bot.daemon = True
         bot.start()
         bot_data['bot_instance'] = bot

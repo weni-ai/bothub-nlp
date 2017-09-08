@@ -1,11 +1,12 @@
-from base_models import DATABASE, BaseModel
+from base_models import DATABASE
 
-import inspect
 import models
+
 
 DATABASE.connect()
 m = [
     models.Bot
 ]
 DATABASE.create_tables(m)
+
 print("SCHEMA CREATED.")

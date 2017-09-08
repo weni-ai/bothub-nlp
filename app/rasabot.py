@@ -1,15 +1,9 @@
 """This module does trainning bot and process data."""
-
-import os
-import uuid
-import base64
-
 from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
-from unipath import Path
 from models.models import Bot
 
 
@@ -35,7 +29,6 @@ class RasaBot():
         Creates a new trainning for the bot.
         '''
 
-      
         config = '{"pipeline": "spacy_sklearn", \
                                 "path" : "./models", "data" : "./data.json", \
                                 "language": "%s"}' % language
@@ -49,15 +42,15 @@ class RasaBot():
         if bot.uuid:
             return dict(uuid=str(bot.uuid))
         else:
-            print("fail")
+            print("Fail when try insert new bot")
 
 
 class RasaBotProcess(Process):
     '''
     This class is instantied when start a process bot and does all data process
     '''
-    def __init__(self, questions_queue, answers_queue, new_question_event, new_answer_event,
-                 model_dir, *args, **kwargs):
+    def __init__(self, questions_queue, answers_queue, new_question_event,
+                 new_answer_event, model_dir, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bot = None
         self.questions_queue = questions_queue

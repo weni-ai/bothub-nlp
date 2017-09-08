@@ -1,6 +1,9 @@
 import peewee
 
-DATABASE = peewee.PostgresqlDatabase('bothub', user='postgres', password='postgres', host='localhost')
+
+DATABASE = peewee.PostgresqlDatabase('bothub', user='postgres',
+                                     password='postgres', host='localhost')
+
 
 class BaseModel(peewee.Model):
     class Meta:
