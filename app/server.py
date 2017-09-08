@@ -14,7 +14,7 @@ from tornado.web import url
 from tornado.gen import coroutine
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
-
+from models.models import Bot
 
 class BotManager():
     '''
@@ -50,12 +50,9 @@ class BotManager():
                 self._pool[bot_uuid] = bot_data
             else:
                 print('Creating a new instance...')
-                model_dir = os.path.abspath('../etc/spacy/%s/model/%s' % # this path is will be changed to get bot in db
-                                            (bot_uuid, os.listdir('../etc/spacy/%s/model' % bot_uuid)[0]))
-
-                with open("%s/metadata.pkl" % model_dir, 'rb') as metadata:
-                    bot = cloudpickle.load(metadata)
-                    self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
+                instance = Bot.get(Bot.uuid == bot_uuid)
+                bot = cloudpickle.loads(instance.bot)
+                self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
                 bot_data = self._start_bot_process(bot)
                 self._pool[bot_uuid] = bot_data
 

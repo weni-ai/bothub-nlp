@@ -2,6 +2,7 @@
 
 import os
 import uuid
+import base64
 
 from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
@@ -9,6 +10,7 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
 from unipath import Path
+from models.models import Bot
 
 
 class RasaBot():
@@ -33,24 +35,21 @@ class RasaBot():
         Creates a new trainning for the bot.
         '''
 
-        bot_uuid = uuid.uuid4()
-        bot_path = "../etc/spacy/%s" % bot_uuid
-        if not os.path.exists(bot_path):
-            os.makedirs(bot_path)
-            os.makedirs("%s/model" % bot_path)
+      
+        config = '{"pipeline": "spacy_sklearn", \
+                                "path" : "./models", "data" : "./data.json", \
+                                "language": "%s"}' % language
 
-            self.model_dir = "%s/model" % bot_path
-            config = '{"pipeline": "spacy_sklearn", \
-                                   "path" : "./models", "data" : "./data.json", \
-                                   "language": "%s"}' % language
-            
-
-            model_dir = Path(self.model_dir)
-            training_data = load_rasa_data(data)
-            trainer = Trainer(RasaNLUConfig(config))
-            trainer.train(training_data)
-            trainer.persist(model_dir)
-            return dict(uuid=str(bot_uuid))
+        training_data = load_rasa_data(data)
+        trainer = Trainer(RasaNLUConfig(config))
+        trainer.train(training_data)
+        bot_data = trainer.persist()
+        bot = Bot.create(bot=bot_data)
+        bot.save()
+        if bot.uuid:
+            return dict(uuid=str(bot.uuid))
+        else:
+            print("fail")
 
 
 class RasaBotProcess(Process):
