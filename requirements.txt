@@ -10,3 +10,4 @@ spacy
 tornado
 Unipath
 redis
+peewee
