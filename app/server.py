@@ -6,6 +6,7 @@ import tornado.escape
 import json
 import cloudpickle
 import redis
+import sys
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -172,5 +173,5 @@ def make_app():
 if __name__ == '__main__':
     bm = BotManager()
     app = make_app()
-    app.listen(4000)
+    app.listen(sys.argv[1])
     tornado.ioloop.IOLoop.current().start()
