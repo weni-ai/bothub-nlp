@@ -16,7 +16,7 @@ from tornado.gen import coroutine
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
 from models.models import Bot
-
+from decouple import config
 
 class BotManager():
     '''
@@ -35,7 +35,7 @@ class BotManager():
 
     def __init__(self):
 
-        self.redis = redis.ConnectionPool(host='localhost', port=6379, db=2)
+        self.redis = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=6379, db=2)
         self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
