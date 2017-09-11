@@ -16,4 +16,5 @@ fi
 source $PYTHON_VENV/bin/activate
 echo $WEBAPP_HOME/bothub/requirements.txt
 pip install -r $WEBAPP_HOME/bothub/requirements.txt
+python -m spacy download en
 supervisord -n
