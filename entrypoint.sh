@@ -1,6 +1,6 @@
 #!/bin/bash
 WEBAPP_HOME=/home/app/webapp
-PYTHON_VENV=/home/app/env
+PYTHON_VENV=/home/app/webapp/env
 PYTHON=$PYTHON_VENV/bin/python
 git clone $APP_REPOSITORY_URL bothub
 cd bothub
@@ -14,5 +14,6 @@ if [ "$CONTAINER_TIMEZONE" ]; then
 fi
 
 source $PYTHON_VENV/bin/activate
+echo $WEBAPP_HOME/bothub/requirements.txt
 pip install -r $WEBAPP_HOME/bothub/requirements.txt
 supervisord -n

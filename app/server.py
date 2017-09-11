@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """ This module start server """
 from multiprocessing import Queue, Event
 
