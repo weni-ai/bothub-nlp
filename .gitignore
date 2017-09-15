@@ -3,3 +3,6 @@ env/
 .ipynb_checkpoints
 .~*
 *.pyc
+.DS_Store
+app/dump.rdb
+etc/
