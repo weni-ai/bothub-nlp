@@ -35,7 +35,7 @@ class BotManager():
 
     def __init__(self):
 
-        self.redis = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=6379, db=2)
+        self.redis = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))
         self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
