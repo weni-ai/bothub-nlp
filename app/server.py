@@ -94,7 +94,7 @@ class BotManager():
         self._get_questions_queue(bot_uuid)
 
     def start_garbage_collector(self):
-        Timer(*60.0, self.garbage_collector).start()
+        Timer(5*60.0, self.garbage_collector).start()
 
     def garbage_collector(self):
         with Lock():
@@ -126,7 +126,7 @@ class BotManager():
         raise ValueError("Error save bot in instance redis")
 
     def _set_instance_redis(self):
-        self.instance_ip = "127.0.0.1" # urllib.request.urlopen("http://169.254.169.254/latest/meta-data/private-ipv4").read()
+        self.instance_ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/private-ipv4").read()
         if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, ""):
             print("Set instance in redis")
             return
