@@ -8,6 +8,7 @@ import json
 import cloudpickle
 import redis
 import sys
+import urllib.request
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -17,6 +18,7 @@ from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
 from models.models import Bot
 from decouple import config
+
 
 class BotManager():
     '''
@@ -36,6 +38,7 @@ class BotManager():
     def __init__(self):
 
         self.redis = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))
+        self._set_instance_redis()
         self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
@@ -50,6 +53,7 @@ class BotManager():
                 redis_bot = cloudpickle.loads(redis_bot)
                 bot_data = self._start_bot_process(redis_bot)
                 self._pool[bot_uuid] = bot_data
+                self._set_bot_in_instance_redis(bot_uuid)
             else:
                 print('Creating a new instance...')
                 instance = Bot.get(Bot.uuid == bot_uuid)
@@ -57,7 +61,7 @@ class BotManager():
                 self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
                 bot_data = self._start_bot_process(bot)
                 self._pool[bot_uuid] = bot_data
-
+                self._set_bot_in_instance_redis(bot_uuid)
         return bot_data
 
     def _get_new_answer_event(self, bot_uuid):
@@ -90,7 +94,7 @@ class BotManager():
         self._get_questions_queue(bot_uuid)
 
     def start_garbage_collector(self):
-        Timer(5*60.0, self.garbage_collector).start()
+        Timer(*60.0, self.garbage_collector).start()
 
     def garbage_collector(self):
         with Lock():
@@ -99,6 +103,7 @@ class BotManager():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=5):
                     new_pool[uuid] = bot_instance
                 else:
+                    self._remove_bot_instance_redis(uuid)
                     bot_instance['bot_instance'].terminate()
             self._pool = new_pool
         print("garbage collected...")
@@ -109,6 +114,33 @@ class BotManager():
 
     def _set_bot_redis(self, bot_uuid, bot):
         return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
+
+    def _set_bot_in_instance_redis(self, bot_uuid):
+        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip):
+            server_bots = str(redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
+            server_bots.append("BOT-%s" % bot_uuid)
+            server_bots = " ".join(map(str, server_bots))
+            if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bots):
+                print("Bot set in redis")
+                return
+        raise ValueError("Error save bot in instance redis")
+
+    def _set_instance_redis(self):
+        self.instance_ip = "127.0.0.1" # urllib.request.urlopen("http://169.254.169.254/latest/meta-data/private-ipv4").read()
+        if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, ""):
+            print("Set instance in redis")
+            return
+        raise ValueError("Error save instance in redis")
+
+    def _remove_bot_instance_redis(self, bot_uuid):
+        if redis.Redis(connection_pool=self.redis).delete("BOT-%s" % bot_uuid):
+            server_bot_list = str(redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
+            server_bot_list.remove("BOT-%s" % bot_uuid)
+            server_bot_list = " ".join(map(str, server_bot_list))
+            if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bot_list):
+                print("Removing bot from instance redis")
+                return
+        raise ValueError("Error remove bot in instance redis")
 
     def _start_bot_process(self, bot):
         bot_data = {}
