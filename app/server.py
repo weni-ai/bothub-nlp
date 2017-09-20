@@ -37,7 +37,11 @@ class BotManager():
 
     def __init__(self):
 
-        self.redis = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))
+        self.redis = redis.ConnectionPool(
+            host=config('BOTHUB_REDIS'),
+            port=config('BOTHUB_REDIS_PORT'),
+            db=config('BOTHUB_REDIS_DB')
+        )
         self._set_instance_redis()
         self.start_garbage_collector()
 
@@ -117,29 +121,47 @@ class BotManager():
 
     def _set_bot_in_instance_redis(self, bot_uuid):
         if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip):
-            server_bots = str(redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
+            server_bots = str(
+                redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
             server_bots.append("BOT-%s" % bot_uuid)
             server_bots = " ".join(map(str, server_bots))
+        
             if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bots):
                 print("Bot set in redis")
                 return
+        
         raise ValueError("Error save bot in instance redis")
 
     def _set_instance_redis(self):
         self.instance_ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/private-ipv4").read()
-        if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, ""):
+        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES")
+
+        if update_servers is not None:
+            update_servers = str(update_servers, "utf-8").split()
+        else:
+            update_servers = []
+
+        update_servers.append(self.instance_ip)
+        update_servers = " ".join(map(str, update_servers))
+
+        if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, "") and \
+                redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES", update_servers):
             print("Set instance in redis")
             return
+
         raise ValueError("Error save instance in redis")
 
     def _remove_bot_instance_redis(self, bot_uuid):
         if redis.Redis(connection_pool=self.redis).delete("BOT-%s" % bot_uuid):
-            server_bot_list = str(redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
+            server_bot_list = str(
+                redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
             server_bot_list.remove("BOT-%s" % bot_uuid)
             server_bot_list = " ".join(map(str, server_bot_list))
+
             if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bot_list):
                 print("Removing bot from instance redis")
                 return
+
         raise ValueError("Error remove bot in instance redis")
 
     def _start_bot_process(self, bot):
