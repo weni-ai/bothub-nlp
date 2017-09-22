@@ -4,6 +4,7 @@ PYTHON_VENV=/home/app/webapp/env
 PYTHON=$PYTHON_VENV/bin/python
 git clone $APP_REPOSITORY_URL bothub
 cd bothub
+git checkout develop
 chmod +x app/server.py
 
 # Configure timezone
@@ -17,4 +18,5 @@ source $PYTHON_VENV/bin/activate
 echo $WEBAPP_HOME/bothub/requirements.txt
 pip install -r $WEBAPP_HOME/bothub/requirements.txt
 python -m spacy download en
-supervisord -n
+python app/server.py 80
+# supervisord -n
