@@ -133,7 +133,7 @@ class BotManager():
         raise ValueError("Error save bot in instance redis")
 
     def _set_instance_redis(self):
-        self.instance_ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/private-ipv4").read()
+        self.instance_ip = urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read()
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES")
 
         if update_servers is not None:
