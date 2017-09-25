@@ -43,6 +43,7 @@ class BotManager():
             db=config('BOTHUB_REDIS_DB')
         )
         self._set_instance_redis()
+        self._set_server_alive()
         self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
@@ -98,10 +99,11 @@ class BotManager():
         self._get_questions_queue(bot_uuid)
 
     def start_garbage_collector(self):
-        Timer(5*60.0, self.garbage_collector).start()
+        Timer(60.0, self.garbage_collector).start()
 
     def garbage_collector(self):
         with Lock():
+            self._set_server_alive()
             new_pool = {}
             for uuid, bot_instance in self._pool.items():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=5):
@@ -182,6 +184,12 @@ class BotManager():
         bot_data['last_time_update'] = datetime.now()
 
         return bot_data
+
+    def _set_server_alive(self):
+        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=70):
+            print("Ping redis, i'm alive")
+            return
+        raise ValueError("Error on ping redis")
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
