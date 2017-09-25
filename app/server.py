@@ -127,15 +127,16 @@ class BotManager():
                 redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
             server_bots.append("BOT-%s" % bot_uuid)
             server_bots = " ".join(map(str, server_bots))
-        
+
             if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bots):
                 print("Bot set in redis")
                 return
-        
+
         raise ValueError("Error save bot in instance redis")
 
     def _set_instance_redis(self):
-        self.instance_ip = str(urllib.request.urlopen("http://169.254.169.254/latest/meta-data/local-ipv4").read(), "utf-8")
+        self.instance_ip = str(urllib.request.urlopen(
+                                "http://169.254.169.254/latest/meta-data/local-ipv4").read(), "utf-8")
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES")
 
         if update_servers is not None:
