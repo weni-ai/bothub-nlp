@@ -4,7 +4,7 @@ PYTHON_VENV=/home/app/webapp/env
 PYTHON=$PYTHON_VENV/bin/python
 git clone $APP_REPOSITORY_URL bothub
 cd bothub
-git checkout develop
+git checkout $APP_REPOSITORY_BRANCH
 chmod +x app/server.py
 
 # Configure timezone
