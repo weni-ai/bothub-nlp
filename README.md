@@ -5,7 +5,7 @@
     docker build -t bothub-demo . 
  #
     docker run -e APP_REPOSITORY_URL=https://github.com/push-flow/bothub-nlp.git \
-    -e APP_REPOSITORY_BRANCH=develop
+    -e APP_REPOSITORY_BRANCH=develop \
     -e BOTHUB_POSTGRES_USER=postgres \
     -e BOTHUB_POSTGRES_PASSWORD=postgres \
     -e BOTHUB_POSTGRES_DB=bothub \
