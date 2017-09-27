@@ -9,6 +9,7 @@ import cloudpickle
 import redis
 import sys
 import urllib.request
+import psutil
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -102,8 +103,8 @@ class BotManager():
         Timer(60.0, self.garbage_collector).start()
 
     def garbage_collector(self):
+        self._set_server_alive()
         with Lock():
-            self._set_server_alive()
             new_pool = {}
             for uuid, bot_instance in self._pool.items():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=5):
@@ -113,6 +114,7 @@ class BotManager():
                     bot_instance['bot_instance'].terminate()
             self._pool = new_pool
         print("garbage collected...")
+        self._set_usage_memory()
         self.start_garbage_collector()
 
     def _get_bot_redis(self, bot_uuid):
@@ -137,7 +139,7 @@ class BotManager():
     def _set_instance_redis(self):
         self.instance_ip = str(urllib.request.urlopen(
                                 "http://169.254.169.254/latest/meta-data/local-ipv4").read(), "utf-8")
-        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES")
+        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLE")
 
         if update_servers is not None:
             update_servers = str(update_servers, "utf-8").split()
@@ -148,7 +150,7 @@ class BotManager():
         update_servers = " ".join(map(str, update_servers))
 
         if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, "") and \
-                redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES", update_servers):
+                redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLE", update_servers):
             print("Set instance in redis")
             return
 
@@ -191,6 +193,28 @@ class BotManager():
             print("Ping redis, i'm alive")
             return
         raise ValueError("Error on ping redis")
+
+    def _set_usage_memory(self):
+        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLE")
+        if update_servers is not None:
+            update_servers = str(update_servers, "utf-8").split()
+        else:
+            update_servers = []
+
+        usage_memory = psutil.virtual_memory().percent
+        if usage_memory <= 80:
+            update_servers.append(self.instance_ip)
+        else:
+            if self.instance_ip in update_servers:
+                update_servers.remove(self.instance_ip)
+
+        update_servers = " ".join(map(str, update_servers))
+
+        if redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLE", update_servers):
+            print("Setted server is available")
+            return
+
+        raise ValueError("Error on set servers is available")
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
