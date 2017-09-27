@@ -139,7 +139,7 @@ class BotManager():
     def _set_instance_redis(self):
         self.instance_ip = str(urllib.request.urlopen(
                                 "http://169.254.169.254/latest/meta-data/local-ipv4").read(), "utf-8")
-        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLE")
+        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
             update_servers = str(update_servers, "utf-8").split()
@@ -150,7 +150,7 @@ class BotManager():
         update_servers = " ".join(map(str, update_servers))
 
         if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, "") and \
-                redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLE", update_servers):
+                redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLES", update_servers):
             print("Set instance in redis")
             return
 
@@ -195,7 +195,7 @@ class BotManager():
         raise ValueError("Error on ping redis")
 
     def _set_usage_memory(self):
-        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLE")
+        update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
         if update_servers is not None:
             update_servers = str(update_servers, "utf-8").split()
         else:
@@ -210,11 +210,11 @@ class BotManager():
 
         update_servers = " ".join(map(str, update_servers))
 
-        if redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLE", update_servers):
-            print("Setted server is available")
+        if redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLES", update_servers):
+            print("Setted servers availables")
             return
 
-        raise ValueError("Error on set servers is available")
+        raise ValueError("Error on set servers availables")
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
