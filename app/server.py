@@ -108,6 +108,7 @@ class BotManager():
             new_pool = {}
             for uuid, bot_instance in self._pool.items():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=5):
+                    self._set_bot_in_instance_redis(uuid)
                     new_pool[uuid] = bot_instance
                 else:
                     self._remove_bot_instance_redis(uuid)
@@ -124,7 +125,7 @@ class BotManager():
         return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
 
     def _set_bot_in_instance_redis(self, bot_uuid):
-        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip):
+        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip, ex=70):
             server_bots = str(
                 redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
             server_bots.append("BOT-%s" % bot_uuid)
