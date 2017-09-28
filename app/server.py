@@ -203,7 +203,8 @@ class BotManager():
 
         usage_memory = psutil.virtual_memory().percent
         if usage_memory <= 80:
-            update_servers.append(self.instance_ip)
+            if self.instance_ip not in update_servers:
+                update_servers.append(self.instance_ip)
         else:
             if self.instance_ip in update_servers:
                 update_servers.remove(self.instance_ip)
