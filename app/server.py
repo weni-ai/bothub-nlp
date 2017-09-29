@@ -256,6 +256,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
 def make_app():
     return Application([
         url(r'/bots', BotRequestHandler),
+        url(r'/bots-redirect', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])
 
