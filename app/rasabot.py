@@ -5,6 +5,7 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
 from models.models import Bot
+from models.base_models import DATABASE
 
 
 class RasaBot():
@@ -37,12 +38,13 @@ class RasaBot():
         trainer = Trainer(RasaNLUConfig(config))
         trainer.train(training_data)
         bot_data = trainer.persist()
-        bot = Bot.create(bot=bot_data)
-        bot.save()
-        if bot.uuid:
-            return dict(uuid=str(bot.uuid))
-        else:
-            print("Fail when try insert new bot")
+        with DATABASE.execution_context() as ctx:
+            bot = Bot.create(bot=bot_data)
+            bot.save()
+            if bot.uuid:
+                return dict(uuid=str(bot.uuid))
+            else:
+                print("Fail when try insert new bot")
 
 
 class RasaBotProcess(Process):

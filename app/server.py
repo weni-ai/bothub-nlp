@@ -18,6 +18,7 @@ from tornado.gen import coroutine
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
 from models.models import Bot
+from models.base_models import DATABASE
 from decouple import config
 
 
@@ -62,7 +63,9 @@ class BotManager():
                 self._set_bot_in_instance_redis(bot_uuid)
             else:
                 print('Creating a new instance...')
-                instance = Bot.get(Bot.uuid == bot_uuid)
+                
+                with DATABASE.execution_context() as ctx:
+                    instance = Bot.get(Bot.uuid == bot_uuid)
                 bot = cloudpickle.loads(instance.bot)
                 self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
                 bot_data = self._start_bot_process(bot)
