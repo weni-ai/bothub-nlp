@@ -38,7 +38,7 @@ class RasaBot():
         trainer = Trainer(RasaNLUConfig(config))
         trainer.train(training_data)
         bot_data = trainer.persist()
-        with DATABASE.execution_context() as ctx:
+        with DATABASE.execution_context():
             bot = Bot.create(bot=bot_data)
             bot.save()
             if bot.uuid:

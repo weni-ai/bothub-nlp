@@ -63,9 +63,10 @@ class BotManager():
                 self._set_bot_in_instance_redis(bot_uuid)
             else:
                 print('Creating a new instance...')
-                
-                with DATABASE.execution_context() as ctx:
+
+                with DATABASE.execution_context():
                     instance = Bot.get(Bot.uuid == bot_uuid)
+
                 bot = cloudpickle.loads(instance.bot)
                 self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
                 bot_data = self._start_bot_process(bot)
