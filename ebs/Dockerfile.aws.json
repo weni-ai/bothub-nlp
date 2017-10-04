@@ -18,6 +18,10 @@
             "value": "https://github.com/push-flow/bothub-nlp.git"
           },
           {
+            "name": "APP_REPOSITORY_BRANCH",
+            "value": "develop"
+          },
+          {
             "name": "BOTHUB_POSTGRES_USER",
             "value": "postgres"
           },
