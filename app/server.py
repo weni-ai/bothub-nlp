@@ -111,7 +111,7 @@ class BotManager():
         with Lock():
             new_pool = {}
             for uuid, bot_instance in self._pool.items():
-                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=5):
+                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=60):
                     self._set_bot_in_instance_redis(uuid)
                     new_pool[uuid] = bot_instance
                 else:
