@@ -5,7 +5,6 @@ import uuid
 import peewee
 
 
-
 class Profile(BaseModel):
     uuid = peewee.UUIDField(primary_key=True, default=uuid.uuid4)
     created_at = peewee.DateTimeField(default=datetime.now)
@@ -17,6 +16,7 @@ class Profile(BaseModel):
 
     class Meta:
         db_table = 'profiles'
+
 
 class Bot(BaseModel):
     uuid = peewee.UUIDField(primary_key=True, default=uuid.uuid4)
