@@ -130,7 +130,8 @@ class BotManager():
                 print("Bot set in redis")
                 return
 
-        raise ValueError("Error save bot in instance redis")
+        print("Error save bot in instance redis, trying again...")
+        return self._set_bot_in_instance_redis(bot_uuid)
 
     def _set_instance_redis(self):
         self.instance_ip = str(urllib.request.urlopen(
@@ -150,7 +151,8 @@ class BotManager():
             print("Set instance in redis")
             return
 
-        raise ValueError("Error save instance in redis")
+        print("Error save instance in redis, trying again")
+        return self._set_instance_redis()
 
     def _remove_bot_instance_redis(self, bot_uuid):
         if redis.Redis(connection_pool=self.redis).delete("BOT-%s" % bot_uuid):
@@ -163,7 +165,8 @@ class BotManager():
                 print("Removing bot from instance redis")
                 return
 
-        raise ValueError("Error remove bot in instance redis")
+        print("Error remove bot in instance redis, trying again...")
+        return self._remove_bot_instance_redis(bot_uuid)
 
     def _start_bot_process(self, bot):
         bot_data = {}
@@ -188,7 +191,8 @@ class BotManager():
         if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=70):
             print("Ping redis, i'm alive")
             return
-        raise ValueError("Error on ping redis")
+        print("Error on ping redis, trying again...")
+        return self._set_server_alive()
 
     def _set_usage_memory(self):
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
@@ -211,8 +215,8 @@ class BotManager():
             print("Setted servers availables")
             return
 
-        raise ValueError("Error on set servers availables")
-
+        print("Error on set servers availables, trying again...")
+        return self._set_usage_memory()
 
 class BotRequestHandler(tornado.web.RequestHandler):
     """
