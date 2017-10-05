@@ -9,13 +9,13 @@ from models.base_models import DATABASE
 
 
 class RasaBot():
-    '''
+    """
     Before trainning your bot, make sure do you have the last model lang file.
 
     python -m spacy download en
 
     This version load interpreter on initialization.
-    '''
+    """
     def __init__(self, model_dir=None, trainning=False):
         self.model_dir = model_dir
         if not trainning:
@@ -26,9 +26,9 @@ class RasaBot():
         return self.interpreter.parse(question)
 
     def trainning(self, language, data):
-        '''
+        """
         Creates a new trainning for the bot.
-        '''
+        """
 
         config = '{"pipeline": "spacy_sklearn", \
                                 "path" : "./models", "data" : "./data.json", \
@@ -48,9 +48,9 @@ class RasaBot():
 
 
 class RasaBotProcess(Process):
-    '''
+    """
     This class is instantied when start a process bot and does all data process
-    '''
+    """
     def __init__(self, questions_queue, answers_queue, new_question_event,
                  new_answer_event, model_dir, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -74,6 +74,9 @@ class RasaBotProcess(Process):
 
 
 class RasaBotTrainProcess(Process):
+    """
+    This class is instantied when start a process bot to train
+    """
     def __init__(self, language, data, callback, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._bot = None

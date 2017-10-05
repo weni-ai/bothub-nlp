@@ -23,18 +23,9 @@ from decouple import config
 
 
 class BotManager():
-    '''
-    javascript client:
-    var ws = new WebSocket('ws://localhost:8888/ws');
-    ws.onmessage = (evt) => {
-        console.log(JSON.parse(evt.data));
-    }
-    var bot_message = {
-        question: 'Whos there?',
-        botId: '123456'
-    }
-    ws.send(JSON.stringify(bot_message))
-    '''
+    """
+    Bot mananger responsible to manager all bots in this instance
+    """
     _pool = {}
 
     def __init__(self):
@@ -224,7 +215,9 @@ class BotManager():
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
-
+    """
+    Tornado request handler to predict data
+    """
     @asynchronous
     @coroutine
     def get(self):
@@ -241,7 +234,9 @@ class BotRequestHandler(tornado.web.RequestHandler):
 
 
 class BotTrainerRequestHandler(tornado.web.RequestHandler):
-
+    """
+    Tornado request handler to train bot
+    """
     @asynchronous
     def post(self):
         json_body = tornado.escape.json_decode(self.request.body)
