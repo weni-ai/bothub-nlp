@@ -5,7 +5,8 @@ import models
 
 DATABASE.connect()
 m = [
-    models.Bot
+    models.Bot,
+    models.Profile
 ]
 DATABASE.create_tables(m)
 
