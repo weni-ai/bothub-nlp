@@ -17,9 +17,10 @@ from tornado.web import url
 from tornado.gen import coroutine
 from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
-from models.models import Bot
+from models.models import Bot, Profile
 from models.base_models import DATABASE
 from decouple import config
+from utils import INVALID_TOKEN, DB_FAIL
 
 
 class BotManager():
@@ -168,14 +169,14 @@ class BotManager():
         print("Error remove bot in instance redis, trying again...")
         return self._remove_bot_instance_redis(bot_uuid)
 
-    def _start_bot_process(self, bot):
+    def _start_bot_process(self, model_bot):
         bot_data = {}
         answers_queue = Queue()
         questions_queue = Queue()
         new_question_event = Event()
         new_answer_event = Event()
         bot = RasaBotProcess(questions_queue, answers_queue,
-                             new_question_event, new_answer_event, bot)
+                             new_question_event, new_answer_event, model_bot)
         bot.daemon = True
         bot.start()
         bot_data['bot_instance'] = bot
@@ -218,6 +219,7 @@ class BotManager():
         print("Error on set servers availables, trying again...")
         return self._set_usage_memory()
 
+
 class BotRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to predict data
@@ -244,20 +246,48 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
     @asynchronous
     def post(self):
         json_body = tornado.escape.json_decode(self.request.body)
+        auth_token = self.request.headers.get('Authorization')
+        if auth_token and len(auth_token) == 32:
+            language = json_body.get("language", None)
+            data = json.dumps(json_body.get("data", None))
+            bot_slug = json.dumps(json_body.get("slug", None))
+            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
+            bot.daemon = True
+            bot.start()
+        else:
+            self.set_status(401)
+            self.write("Auth token wrong")
+            self.finish()
 
-        language = json_body.get("language", None)
-        data = json.dumps(json_body.get("data", None))
-        bot = RasaBotTrainProcess(language, data, self.callback)
-        bot.daemon = True
-        bot.start()
+    def callback(self, data):
+        if data == INVALID_TOKEN:
+            self.set_status(401)
+        elif data == DB_FAIL:
+            self.set_status(500)
+        self.write(json.dumps(data))
+        self.finish()
 
-    def callback(self, uuid):
-        self.write(json.dumps(uuid))
+
+class ProfileRequestHandler(tornado.web.RequestHandler):
+    """
+    Tornado request handler to predict data
+    """
+    def _register_profile(self):
+        profile = Profile.create()
+        profile.save()
+        return dict(uuid=profile.uuid.hex)
+
+    @asynchronous
+    @coroutine
+    def post(self):
+        with DATABASE.execution_context():
+            self.write(self._register_profile())
         self.finish()
 
 
 def make_app():
     return Application([
+        url(r'/auth', ProfileRequestHandler),
         url(r'/bots', BotRequestHandler),
         url(r'/bots-redirect', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)

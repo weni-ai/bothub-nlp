@@ -4,8 +4,12 @@ from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu.model import Metadata, Interpreter
-from models.models import Bot
+from models.models import Bot, Profile
 from models.base_models import DATABASE
+from utils import INVALID_TOKEN, DB_FAIL
+
+
+import uuid
 
 
 class RasaBot():
@@ -16,20 +20,32 @@ class RasaBot():
 
     This version load interpreter on initialization.
     """
-    def __init__(self, model_dir=None, trainning=False):
-        self.model_dir = model_dir
+    def __init__(self, model_bot=None, trainning=False):
+        self.model_bot = model_bot
         if not trainning:
-            metadata = Metadata(self.model_dir, None)
+            metadata = Metadata(self.model_bot, None)
             self.interpreter = Interpreter.load(metadata, None)
 
     def ask(self, question):
         return self.interpreter.parse(question)
 
-    def trainning(self, language, data):
+    def trainning(self, language, data, auth_token, bot_slug):
         """
         Creates a new trainning for the bot.
+        Args:
+            language: language that bot will be trained
+            data: rasa nlu object
+            auth_token: token that bot will be related
+            bot_slug: unique name bot (beatiful)
         """
 
+        with DATABASE.execution_context():
+            owner = Profile.select().where(Profile.uuid == uuid.UUID(auth_token))
+
+        if len(owner) != 1:
+            return INVALID_TOKEN
+
+        owner = owner.get()
         config = '{"pipeline": "spacy_sklearn", \
                                 "path" : "./models", "data" : "./data.json", \
                                 "language": "%s"}' % language
@@ -38,13 +54,14 @@ class RasaBot():
         trainer = Trainer(RasaNLUConfig(config))
         trainer.train(training_data)
         bot_data = trainer.persist()
+
         with DATABASE.execution_context():
-            bot = Bot.create(bot=bot_data)
+            bot = Bot.create(bot=bot_data, owner=owner, slug=bot_slug)
             bot.save()
             if bot.uuid:
-                return dict(uuid=str(bot.uuid))
-            else:
-                print("Fail when try insert new bot")
+                return dict(uuid=str(bot.uuid), slug=str(bot.slug), owner=bot.owner.uuid.hex)
+
+        return DB_FAIL
 
 
 class RasaBotProcess(Process):
@@ -52,18 +69,24 @@ class RasaBotProcess(Process):
     This class is instantied when start a process bot and does all data process
     """
     def __init__(self, questions_queue, answers_queue, new_question_event,
-                 new_answer_event, model_dir, *args, **kwargs):
+                 new_answer_event, model_bot, *args, **kwargs):
+        """
+        Args:
+            questions_queue: queue with question to this bot
+            answaers_queue: queue that will be put response after prediction
+            new_questions_event: event that will start new prediction
+            new_answer_event: event will be dispareted when rasa return prediction
+        """
         super().__init__(*args, **kwargs)
         self._bot = None
         self.questions_queue = questions_queue
         self.answers_queue = answers_queue
         self.new_question_event = new_question_event
         self.new_answer_event = new_answer_event
-        self.model_dir = model_dir
+        self.model_bot = model_bot
 
     def run(self):
-        print('run')
-        self._bot = RasaBot(self.model_dir)
+        self._bot = RasaBot(self.model_bot)
         while True:
             self.new_question_event.wait()
             self.new_question_event.clear()
@@ -77,14 +100,24 @@ class RasaBotTrainProcess(Process):
     """
     This class is instantied when start a process bot to train
     """
-    def __init__(self, language, data, callback, *args, **kwargs):
+    def __init__(self, language, data, callback, auth_token, bot_slug, *args, **kwargs):
+        """
+        Args:
+            language: language that bot will be trained
+            data: rasa nlu object
+            callback: function to callback when and train
+            auth_token: token that bot will be related
+            bot_slug: unique name bot (beatiful)
+        """
         super().__init__(*args, **kwargs)
         self._bot = None
         self.language = language
         self.data = data
+        self.auth_token = auth_token
         self.callback = callback
+        self.bot_slug = bot_slug
 
     def run(self):
         self._bot = RasaBot(trainning=True)
-        uuid = self._bot.trainning(self.language, self.data)
-        self.callback(uuid)
+        data = self._bot.trainning(self.language, self.data, self.auth_token, self.bot_slug)
+        self.callback(data)
