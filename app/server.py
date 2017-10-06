@@ -106,12 +106,12 @@ class BotManager():
         self._set_server_alive()
         with Lock():
             new_pool = {}
-            for uuid, bot_instance in self._pool.items():
+            for bot_uuid, bot_instance in self._pool.items():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=60):
-                    self._set_bot_in_instance_redis(uuid)
-                    new_pool[uuid] = bot_instance
+                    self._set_bot_in_instance_redis(bot_uuid)
+                    new_pool[bot_uuid] = bot_instance
                 else:
-                    self._remove_bot_instance_redis(uuid)
+                    self._remove_bot_instance_redis(bot_uuid)
                     bot_instance['bot_instance'].terminate()
             self._pool = new_pool
         print("garbage collected...")
@@ -268,7 +268,6 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
         bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
         bot.daemon = True
         bot.start()
-
 
     def callback(self, data):
         if data == INVALID_TOKEN:
