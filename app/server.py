@@ -94,13 +94,14 @@ class BotManager():
     def ask(self, question, bot_uuid, auth_token):
         questions_queue = self._get_questions_queue(bot_uuid)
         answers_queue = self._get_answers_queue(bot_uuid)
+
+        if not self._pool[bot_uuid]['auth_token'] == auth_token:
+            return INVALID_TOKEN
+
         questions_queue.put(question)
         new_question_event = self._get_new_question_event(bot_uuid)
         new_question_event.set()
         new_answer_event = self._get_new_answer_event(bot_uuid)
-
-        if not self._pool[bot_uuid]['auth_token'] == auth_token:
-            return INVALID_TOKEN
 
         self._pool[bot_uuid]['last_time_update'] = datetime.now()
 
@@ -112,14 +113,14 @@ class BotManager():
         self._get_questions_queue(bot_uuid)
 
     def start_garbage_collector(self):
-        Timer(60.0, self.garbage_collector).start()
+        Timer(settings.GARBAGE_COLLECTOR_TIMER, self.garbage_collector).start()
 
     def garbage_collector(self):
         self._set_server_alive()
         with Lock():
             new_pool = {}
             for bot_uuid, bot_instance in self._pool.items():
-                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=60):
+                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=settings.BOT_REMOVER_TIME):
                     self._set_bot_on_instance_redis(bot_uuid)
                     new_pool[bot_uuid] = bot_instance
                 else:
@@ -137,7 +138,7 @@ class BotManager():
         return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
 
     def _set_bot_on_instance_redis(self, bot_uuid):
-        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip, ex=70):
+        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip, ex=settings.SERVER_ALIVE_TIMER):
             server_bots = str(
                 redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
             server_bots.append("BOT-%s" % bot_uuid)
@@ -209,7 +210,7 @@ class BotManager():
         return bot_data
 
     def _set_server_alive(self):
-        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=70):
+        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=settings.SERVER_ALIVE_TIMER):
             logger.info("Ping redis, i'm alive")
             return
         logger.warning("Error on ping redis, trying again...")
