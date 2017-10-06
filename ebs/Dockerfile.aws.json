@@ -3,7 +3,7 @@
     "containerDefinitions": [
       {
         "name": "bothub-proxy-dev",
-        "image": "vctrferreira/bothub-nlp-dev",
+        "image": "ilha/bothub-nlp",
         "essential": true,
         "memoryReservation": 128,
         "portMappings": [
