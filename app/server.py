@@ -10,6 +10,8 @@ import redis
 import sys
 import urllib.request
 import psutil
+import logging
+import settings
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -22,6 +24,17 @@ from models.base_models import DATABASE
 from decouple import config
 
 
+logging.basicConfig(filename="bothub-nlp.log")
+logger = logging.getLogger('bothub NLP - Bot Manager')
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
 class BotManager():
     """
     Bot mananger responsible to manager all bots in this instance
@@ -29,7 +42,6 @@ class BotManager():
     _pool = {}
 
     def __init__(self):
-
         self.redis = redis.ConnectionPool(
             host=config('BOTHUB_REDIS'),
             port=config('BOTHUB_REDIS_PORT'),
@@ -42,18 +54,18 @@ class BotManager():
     def _get_bot_data(self, bot_uuid):
         bot_data = {}
         if bot_uuid in self._pool:
-            print('Reusing an instance...')
+            logger.info('Reusing an instance...')
             bot_data = self._pool[bot_uuid]
         else:
             redis_bot = self._get_bot_redis(bot_uuid)
             if redis_bot is not None:
-                print('Reusing from redis...')
+                logger.info('Reusing from redis...')
                 redis_bot = cloudpickle.loads(redis_bot)
                 bot_data = self._start_bot_process(redis_bot)
                 self._pool[bot_uuid] = bot_data
-                self._set_bot_in_instance_redis(bot_uuid)
+                self._set_bot_on_instance_redis(bot_uuid)
             else:
-                print('Creating a new instance...')
+                logger.info('Creating a new instance...')
 
                 with DATABASE.execution_context():
                     instance = Bot.get(Bot.uuid == bot_uuid)
@@ -62,7 +74,7 @@ class BotManager():
                 self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
                 bot_data = self._start_bot_process(bot)
                 self._pool[bot_uuid] = bot_data
-                self._set_bot_in_instance_redis(bot_uuid)
+                self._set_bot_on_instance_redis(bot_uuid)
         return bot_data
 
     def _get_new_answer_event(self, bot_uuid):
@@ -78,7 +90,6 @@ class BotManager():
         return self._get_bot_data(bot_uuid)['answers_queue']
 
     def ask(self, question, bot_uuid):
-
         questions_queue = self._get_questions_queue(bot_uuid)
         answers_queue = self._get_answers_queue(bot_uuid)
         questions_queue.put(question)
@@ -103,13 +114,13 @@ class BotManager():
             new_pool = {}
             for uuid, bot_instance in self._pool.items():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=60):
-                    self._set_bot_in_instance_redis(uuid)
+                    self._set_bot_on_instance_redis(uuid)
                     new_pool[uuid] = bot_instance
                 else:
                     self._remove_bot_instance_redis(uuid)
                     bot_instance['bot_instance'].terminate()
             self._pool = new_pool
-        print("garbage collected...")
+        logger.info("Garbage collected...")
         self._set_usage_memory()
         self.start_garbage_collector()
 
@@ -119,7 +130,7 @@ class BotManager():
     def _set_bot_redis(self, bot_uuid, bot):
         return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
 
-    def _set_bot_in_instance_redis(self, bot_uuid):
+    def _set_bot_on_instance_redis(self, bot_uuid):
         if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip, ex=70):
             server_bots = str(
                 redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
@@ -127,11 +138,11 @@ class BotManager():
             server_bots = " ".join(map(str, server_bots))
 
             if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bots):
-                print("Bot set in redis")
+                logger.info("Bot set in redis")
                 return
 
-        print("Error save bot in instance redis, trying again...")
-        return self._set_bot_in_instance_redis(bot_uuid)
+        logger.warning("Error on saving bot on Redis instance, trying again...")
+        return self._set_bot_on_instance_redis(bot_uuid)
 
     def _set_instance_redis(self):
         self.instance_ip = str(urllib.request.urlopen(
@@ -148,10 +159,10 @@ class BotManager():
 
         if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, "") and \
                 redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLES", update_servers):
-            print("Set instance in redis")
+            logger.info("Set instance in redis")
             return
 
-        print("Error save instance in redis, trying again")
+        logger.critical("Error save instance in redis, trying again")
         return self._set_instance_redis()
 
     def _remove_bot_instance_redis(self, bot_uuid):
@@ -162,10 +173,10 @@ class BotManager():
             server_bot_list = " ".join(map(str, server_bot_list))
 
             if redis.Redis(connection_pool=self.redis).set("SERVER-%s" % self.instance_ip, server_bot_list):
-                print("Removing bot from instance redis")
+                logger.info("Removing bot from Redis")
                 return
 
-        print("Error remove bot in instance redis, trying again...")
+        logger.warning("Error remove bot in instance redis, trying again...")
         return self._remove_bot_instance_redis(bot_uuid)
 
     def _start_bot_process(self, bot):
@@ -189,9 +200,9 @@ class BotManager():
 
     def _set_server_alive(self):
         if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=70):
-            print("Ping redis, i'm alive")
+            logger.info("Ping redis, i'm alive")
             return
-        print("Error on ping redis, trying again...")
+        logger.warning("Error on ping redis, trying again...")
         return self._set_server_alive()
 
     def _set_usage_memory(self):
@@ -202,7 +213,7 @@ class BotManager():
             update_servers = []
 
         usage_memory = psutil.virtual_memory().percent
-        if usage_memory <= 80:
+        if usage_memory <= settings.MAX_USAGE_MEMORY:
             if self.instance_ip not in update_servers:
                 update_servers.append(self.instance_ip)
         else:
@@ -212,11 +223,12 @@ class BotManager():
         update_servers = " ".join(map(str, update_servers))
 
         if redis.Redis(connection_pool=self.redis).set("SERVERS_INSTANCES_AVAILABLES", update_servers):
-            print("Setted servers availables")
+            logger.info("Servers set up available")
             return
 
-        print("Error on set servers availables, trying again...")
+        logger.warning("Error on set servers availables, trying again...")
         return self._set_usage_memory()
+
 
 class BotRequestHandler(tornado.web.RequestHandler):
     """
@@ -230,7 +242,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
         if message and uuid:
             answer = bm.ask(message, uuid)
             answer_data = {
-                'botId': uuid,
+                'bot_uuid': uuid,
                 'answer': answer
             }
             self.write(answer_data)

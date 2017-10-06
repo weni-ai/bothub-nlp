@@ -1,0 +1,2 @@
+MAX_USAGE_MEMORY = 80
+DEBUG = False

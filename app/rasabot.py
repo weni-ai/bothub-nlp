@@ -7,6 +7,18 @@ from rasa_nlu.model import Metadata, Interpreter
 from models.models import Bot
 from models.base_models import DATABASE
 
+import logging
+
+
+logger = logging.getLogger('bothub NLP - RasaBot')
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 
 class RasaBot():
     """
@@ -29,7 +41,6 @@ class RasaBot():
         """
         Creates a new trainning for the bot.
         """
-
         config = '{"pipeline": "spacy_sklearn", \
                                 "path" : "./models", "data" : "./data.json", \
                                 "language": "%s"}' % language
@@ -44,7 +55,7 @@ class RasaBot():
             if bot.uuid:
                 return dict(uuid=str(bot.uuid))
             else:
-                print("Fail when try insert new bot")
+                logger.error("Fail when try insert new bot")
 
 
 class RasaBotProcess(Process):
@@ -62,12 +73,11 @@ class RasaBotProcess(Process):
         self.model_dir = model_dir
 
     def run(self):
-        print('run')
         self._bot = RasaBot(self.model_dir)
         while True:
             self.new_question_event.wait()
             self.new_question_event.clear()
-            print('A new question arrived!')
+            logger.info('A new question arrived!')
             answer = self._bot.ask(self.questions_queue.get())
             self.answers_queue.put(answer)
             self.new_answer_event.set()
