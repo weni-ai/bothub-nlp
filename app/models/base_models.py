@@ -1,6 +1,7 @@
 import peewee
 from decouple import config
 
+
 DATABASE = peewee.PostgresqlDatabase(
     config('BOTHUB_POSTGRES_DB'),
     user=config('BOTHUB_POSTGRES_USER'),

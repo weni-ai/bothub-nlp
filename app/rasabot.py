@@ -2,8 +2,7 @@
 from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
-from rasa_nlu.model import Trainer
-from rasa_nlu.model import Metadata, Interpreter
+from rasa_nlu.model import Trainer, Metadata, Interpreter
 from models.models import Bot
 from models.base_models import DATABASE
 
