@@ -251,6 +251,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
             self.write(data)
         self.finish()
 
+
 class BotTrainerRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to train bot
@@ -266,7 +267,6 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
         bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
         bot.daemon = True
         bot.start()
-
 
     def callback(self, data):
         if data == INVALID_TOKEN:

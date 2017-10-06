@@ -11,6 +11,6 @@ def token_required(f):
             handler.set_status(401)
             handler.write("Auth token wrong")
             handler.finish()
-    check.__doc__= f.__doc__
-    check.__name__= f.__name__
+    check.__doc__ = f.__doc__
+    check.__name__ = f.__name__
     return check
