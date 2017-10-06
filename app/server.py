@@ -20,7 +20,7 @@ from datetime import datetime, timedelta
 from models.models import Bot, Profile
 from models.base_models import DATABASE
 from decouple import config
-from utils import INVALID_TOKEN, DB_FAIL
+from utils import INVALID_TOKEN, DB_FAIL, token_required
 
 
 class BotManager():
@@ -50,7 +50,7 @@ class BotManager():
             if redis_bot is not None:
                 print('Reusing from redis...')
                 redis_bot = cloudpickle.loads(redis_bot)
-                bot_data = self._start_bot_process(redis_bot)
+                bot_data = self._start_bot_process(bot_uuid, redis_bot)
                 self._pool[bot_uuid] = bot_data
                 self._set_bot_in_instance_redis(bot_uuid)
             else:
@@ -61,7 +61,7 @@ class BotManager():
 
                 bot = cloudpickle.loads(instance.bot)
                 self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
-                bot_data = self._start_bot_process(bot)
+                bot_data = self._start_bot_process(bot_uuid, bot)
                 self._pool[bot_uuid] = bot_data
                 self._set_bot_in_instance_redis(bot_uuid)
         return bot_data
@@ -78,8 +78,7 @@ class BotManager():
     def _get_answers_queue(self, bot_uuid):
         return self._get_bot_data(bot_uuid)['answers_queue']
 
-    def ask(self, question, bot_uuid):
-
+    def ask(self, question, bot_uuid, auth_token):
         questions_queue = self._get_questions_queue(bot_uuid)
         answers_queue = self._get_answers_queue(bot_uuid)
         questions_queue.put(question)
@@ -87,7 +86,11 @@ class BotManager():
         new_question_event.set()
         new_answer_event = self._get_new_answer_event(bot_uuid)
 
+        if not self._pool[bot_uuid]['auth_token'] == auth_token:
+            return INVALID_TOKEN
+
         self._pool[bot_uuid]['last_time_update'] = datetime.now()
+
         new_answer_event.wait()
         new_answer_event.clear()
         return answers_queue.get()
@@ -169,7 +172,7 @@ class BotManager():
         print("Error remove bot in instance redis, trying again...")
         return self._remove_bot_instance_redis(bot_uuid)
 
-    def _start_bot_process(self, model_bot):
+    def _start_bot_process(self, bot_uuid, model_bot):
         bot_data = {}
         answers_queue = Queue()
         questions_queue = Queue()
@@ -185,6 +188,10 @@ class BotManager():
         bot_data['new_question_event'] = new_question_event
         bot_data['new_answer_event'] = new_answer_event
         bot_data['last_time_update'] = datetime.now()
+
+        with DATABASE.execution_context():
+            bot = Bot.get(Bot.uuid == bot_uuid)
+        bot_data['auth_token'] = bot.owner.uuid.hex
 
         return bot_data
 
@@ -226,38 +233,40 @@ class BotRequestHandler(tornado.web.RequestHandler):
     """
     @asynchronous
     @coroutine
+    @token_required
     def get(self):
+        auth_token = self.request.headers.get('Authorization')
         uuid = self.get_argument('uuid', None)
         message = self.get_argument('msg', None)
         if message and uuid:
-            answer = bm.ask(message, uuid)
-            answer_data = {
-                'botId': uuid,
-                'answer': answer
-            }
-            self.write(answer_data)
+            answer = bm.ask(message, uuid, auth_token)
+            if answer != INVALID_TOKEN:
+                data = {
+                    'botId': uuid,
+                    'answer': answer
+                }
+            else:
+                data = INVALID_TOKEN
+                self.set_status(401)
+            self.write(data)
         self.finish()
-
 
 class BotTrainerRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to train bot
     """
     @asynchronous
+    @token_required
     def post(self):
         json_body = tornado.escape.json_decode(self.request.body)
         auth_token = self.request.headers.get('Authorization')
-        if auth_token and len(auth_token) == 32:
-            language = json_body.get("language", None)
-            data = json.dumps(json_body.get("data", None))
-            bot_slug = json.dumps(json_body.get("slug", None))
-            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
-            bot.daemon = True
-            bot.start()
-        else:
-            self.set_status(401)
-            self.write("Auth token wrong")
-            self.finish()
+        language = json_body.get("language", None)
+        data = json.dumps(json_body.get("data", None))
+        bot_slug = json.dumps(json_body.get("slug", None))
+        bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
+        bot.daemon = True
+        bot.start()
+
 
     def callback(self, data):
         if data == INVALID_TOKEN:
@@ -276,6 +285,11 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
         profile = Profile.create()
         profile.save()
         return dict(uuid=profile.uuid.hex)
+
+    @asynchronous
+    @coroutine
+    def get(self):
+        self.finish()
 
     @asynchronous
     @coroutine
