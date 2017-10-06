@@ -1,5 +1,6 @@
-import peewee
 from decouple import config
+
+import peewee
 
 
 DATABASE = peewee.PostgresqlDatabase(
