@@ -10,6 +10,7 @@ import redis
 import sys
 import urllib.request
 import psutil
+import uuid
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous
@@ -262,11 +263,12 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
         json_body = tornado.escape.json_decode(self.request.body)
         auth_token = self.request.headers.get('Authorization')
         language = json_body.get("language", None)
+        bot_slug = json_body.get("slug", None)
         data = json.dumps(json_body.get("data", None))
-        bot_slug = json.dumps(json_body.get("slug", None))
         bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
         bot.daemon = True
         bot.start()
+
 
     def callback(self, data):
         if data == INVALID_TOKEN:
@@ -288,7 +290,26 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
 
     @asynchronous
     @coroutine
+    @token_required
     def get(self):
+        with DATABASE.execution_context():
+            owner_profile = Profile.select().where(
+                Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')))
+
+            if len(owner_profile) != 1:
+                self.set_status(401)
+                self.write(INVALID_TOKEN)
+                self.finish()
+
+            owner_profile = owner_profile.get()
+            bots = Bot.select(Bot.uuid, Bot.slug).where(
+                Bot.owner == owner_profile).dicts()
+
+        list_bots = list()
+        for bot in bots:
+            bot['uuid'] = str(bot['uuid'])
+            list_bots.append(bot)
+        self.write(json.dumps(list_bots))
         self.finish()
 
     @asynchronous
