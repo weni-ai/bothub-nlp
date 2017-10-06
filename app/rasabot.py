@@ -2,14 +2,25 @@
 from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
-from rasa_nlu.model import Trainer
-from rasa_nlu.model import Metadata, Interpreter
+from rasa_nlu.model import Trainer, Metadata, Interpreter
 from models.models import Bot, Profile
 from models.base_models import DATABASE
 from utils import INVALID_TOKEN, DB_FAIL
 
 
 import uuid
+
+import logging
+
+
+logger = logging.getLogger('bothub NLP - RasaBot')
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 class RasaBot():
@@ -61,6 +72,7 @@ class RasaBot():
             if bot.uuid:
                 return dict(uuid=str(bot.uuid), slug=str(bot.slug), owner=bot.owner.uuid.hex)
 
+        logger.error("Fail when try insert new bot")
         return DB_FAIL
 
 
@@ -90,7 +102,7 @@ class RasaBotProcess(Process):
         while True:
             self.new_question_event.wait()
             self.new_question_event.clear()
-            print('A new question arrived!')
+            logger.info('A new question arrived!')
             answer = self._bot.ask(self.questions_queue.get())
             self.answers_queue.put(answer)
             self.new_answer_event.set()
