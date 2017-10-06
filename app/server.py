@@ -120,7 +120,7 @@ class BotManager():
             new_pool = {}
             for bot_uuid, bot_instance in self._pool.items():
                 if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=60):
-                    self._set_bot_in_instance_redis(bot_uuid)
+                    self._set_bot_on_instance_redis(bot_uuid)
                     new_pool[bot_uuid] = bot_instance
                 else:
                     self._remove_bot_instance_redis(bot_uuid)
