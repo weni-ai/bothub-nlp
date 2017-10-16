@@ -296,8 +296,9 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
     Tornado request handler to predict data
     """
     def _register_profile(self):
-        profile = Profile.create()
-        profile.save()
+        with DATABASE.execution_context():
+            profile = Profile.create()
+            profile.save()
         return dict(uuid=profile.uuid.hex)
 
     @asynchronous
@@ -327,8 +328,7 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
     @asynchronous
     @coroutine
     def post(self):
-        with DATABASE.execution_context():
-            self.write(self._register_profile())
+        self.write(self._register_profile())
         self.finish()
 
 
