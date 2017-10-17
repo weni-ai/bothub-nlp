@@ -1,5 +1,6 @@
 INVALID_TOKEN = "invalid_token"
 DB_FAIL = "db_fail"
+DUPLICATE_SLUG = "duplicated_slug"
 
 
 def token_required(f):

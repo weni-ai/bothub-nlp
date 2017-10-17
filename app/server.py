@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from models.models import Bot, Profile
 from models.base_models import DATABASE
 from decouple import config
-from utils import INVALID_TOKEN, DB_FAIL, token_required
+from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required
 
 
 logging.basicConfig(filename="bothub-nlp.log")
@@ -287,6 +287,8 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             self.set_status(401)
         elif data == DB_FAIL:
             self.set_status(500)
+        elif data == DUPLICATE_SLUG:
+            self.set_status(409)
         self.write(json.dumps(data))
         self.finish()
 

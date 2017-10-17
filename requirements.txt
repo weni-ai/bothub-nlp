@@ -11,3 +11,4 @@ redis
 peewee
 python-decouple
 psutil
+python-slugify

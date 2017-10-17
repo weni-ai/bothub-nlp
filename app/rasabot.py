@@ -5,7 +5,8 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer, Metadata, Interpreter
 from models.models import Bot, Profile
 from models.base_models import DATABASE
-from utils import INVALID_TOKEN, DB_FAIL
+from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG
+from slugify import slugify
 
 
 import uuid
@@ -52,9 +53,13 @@ class RasaBot():
 
         with DATABASE.execution_context():
             owner = Profile.select().where(Profile.uuid == uuid.UUID(auth_token))
+            bot_exist = Bot.select().where(Bot.slug == bot_slug)
 
         if len(owner) != 1:
             return INVALID_TOKEN
+
+        if len(bot_exist):
+            return DUPLICATE_SLUG
 
         owner = owner.get()
         config = '{"pipeline": "spacy_sklearn", \
@@ -65,9 +70,10 @@ class RasaBot():
         trainer = Trainer(RasaNLUConfig(config))
         trainer.train(training_data)
         bot_data = trainer.persist()
-
+        bot_slug = slugify(bot_slug)
         with DATABASE.execution_context():
             bot = Bot.create(bot=bot_data, owner=owner, slug=bot_slug)
+
             bot.save()
             if bot.uuid:
                 return dict(uuid=str(bot.uuid), slug=str(bot.slug), owner=bot.owner.uuid.hex)
