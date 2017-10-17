@@ -5,7 +5,7 @@ DB_FAIL = "db_fail"
 def token_required(f):
     def check(handler, *args, **kwargs):
         auth_token = handler.request.headers.get('Authorization')
-        if auth_token and len(auth_token) == 32:
+        if auth_token and len(auth_token) == 39 and auth_token.startswith('Bearer '):
             return f(handler, *args, **kwargs)
         else:
             handler.set_status(401)

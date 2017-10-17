@@ -249,7 +249,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
     @coroutine
     @token_required
     def get(self):
-        auth_token = self.request.headers.get('Authorization')
+        auth_token = self.request.headers.get('Authorization')[7:]
         uuid = self.get_argument('uuid', None)
         message = self.get_argument('msg', None)
         if message and uuid:
@@ -274,7 +274,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
     @token_required
     def post(self):
         json_body = tornado.escape.json_decode(self.request.body)
-        auth_token = self.request.headers.get('Authorization')
+        auth_token = self.request.headers.get('Authorization')[7:]
         language = json_body.get("language", None)
         bot_slug = json_body.get("slug", None)
         data = json.dumps(json_body.get("data", None))
@@ -307,7 +307,7 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
     def get(self):
         with DATABASE.execution_context():
             owner_profile = Profile.select().where(
-                Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')))
+                Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:]))
 
             if len(owner_profile) != 1:
                 self.set_status(401)
