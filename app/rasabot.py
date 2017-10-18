@@ -1,4 +1,4 @@
-"""This module does trainning bot and process data."""
+"""This module does training bot and process data."""
 from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
@@ -26,24 +26,24 @@ logger.addHandler(ch)
 
 class RasaBot():
     """
-    Before trainning your bot, make sure do you have the last model lang file.
+    Before training your bot, make sure do you have the last model lang file.
 
     python -m spacy download en
 
     This version load interpreter on initialization.
     """
-    def __init__(self, model_bot=None, trainning=False):
+    def __init__(self, model_bot=None, training=False):
         self.model_bot = model_bot
-        if not trainning:
+        if not training:
             metadata = Metadata(self.model_bot, None)
             self.interpreter = Interpreter.load(metadata, None)
 
     def ask(self, question):
         return self.interpreter.parse(question)
 
-    def trainning(self, language, data, auth_token, bot_slug):
+    def training(self, language, data, auth_token, bot_slug):
         """
-        Creates a new trainning for the bot.
+        Creates a new training for the bot.
         Args:
             language: language that bot will be trained
             data: rasa nlu object
@@ -136,6 +136,6 @@ class RasaBotTrainProcess(Process):
         self.bot_slug = bot_slug
 
     def run(self):
-        self._bot = RasaBot(trainning=True)
-        data = self._bot.trainning(self.language, self.data, self.auth_token, self.bot_slug)
+        self._bot = RasaBot(training=True)
+        data = self._bot.training(self.language, self.data, self.auth_token, self.bot_slug)
         self.callback(data)

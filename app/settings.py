@@ -9,3 +9,5 @@ GARBAGE_COLLECTOR_TIMER = 60.0
 
 # Timer for redis key SERVER-ALIVE-(IP)
 SERVER_ALIVE_TIMER = 70
+
+AWS_URL_INSTANCES_INFO = "http://169.254.169.254/latest/meta-data/local-ipv4"
