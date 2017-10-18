@@ -35,7 +35,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-class BotManager():
+class BotManager(object):
     """
     Bot mananger responsible to manager all bots in this instance
     """
@@ -145,8 +145,7 @@ class BotManager():
         return self._set_bot_on_instance_redis(bot_uuid)
 
     def _set_instance_redis(self):
-        self.instance_ip = str(urllib.request.urlopen(
-                                "http://169.254.169.254/latest/meta-data/local-ipv4").read(), "utf-8")
+        self.instance_ip = str(urllib.request.urlopen(settings.AWS_URL_INSTANCES_INFO).read(), "utf-8")
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
@@ -180,7 +179,6 @@ class BotManager():
         return self._remove_bot_instance_redis(bot_uuid)
 
     def _start_bot_process(self, bot):
-        bot_data = {}
         answers_queue = Queue()
         questions_queue = Queue()
         new_question_event = Event()
@@ -189,14 +187,14 @@ class BotManager():
                              new_question_event, new_answer_event, bot)
         bot.daemon = True
         bot.start()
-        bot_data['bot_instance'] = bot
-        bot_data['answers_queue'] = answers_queue
-        bot_data['questions_queue'] = questions_queue
-        bot_data['new_question_event'] = new_question_event
-        bot_data['new_answer_event'] = new_answer_event
-        bot_data['last_time_update'] = datetime.now()
-
-        return bot_data
+        return {
+            'bot_instance': bot,
+            'answers_queue': answers_queue,
+            'questions_queue': questions_queue,
+            'new_question_event': new_question_event,
+            'new_answer_event': new_answer_event,
+            'last_time_update': datetime.now()
+        }
 
     def _set_server_alive(self):
         if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=70):
