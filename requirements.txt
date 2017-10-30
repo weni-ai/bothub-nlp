@@ -10,3 +10,4 @@ tornado
 redis
 peewee
 python-decouple
+psutil
