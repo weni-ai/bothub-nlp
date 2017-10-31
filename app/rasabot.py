@@ -59,7 +59,7 @@ class RasaBot():
             return MSG_INFORMATION % INVALID_TOKEN
 
         if len(bot_exist):
-            return DUPLICATE_SLUG
+            return MSG_INFORMATION % DUPLICATE_SLUG
 
         owner = owner.get()
         config = '{"pipeline": "spacy_sklearn", \

@@ -285,7 +285,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             self.set_status(401)
         elif data == (MSG_INFORMATION % DB_FAIL):
             self.set_status(500)
-        elif data == DUPLICATE_SLUG:
+        elif data == (MSG_INFORMATION % DUPLICATE_SLUG):
             self.set_status(409)
         self.write(json.dumps(data))
         self.finish()
