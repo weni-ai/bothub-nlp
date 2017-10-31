@@ -1,6 +1,8 @@
-INVALID_TOKEN = "invalid_token"
-DB_FAIL = "db_fail"
-DUPLICATE_SLUG = "duplicated_slug"
+INVALID_TOKEN = 'invalid_token'
+DB_FAIL = 'db_fail'
+DUPLICATE_SLUG = 'duplicated_slug'
+WRONG_TOKEN = 'auth_token_wrong'
+MSG_INFORMATION = '{"info": "%s"}'
 
 
 def token_required(f):
@@ -10,7 +12,7 @@ def token_required(f):
             return f(handler, *args, **kwargs)
         else:
             handler.set_status(401)
-            handler.write("Auth token wrong")
+            handler.write(MSG_INFORMATION % WRONG_TOKEN)
             handler.finish()
     check.__doc__ = f.__doc__
     check.__name__ = f.__name__

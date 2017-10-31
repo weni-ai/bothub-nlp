@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from models.models import Bot, Profile
 from models.base_models import DATABASE
 from decouple import config
-from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required
+from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION
 
 
 logging.basicConfig(filename="bothub-nlp.log")
@@ -96,7 +96,7 @@ class BotManager(object):
         answers_queue = self._get_answers_queue(bot_uuid)
 
         if not self._pool[bot_uuid]['auth_token'] == auth_token:
-            return INVALID_TOKEN
+            return MSG_INFORMATION % INVALID_TOKEN
 
         questions_queue.put(question)
         new_question_event = self._get_new_question_event(bot_uuid)
@@ -252,13 +252,13 @@ class BotRequestHandler(tornado.web.RequestHandler):
         message = self.get_argument('msg', None)
         if message and uuid:
             answer = bm.ask(message, uuid, auth_token)
-            if answer != INVALID_TOKEN:
+            if answer != (MSG_INFORMATION % INVALID_TOKEN):
                 data = {
                     'bot_uuid': uuid,
                     'answer': answer
                 }
             else:
-                data = INVALID_TOKEN
+                data = MSG_INFORMATION % INVALID_TOKEN
                 self.set_status(401)
             self.write(data)
         self.finish()
@@ -281,7 +281,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
         bot.start()
 
     def callback(self, data):
-        if data == INVALID_TOKEN:
+        if data == (MSG_INFORMATION % INVALID_TOKEN):
             self.set_status(401)
         elif data == DB_FAIL:
             self.set_status(500)
@@ -311,7 +311,7 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
 
             if len(owner_profile) != 1:
                 self.set_status(401)
-                self.write(INVALID_TOKEN)
+                self.write(MSG_INFORMATION % INVALID_TOKEN)
                 self.finish()
 
             owner_profile = owner_profile.get()

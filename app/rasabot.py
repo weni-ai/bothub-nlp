@@ -5,7 +5,7 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer, Metadata, Interpreter
 from models.models import Bot, Profile
 from models.base_models import DATABASE
-from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG
+from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, MSG_INFORMATION
 from slugify import slugify
 
 
@@ -56,7 +56,7 @@ class RasaBot():
             bot_exist = Bot.select().where(Bot.slug == bot_slug)
 
         if len(owner) != 1:
-            return INVALID_TOKEN
+            return MSG_INFORMATION % INVALID_TOKEN
 
         if len(bot_exist):
             return DUPLICATE_SLUG
