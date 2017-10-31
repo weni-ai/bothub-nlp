@@ -283,7 +283,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
     def callback(self, data):
         if data == (MSG_INFORMATION % INVALID_TOKEN):
             self.set_status(401)
-        elif data == DB_FAIL:
+        elif data == (MSG_INFORMATION % DB_FAIL):
             self.set_status(500)
         elif data == DUPLICATE_SLUG:
             self.set_status(409)

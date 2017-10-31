@@ -79,7 +79,7 @@ class RasaBot():
                 return dict(uuid=str(bot.uuid), slug=str(bot.slug), owner=bot.owner.uuid.hex)
 
         logger.error("Fail when try insert new bot")
-        return DB_FAIL
+        return MSG_INFORMATION % DB_FAIL
 
 
 class RasaBotProcess(Process):
