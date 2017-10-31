@@ -8,7 +8,7 @@ import json
 import cloudpickle
 import redis
 import sys
-import urllib.request
+import requests
 import psutil
 import uuid
 import logging
@@ -152,7 +152,7 @@ class BotManager(object):
         return self._set_bot_on_instance_redis(bot_uuid)
 
     def _set_instance_redis(self):
-        self.instance_ip = str(urllib.request.urlopen(settings.AWS_URL_INSTANCES_INFO).read(), "utf-8")
+        self.instance_ip = requests.get(settings.AWS_URL_INSTANCES_INFO).text
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
