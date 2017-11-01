@@ -12,18 +12,21 @@ import requests
 import psutil
 import uuid
 import logging
-import settings
+import os
+
+sys.path.append(os.path.abspath(__file__).rsplit('/', 2)[0])
 
 from threading import Timer, Lock
-from tornado.web import Application, asynchronous
-from tornado.web import url
+from tornado.web import Application, asynchronous, url
 from tornado.gen import coroutine
-from rasabot import RasaBotProcess, RasaBotTrainProcess
 from datetime import datetime, timedelta
-from models.models import Bot, Profile
-from models.base_models import DATABASE
+from app.rasabot import RasaBotProcess, RasaBotTrainProcess
+from app.models.models import Bot, Profile
+from app.models.base_models import DATABASE
+from app.settings import *
+from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION
 from decouple import config
-from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION
+
 
 
 logging.basicConfig(filename="bothub-nlp.log")
@@ -113,14 +116,14 @@ class BotManager(object):
         self._get_questions_queue(bot_uuid)
 
     def start_garbage_collector(self):
-        Timer(settings.GARBAGE_COLLECTOR_TIMER, self.garbage_collector).start()
+        Timer(GARBAGE_COLLECTOR_TIMER, self.garbage_collector).start()
 
     def garbage_collector(self):
         self._set_server_alive()
         with Lock():
             new_pool = {}
             for bot_uuid, bot_instance in self._pool.items():
-                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=settings.BOT_REMOVER_TIME):
+                if not (datetime.now() - bot_instance['last_time_update']) >= timedelta(minutes=BOT_REMOVER_TIME):
                     self._set_bot_on_instance_redis(bot_uuid)
                     new_pool[bot_uuid] = bot_instance
                 else:
@@ -138,7 +141,7 @@ class BotManager(object):
         return redis.Redis(connection_pool=self.redis).set(bot_uuid, bot)
 
     def _set_bot_on_instance_redis(self, bot_uuid):
-        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip, ex=settings.SERVER_ALIVE_TIMER):
+        if redis.Redis(connection_pool=self.redis).set("BOT-%s" % bot_uuid, self.instance_ip, ex=SERVER_ALIVE_TIMER):
             server_bots = str(
                 redis.Redis(connection_pool=self.redis).get("SERVER-%s" % self.instance_ip), "utf-8").split()
             server_bots.append("BOT-%s" % bot_uuid)
@@ -152,7 +155,7 @@ class BotManager(object):
         return self._set_bot_on_instance_redis(bot_uuid)
 
     def _set_instance_redis(self):
-        self.instance_ip = requests.get(settings.AWS_URL_INSTANCES_INFO).text
+        self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
@@ -208,7 +211,7 @@ class BotManager(object):
         }
 
     def _set_server_alive(self):
-        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=settings.SERVER_ALIVE_TIMER):
+        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=SERVER_ALIVE_TIMER):
             logger.info("Ping redis, i'm alive")
             return
         logger.warning("Error on ping redis, trying again...")
@@ -222,7 +225,7 @@ class BotManager(object):
             update_servers = []
 
         usage_memory = psutil.virtual_memory().percent
-        if usage_memory <= settings.MAX_USAGE_MEMORY:
+        if usage_memory <= MAX_USAGE_MEMORY:
             if self.instance_ip not in update_servers:
                 update_servers.append(self.instance_ip)
         else:

@@ -1,12 +1,12 @@
-from base_models import DATABASE
+from app.models.base_models import DATABASE
 
-import models
+from app.models.models import Bot, Profile
 
 
 DATABASE.connect()
 m = [
-    models.Bot,
-    models.Profile
+    Bot,
+    Profile
 ]
 DATABASE.create_tables(m)
 

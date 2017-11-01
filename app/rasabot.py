@@ -3,9 +3,9 @@ from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer, Metadata, Interpreter
-from models.models import Bot, Profile
-from models.base_models import DATABASE
-from utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, MSG_INFORMATION
+from app.models.models import Bot, Profile
+from app.models.base_models import DATABASE
+from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, MSG_INFORMATION
 from slugify import slugify
 
 
