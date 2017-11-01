@@ -1,0 +1,18 @@
+# .coveragerc to control coverage.py
+[run]
+source = ./
+
+[report]
+ignore_errors = True
+precision = 0
+show_missing = True
+skip_covered = True
+
+omit =
+    *tests*,
+    *__init__*,
+    *settings*
+    *env*
+
+[html]
+directory = coverage_html_report
