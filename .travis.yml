@@ -25,7 +25,6 @@ install:
 before_script:
   # setup test database
   - psql -U postgres -c "CREATE DATABASE bothub;"
-  - cd app/models
   - export BOTHUB_POSTGRES_USER=postgres
   - export BOTHUB_POSTGRES_PASSWORD=postgres
   - export BOTHUB_POSTGRES_DB=bothub
@@ -34,8 +33,7 @@ before_script:
   - export BOTHUB_REDIS=127.0.0.1
   - export BOTHUB_REDIS_PORT=6379
   - export BOTHUB_REDIS_DB=2
-  - python create_schema.py 
-  - cd ..
+  - PYTHONPATH=`pwd` python app/models/create_schema.py
 
 script:
  - cd app
