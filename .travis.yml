@@ -34,6 +34,7 @@ before_script:
   - export BOTHUB_REDIS_PORT=6379
   - export BOTHUB_REDIS_DB=2
   - export ASYNC_TEST_TIMEOUT=25
+  - python -m spacy download en
   - PYTHONPATH=`pwd` python app/models/create_schema.py
 
 script:
