@@ -24,7 +24,7 @@ from app.rasabot import RasaBotProcess, RasaBotTrainProcess
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
 from app.settings import *
-from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION
+from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION, MISSING_DATA
 from decouple import config
 
 
@@ -274,14 +274,19 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
     @asynchronous
     @token_required
     def post(self):
-        json_body = tornado.escape.json_decode(self.request.body)
-        auth_token = self.request.headers.get('Authorization')[7:]
-        language = json_body.get("language", None)
-        bot_slug = json_body.get("slug", None)
-        data = json.dumps(json_body.get("data", None))
-        bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
-        bot.daemon = True
-        bot.start()
+        if self.request.body:
+            json_body = tornado.escape.json_decode(self.request.body)
+            auth_token = self.request.headers.get('Authorization')[7:]
+            language = json_body.get("language", None)
+            bot_slug = json_body.get("slug", None)
+            data = json.dumps(json_body.get("data", None))
+            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
+            bot.daemon = True
+            bot.start()
+        else:
+            self.set_status(401)
+            self.write(MSG_INFORMATION % MISSING_DATA)
+            self.finish()
 
     def callback(self, data):
         if data == (MSG_INFORMATION % INVALID_TOKEN):
@@ -290,7 +295,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             self.set_status(500)
         elif data == (MSG_INFORMATION % DUPLICATE_SLUG):
             self.set_status(409)
-        self.write(json.dumps(data))
+        self.write(data)
         self.finish()
 
 

@@ -2,6 +2,7 @@ INVALID_TOKEN = 'invalid_token'
 DB_FAIL = 'db_fail'
 DUPLICATE_SLUG = 'duplicated_slug'
 WRONG_TOKEN = 'auth_token_wrong'
+MISSING_DATA = 'missing_data'
 MSG_INFORMATION = '{"info": "%s"}'
 
 
