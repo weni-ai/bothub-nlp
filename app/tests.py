@@ -10,7 +10,6 @@ from tornado.web import Application, url
 import urllib
 import unittest
 import json
-import sys
 
 
 test_db = SqliteDatabase('tests.db')
