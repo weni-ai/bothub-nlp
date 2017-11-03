@@ -34,13 +34,16 @@ before_script:
   - export BOTHUB_REDIS_PORT=6379
   - export BOTHUB_REDIS_DB=2
   - export ASYNC_TEST_TIMEOUT=25
+  - export BOT_REMOVER_TIME=5
+  - export GARBAGE_COLLECTOR_TIMER=20
   - python -m spacy download en
   - PYTHONPATH=`pwd` python app/models/create_schema.py
 
 script:
  - cd app
- - coverage run -m unittest tests
+ - coverage run --concurrency=multiprocessing -m unittest tests
 
 after_success:
+  - coverage combine
   - coveralls --rcfile ../.coveragerc
   - coverage report -i --rcfile ../.coveragerc  --fail-under=90
