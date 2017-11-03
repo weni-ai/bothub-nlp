@@ -1,13 +1,16 @@
-MAX_USAGE_MEMORY = 80
+from decouple import config
+
+
+MAX_USAGE_MEMORY = config('MAX_USAGE_MEMORY', default=80, cast=int)
 DEBUG = False
 
 # Timer to bot timeout (60 minutes)
-BOT_REMOVER_TIME = 60
+BOT_REMOVER_TIME = config('BOT_REMOVER_TIME', default=60, cast=int)
 
 # Interval timer garbage collector 60 seconds
-GARBAGE_COLLECTOR_TIMER = 60.0
+GARBAGE_COLLECTOR_TIMER = config('GARBAGE_COLLECTOR_TIMER', default=60.0, cast=float)
 
 # Timer for redis key SERVER-ALIVE-(IP)
-SERVER_ALIVE_TIMER = 70
+SERVER_ALIVE_TIMER = config('SERVER_ALIVE_TIMER', default=70, cast=int)
 
 AWS_URL_INSTANCES_INFO = "http://169.254.169.254/latest/meta-data/local-ipv4"
