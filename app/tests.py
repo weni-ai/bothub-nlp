@@ -10,6 +10,7 @@ from tornado.web import Application, url
 import urllib
 import unittest
 import json
+import sys
 
 
 test_db = SqliteDatabase('tests.db')
@@ -347,9 +348,10 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
         with patch('requests.get') as mock_get:
 
             mock_get.text = '127.0.0.1'
+            self.bm = BotManager(gc=False)
             return Application([
                 url(r'/auth', ProfileRequestHandler),
-                url(r'/bots', BotRequestHandler, {'bm': BotManager()}),
+                url(r'/bots', BotRequestHandler, {'bm': self.bm}),
                 url(r'/bots-redirect', BotRequestHandler),
                 url(r'/train-bot', BotTrainerRequestHandler)
             ])
