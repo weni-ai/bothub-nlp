@@ -53,8 +53,9 @@ class BotManager(object):
         )
         self._set_instance_redis()
         self._set_server_alive()
-        if gc:
-            self.start_garbage_collector()
+        if not gc:  # pragma: no cover
+            self.gc_test = True
+        self.start_garbage_collector()
 
     def _get_bot_data(self, bot_uuid):
         bot_data = {}
@@ -63,7 +64,7 @@ class BotManager(object):
             bot_data = self._pool[bot_uuid]
         else:
             redis_bot = self._get_bot_redis(bot_uuid)
-            if redis_bot is not None:
+            if redis_bot is not None:  # pragma: no cover
                 logger.info('Reusing from redis...')
                 redis_bot = cloudpickle.loads(redis_bot)
                 bot_data = self._start_bot_process(bot_uuid, redis_bot)
@@ -112,13 +113,13 @@ class BotManager(object):
         new_answer_event.clear()
         return answers_queue.get()
 
-    def start_bot_process(self, bot_uuid):
+    def start_bot_process(self, bot_uuid):  # pragma: no cover
         self._get_questions_queue(bot_uuid)
 
-    def start_garbage_collector(self):
+    def start_garbage_collector(self):  # pragma: no cover
         Timer(GARBAGE_COLLECTOR_TIMER, self.garbage_collector).start()
 
-    def garbage_collector(self):
+    def garbage_collector(self):  # pragma: no cover
         self._set_server_alive()
         with Lock():
             new_pool = {}
@@ -132,7 +133,8 @@ class BotManager(object):
             self._pool = new_pool
         logger.info("Garbage collected...")
         self._set_usage_memory()
-        self.start_garbage_collector()
+        if not self.gc_test:
+            self.start_garbage_collector()
 
     def _get_bot_redis(self, bot_uuid):
         return redis.Redis(connection_pool=self.redis).get(bot_uuid)
@@ -151,8 +153,8 @@ class BotManager(object):
                 logger.info("Bot set in redis")
                 return
 
-        logger.warning("Error on saving bot on Redis instance, trying again...")
-        return self._set_bot_on_instance_redis(bot_uuid)
+        logger.warning("Error on saving bot on Redis instance, trying again...")  # pragma: no cover
+        return self._set_bot_on_instance_redis(bot_uuid)  # pragma: no cover
 
     def _set_instance_redis(self):
         self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
@@ -160,7 +162,7 @@ class BotManager(object):
 
         if update_servers is not None:
             update_servers = str(update_servers, "utf-8").split()
-        else:
+        else:  # pragma: no cover
             update_servers = []
 
         update_servers.append(self.instance_ip)
@@ -171,8 +173,8 @@ class BotManager(object):
             logger.info("Set instance in redis")
             return
 
-        logger.critical("Error save instance in redis, trying again")
-        return self._set_instance_redis()
+        logger.critical("Error save instance in redis, trying again")  # pragma: no cover
+        return self._set_instance_redis()  # pragma: no cover
 
     def _remove_bot_instance_redis(self, bot_uuid):
         if redis.Redis(connection_pool=self.redis).delete("BOT-%s" % bot_uuid):
@@ -214,10 +216,10 @@ class BotManager(object):
         if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=SERVER_ALIVE_TIMER):
             logger.info("Ping redis, i'm alive")
             return
-        logger.warning("Error on ping redis, trying again...")
-        return self._set_server_alive()
+        logger.warning("Error on ping redis, trying again...")  # pragma: no cover
+        return self._set_server_alive()  # pragma: no cover
 
-    def _set_usage_memory(self):
+    def _set_usage_memory(self):  # pragma: no cover
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
         if update_servers is not None:
             update_servers = str(update_servers, "utf-8").split()
@@ -238,8 +240,8 @@ class BotManager(object):
             logger.info("Servers set up available")
             return
 
-        logger.warning("Error on set servers availables, trying again...")
-        return self._set_usage_memory()
+        logger.warning("Error on set servers availables, trying again...")  # pragma: no cover
+        return self._set_usage_memory()  # pragma: no cover
 
 
 class BotRequestHandler(tornado.web.RequestHandler):
@@ -294,7 +296,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
     def callback(self, data):
         if data == (MSG_INFORMATION % INVALID_TOKEN):
             self.set_status(401)
-        elif data == (MSG_INFORMATION % DB_FAIL):
+        elif data == (MSG_INFORMATION % DB_FAIL):  # pragma: no cover
             self.set_status(500)
         elif data == (MSG_INFORMATION % DUPLICATE_SLUG):
             self.set_status(409)
@@ -343,7 +345,7 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
         self.finish()
 
 
-def make_app():
+def make_app():  # pragma: no cover
     return Application([
         url(r'/auth', ProfileRequestHandler),
         url(r'/bots', BotRequestHandler, {'bm': BotManager()}),

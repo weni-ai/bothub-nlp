@@ -11,7 +11,7 @@ class Profile(BaseModel):
     created_at = peewee.DateTimeField(default=datetime.now)
     updated_at = peewee.DateTimeField()
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         r = {}
         for k in self._data.keys():
             try:
@@ -40,7 +40,7 @@ class Bot(BaseModel):
         self.updated_at = datetime.now()
         return super(Bot, self).save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         r = {}
         for k in self._data.keys():
             try:
