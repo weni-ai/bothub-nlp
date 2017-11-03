@@ -438,10 +438,18 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             }
             response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
-
             self.assertEqual(json.loads(response.body).get('bot_uuid', None), data['uuid'])
             self.assertEqual(response.code, 200)
 
+            response = self.fetch('/auth', method='POST', body='')
+            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(response.code, 200)
+
+            user_token = json.loads(response.body).get('uuid', None)
+            response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
+                                  headers={'Authorization': 'Bearer %s' % user_token})
+            self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
+            self.assertEqual(response.code, 401)
 
 if __name__ == '__main__':
     unittest.main()
