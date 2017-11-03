@@ -246,6 +246,8 @@ class BotRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to predict data
     """
+    def initialize(self, bm):
+        self.bm = bm
     @asynchronous
     @coroutine
     @token_required
@@ -254,7 +256,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
         uuid = self.get_argument('uuid', None)
         message = self.get_argument('msg', None)
         if message and uuid:
-            answer = bm.ask(message, uuid, auth_token)
+            answer = self.bm.ask(message, uuid, auth_token)
             if answer != (MSG_INFORMATION % INVALID_TOKEN):
                 data = {
                     'bot_uuid': uuid,
@@ -343,14 +345,13 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
 def make_app():
     return Application([
         url(r'/auth', ProfileRequestHandler),
-        url(r'/bots', BotRequestHandler),
+        url(r'/bots', BotRequestHandler, {'bm': BotManager()}),
         url(r'/bots-redirect', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])
 
 
 if __name__ == '__main__':
-    bm = BotManager()
     app = make_app()
     app.listen(sys.argv[1])
     tornado.ioloop.IOLoop.current().start()
