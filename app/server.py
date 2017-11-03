@@ -28,7 +28,6 @@ from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MS
 from decouple import config
 
 
-
 logging.basicConfig(filename="bothub-nlp.log")
 logger = logging.getLogger('bothub NLP - Bot Manager')
 logger.setLevel(logging.DEBUG)
@@ -248,6 +247,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
     """
     def initialize(self, bm):
         self.bm = bm
+
     @asynchronous
     @coroutine
     @token_required
