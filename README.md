@@ -1,4 +1,5 @@
 # Bothub Demo
+[![Coverage Status](https://coveralls.io/repos/github/push-flow/bothub-nlp/badge.svg?branch=feature%2Fauth-api)](https://coveralls.io/github/push-flow/bothub-nlp?branch=feature%2Fauth-api)
 
  ##### How to run 
  #
