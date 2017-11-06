@@ -451,5 +451,6 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
             self.assertEqual(response.code, 401)
 
+
 if __name__ == '__main__':
     unittest.main()
