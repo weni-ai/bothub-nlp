@@ -4,7 +4,7 @@ import redis
 
 
 MAX_USAGE_MEMORY = config('MAX_USAGE_MEMORY', default=80, cast=int)
-DEBUG = False
+DEBUG = True
 
 # Timer to bot timeout (60 minutes)
 BOT_REMOVER_TIME = config('BOT_REMOVER_TIME', default=60, cast=int)
@@ -18,5 +18,3 @@ SERVER_ALIVE_TIMER = config('SERVER_ALIVE_TIMER', default=70, cast=int)
 AWS_URL_INSTANCES_INFO = 'http://169.254.169.254/latest/meta-data/local-ipv4'
 
 LOCAL_IP = config('LOCAL_IP', default='127.0.0.1')
-
-REDIS_CONNECTION = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))

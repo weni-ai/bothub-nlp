@@ -25,7 +25,6 @@ from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
 from app.settings import *
 from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION, MISSING_DATA
-from decouple import config
 
 
 logging.basicConfig(filename="bothub-nlp.log")
@@ -344,10 +343,34 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
         self.finish()
 
 
+class BotInformationsRequestHandler(tornado.web.RequestHandler):
+    """
+    Tornado request handler to get information of specific bot (intents, entities, etc)
+    """
+    @asynchronous
+    @coroutine
+    @token_required
+    def get(self):
+        bot_uuid = self.get_argument('uuid', None)
+        if bot_uuid:
+            with DATABASE.execution_context():
+                instance = Bot.select(Bot.uuid, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid)
+                if len(instance):
+                    instance = instance.get()
+                    if not instance.private:
+                        self.write(json.dumps(instance.intents))
+                    else:
+                        owner_profile = Profile.select().where(
+                            Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:]))
+                        if instance.owner == owner_profile:
+                            self.write(json.dumps(instance.intents))
+
+
 def make_app():  # pragma: no cover
     return Application([
         url(r'/auth', ProfileRequestHandler),
         url(r'/bots', BotRequestHandler, {'bm': BotManager()}),
+        url(r'/bots/informations', BotInformationsRequestHandler),
         url(r'/bots-redirect', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])
