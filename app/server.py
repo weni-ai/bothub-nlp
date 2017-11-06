@@ -46,11 +46,7 @@ class BotManager(object):
     _pool = {}
 
     def __init__(self, gc=True):
-        self.redis = redis.ConnectionPool(
-            host=config('BOTHUB_REDIS'),
-            port=config('BOTHUB_REDIS_PORT'),
-            db=config('BOTHUB_REDIS_DB')
-        )
+        self.redis = REDIS_CONNECTION
         self._set_instance_redis()
         self._set_server_alive()
         self.gc_test = False
@@ -100,7 +96,7 @@ class BotManager(object):
         questions_queue = self._get_questions_queue(bot_uuid)
         answers_queue = self._get_answers_queue(bot_uuid)
 
-        if not self._pool[bot_uuid]['auth_token'] == auth_token:
+        if not self._pool[bot_uuid]['auth_token'] == auth_token and self._pool[bot_uuid]['private']:
             return MSG_INFORMATION % INVALID_TOKEN
 
         questions_queue.put(question)
@@ -214,7 +210,8 @@ class BotManager(object):
             'new_question_event': new_question_event,
             'new_answer_event': new_answer_event,
             'last_time_update': datetime.now(),
-            'auth_token': bot.owner.uuid.hex
+            'auth_token': bot.owner.uuid.hex,
+            'private': bot.private
         }
 
     def _set_server_alive(self):
@@ -290,7 +287,9 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             language = json_body.get("language", None)
             bot_slug = json_body.get("slug", None)
             data = json.dumps(json_body.get("data", None))
-            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
+            private = json_body.get("private", False)
+
+            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug, private)
             bot.daemon = True
             bot.start()
         else:

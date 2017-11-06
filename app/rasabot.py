@@ -10,7 +10,7 @@ from slugify import slugify
 
 
 import uuid
-
+import json
 import logging
 
 
@@ -41,7 +41,7 @@ class RasaBot():
     def ask(self, question):
         return self.interpreter.parse(question)
 
-    def training(self, language, data, auth_token, bot_slug):
+    def training(self, language, data, auth_token, bot_slug, private):
         """
         Creates a new training for the bot.
         Args:
@@ -51,6 +51,7 @@ class RasaBot():
             bot_slug: unique name bot (beatiful)
         """
 
+        logger.info("Start training bot...")
         with DATABASE.execution_context():
             owner = Profile.select().where(Profile.uuid == uuid.UUID(auth_token))
             bot_exist = Bot.select().where(Bot.slug == bot_slug)
@@ -71,11 +72,17 @@ class RasaBot():
         trainer.train(training_data)
         bot_data = trainer.persist()
         bot_slug = slugify(bot_slug)
+        intents = []
+        common_examples = json.loads(data).get('rasa_nlu_data').get('common_examples')
+        for common_example in common_examples:
+            if common_example.get('intent') not in intents:
+                intents.append(common_example.get('intent'))
         with DATABASE.execution_context():
-            bot = Bot.create(bot=bot_data, owner=owner, slug=bot_slug)
+            bot = Bot.create(bot=bot_data, owner=owner, slug=bot_slug, private=private, intents=intents)
 
             bot.save()
             if bot.uuid:
+                logger.info("Success bot train...")
                 return dict(uuid=str(bot.uuid), slug=str(bot.slug), owner=bot.owner.uuid.hex)
 
         logger.error("Fail when try insert new bot")
@@ -118,7 +125,7 @@ class RasaBotTrainProcess(Process):
     """
     This class is instantied when start a process bot to train
     """
-    def __init__(self, language, data, callback, auth_token, bot_slug, *args, **kwargs):
+    def __init__(self, language, data, callback, auth_token, bot_slug, private, *args, **kwargs):
         """
         Args:
             language: language that bot will be trained
@@ -134,8 +141,9 @@ class RasaBotTrainProcess(Process):
         self.auth_token = auth_token
         self.callback = callback
         self.bot_slug = bot_slug
+        self.private = private
 
     def run(self):
         self._bot = RasaBot(training=True)
-        data = self._bot.training(self.language, self.data, self.auth_token, self.bot_slug)
+        data = self._bot.training(self.language, self.data, self.auth_token, self.bot_slug, self.private)
         self.callback(data)

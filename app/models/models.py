@@ -1,5 +1,6 @@
 from app.models.base_models import BaseModel
 from datetime import datetime
+from playhouse.postgres_ext import JSONField
 
 import uuid
 import peewee
@@ -33,6 +34,8 @@ class Bot(BaseModel):
     bot = peewee.BlobField()
     slug = peewee.CharField(unique=True, null=False)
     owner = peewee.ForeignKeyField(Profile)
+    intents = JSONField()
+    private = peewee.BooleanField(default=False)
     created_at = peewee.DateTimeField(default=datetime.now)
     updated_at = peewee.DateTimeField()
 
