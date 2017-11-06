@@ -1,3 +1,9 @@
+from app.models.base_models import DATABASE
+from app.models.models import Profile
+
+import uuid
+
+
 INVALID_TOKEN = 'invalid_token'
 DB_FAIL = 'db_fail'
 DUPLICATE_SLUG = 'duplicated_slug'
@@ -10,7 +16,16 @@ def token_required(f):
     def check(handler, *args, **kwargs):
         auth_token = handler.request.headers.get('Authorization')
         if auth_token and len(auth_token) == 39 and auth_token.startswith('Bearer '):
-            return f(handler, *args, **kwargs)
+            with DATABASE.execution_context():
+                owner_profile = Profile.select().where(
+                    Profile.uuid == uuid.UUID(auth_token[7:]))
+
+            if len(owner_profile) == 1:
+                return f(handler, *args, **kwargs)
+
+            handler.set_status(401)
+            handler.write(MSG_INFORMATION % INVALID_TOKEN)
+            handler.finish()
         else:
             handler.set_status(401)
             handler.write(MSG_INFORMATION % WRONG_TOKEN)
