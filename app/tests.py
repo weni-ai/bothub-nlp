@@ -406,7 +406,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             user_token = json.loads(response.body).get('uuid', None)
 
             response = self.fetch('/train-bot', method='POST', body='',
-                                headers={'Authorization': 'Bearer %s' % user_token})
+                                  headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(json.loads(response.body).get('info', None), MISSING_DATA)
             self.assertEqual(response.code, 401)
 

@@ -41,8 +41,8 @@ before_script:
   - PYTHONPATH=`pwd` python app/models/create_schema.py
 
 script:
- - cd app
  - flake8
+ - cd app
  - coverage run --concurrency=multiprocessing -m unittest tests
 
 after_success:
