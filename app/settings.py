@@ -1,7 +1,5 @@
 from decouple import config
 
-import redis
-
 
 MAX_USAGE_MEMORY = config('MAX_USAGE_MEMORY', default=80, cast=int)
 DEBUG = True
