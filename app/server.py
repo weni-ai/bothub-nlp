@@ -53,6 +53,7 @@ class BotManager(object):
         )
         self._set_instance_redis()
         self._set_server_alive()
+        self.gc_test = False
         if not gc:  # pragma: no cover
             self.gc_test = True
         self.start_garbage_collector()
@@ -157,7 +158,7 @@ class BotManager(object):
         return self._set_bot_on_instance_redis(bot_uuid)  # pragma: no cover
 
     def _set_instance_redis(self):
-        self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
+        self.instance_ip = '127.0.0.1'#requests.get(AWS_URL_INSTANCES_INFO).text
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
@@ -322,11 +323,6 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
             owner_profile = Profile.select().where(
                 Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:]))
 
-            if len(owner_profile) != 1:
-                self.set_status(401)
-                self.write(MSG_INFORMATION % INVALID_TOKEN)
-                self.finish()
-
             owner_profile = owner_profile.get()
             bots = Bot.select(Bot.uuid, Bot.slug).where(
                 Bot.owner == owner_profile).dicts()
@@ -343,6 +339,19 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
     def post(self):
         self.write(self._register_profile())
         self.finish()
+
+
+class BotInformationsRequestHandler(tornado.web.RequestHandler):
+    """
+    Tornado request handler to get information of specific bot (intents, entities, etc)
+    """
+    @asynchronous
+    @coroutine
+    @token_required
+    def get(self):
+        auth_token = self.request.headers.get('Authorization')[7:]
+        uuid = self.get_argument('uuid', None)
+
 
 
 def make_app():  # pragma: no cover
