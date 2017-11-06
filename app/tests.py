@@ -394,11 +394,6 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(json.loads(response.body).get('info', None), WRONG_TOKEN)
             self.assertEqual(response.code, 401)
 
-            response = self.fetch('/train-bot', method='POST', body='',
-                                  headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
-            self.assertEqual(json.loads(response.body).get('info', None), MISSING_DATA)
-            self.assertEqual(response.code, 401)
-
             response = self.fetch('/train-bot', method='POST', body=self.data_training,
                                   headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
             self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
@@ -409,6 +404,11 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 200)
 
             user_token = json.loads(response.body).get('uuid', None)
+
+            response = self.fetch('/train-bot', method='POST', body='',
+                                headers={'Authorization': 'Bearer %s' % user_token})
+            self.assertEqual(json.loads(response.body).get('info', None), MISSING_DATA)
+            self.assertEqual(response.code, 401)
 
             response = self.fetch('/train-bot', method='POST', body=self.data_training % "slug-training",
                                   headers={'Authorization': 'Bearer %s' % user_token})
