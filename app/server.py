@@ -158,7 +158,11 @@ class BotManager(object):
         return self._set_bot_on_instance_redis(bot_uuid)  # pragma: no cover
 
     def _set_instance_redis(self):
-        self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
+        if not DEBUG:
+            self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
+        else:
+            self.instance_ip = LOCAL_IP
+
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
