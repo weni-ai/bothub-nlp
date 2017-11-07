@@ -5,7 +5,7 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer, Metadata, Interpreter
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
-from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, MSG_INFORMATION
+from app.utils import DB_FAIL, DUPLICATE_SLUG, MSG_INFORMATION
 from slugify import slugify
 
 

@@ -1,5 +1,4 @@
 from server import BotManager, ProfileRequestHandler, BotRequestHandler, BotTrainerRequestHandler, BotInformationsRequestHandler
-from unittest.mock import patch
 from playhouse.test_utils import test_database
 from peewee import *
 from app.models.models import Profile, Bot
@@ -469,7 +468,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
                 'uuid': json.loads(response.body).get('uuid', None)
             }
             response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
-                                    headers={'Authorization': 'Bearer %s' % user_token})
+                                  headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)
 
             response = self.fetch('/auth', method='POST', body='')
@@ -478,13 +477,12 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             user_token = json.loads(response.body).get('uuid', None)
 
             response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
-                                    headers={'Authorization': 'Bearer %s' % user_token})
+                                  headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
             self.assertEqual(response.code, 401)
 
-
             response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-predict-public", "false"),
-                        headers={'Authorization': 'Bearer %s' % user_token})
+                                  headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)
 
             data = {
@@ -492,7 +490,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             }
 
             response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
-                                    headers={'Authorization': 'Bearer %s' % user_token})
+                                  headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)
 
 
