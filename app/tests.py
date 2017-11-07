@@ -20,6 +20,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
     {
         "language": "en",
         "slug": "%s",
+        "private": %s,
         "data": {
                 "rasa_nlu_data": {
                     "regex_features": [
@@ -394,7 +395,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(json.loads(response.body).get('info', None), WRONG_TOKEN)
             self.assertEqual(response.code, 401)
 
-            response = self.fetch('/train-bot', method='POST', body=self.data_training,
+            response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-training", "false"),
                                   headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
             self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
             self.assertEqual(response.code, 401)
@@ -410,13 +411,17 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(json.loads(response.body).get('info', None), MISSING_DATA)
             self.assertEqual(response.code, 401)
 
-            response = self.fetch('/train-bot', method='POST', body=self.data_training % "slug-training",
+            response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-training", "false"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(json.loads(response.body).get('slug', None), "slug-training")
 
-            response = self.fetch('/train-bot', method='POST', body=self.data_training % "slug-training",
+            response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-training", "false"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(json.loads(response.body).get('info', None), DUPLICATE_SLUG)
+
+            response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-training-private", "true"),
+                                  headers={'Authorization': 'Bearer %s' % user_token})
+            self.assertEqual(json.loads(response.body).get('slug', None), "slug-training-private")
 
     def test_predict_handler(self):
         with test_database(test_db, (Profile, Bot)):
@@ -425,9 +430,9 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 200)
 
             user_token = json.loads(response.body).get('uuid', None)
-
-            response = self.fetch('/train-bot', method='POST', body=self.data_training % "slug-predict",
+            response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-predict", "true"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
+            self.assertEqual(response.code, 200)
 
             response = self.fetch('/auth', method='GET', headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)

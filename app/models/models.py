@@ -1,10 +1,18 @@
 from app.models.base_models import BaseModel
 from datetime import datetime
-from playhouse.postgres_ext import JSONField
 
 import uuid
 import peewee
 import json
+
+
+class JSONField(peewee.TextField):
+    def db_value(self, value):
+        return json.dumps(value)
+
+    def python_value(self, value):
+        if value is not None:
+            return json.loads(value)
 
 
 class Profile(BaseModel):
