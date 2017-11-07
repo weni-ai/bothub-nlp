@@ -297,9 +297,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             self.finish()
 
     def callback(self, data):
-        if data == (MSG_INFORMATION % INVALID_TOKEN):
-            self.set_status(401)
-        elif data == (MSG_INFORMATION % DB_FAIL):  # pragma: no cover
+        if data == (MSG_INFORMATION % DB_FAIL):  # pragma: no cover
             self.set_status(500)
         elif data == (MSG_INFORMATION % DUPLICATE_SLUG):
             self.set_status(409)
@@ -361,9 +359,13 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
                         self.write(json.dumps(instance.intents))
                     else:
                         owner_profile = Profile.select().where(
-                            Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:]))
+                            Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:])).get()
                         if instance.owner == owner_profile:
                             self.write(json.dumps(instance.intents))
+                        else:
+                            self.set_status(401)
+                            self.write(MSG_INFORMATION % INVALID_TOKEN)
+                self.finish()
 
 
 def make_app():  # pragma: no cover

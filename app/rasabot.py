@@ -56,9 +56,6 @@ class RasaBot():
             owner = Profile.select().where(Profile.uuid == uuid.UUID(auth_token))
             bot_exist = Bot.select().where(Bot.slug == bot_slug)
 
-        if len(owner) != 1:
-            return MSG_INFORMATION % INVALID_TOKEN
-
         if len(bot_exist):
             return MSG_INFORMATION % DUPLICATE_SLUG
 
