@@ -25,7 +25,6 @@ from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
 from app.settings import *
 from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION, MISSING_DATA
-from decouple import config
 
 
 logging.basicConfig(filename="bothub-nlp.log")
@@ -46,11 +45,7 @@ class BotManager(object):
     _pool = {}
 
     def __init__(self, gc=True):
-        self.redis = redis.ConnectionPool(
-            host=config('BOTHUB_REDIS'),
-            port=config('BOTHUB_REDIS_PORT'),
-            db=config('BOTHUB_REDIS_DB')
-        )
+        self.redis = REDIS_CONNECTION
         self._set_instance_redis()
         self._set_server_alive()
         self.gc_test = False
@@ -100,7 +95,7 @@ class BotManager(object):
         questions_queue = self._get_questions_queue(bot_uuid)
         answers_queue = self._get_answers_queue(bot_uuid)
 
-        if not self._pool[bot_uuid]['auth_token'] == auth_token:
+        if not self._pool[bot_uuid]['auth_token'] == auth_token and self._pool[bot_uuid]['private']:
             return MSG_INFORMATION % INVALID_TOKEN
 
         questions_queue.put(question)
@@ -158,7 +153,11 @@ class BotManager(object):
         return self._set_bot_on_instance_redis(bot_uuid)  # pragma: no cover
 
     def _set_instance_redis(self):
-        self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
+        if not DEBUG:
+            self.instance_ip = requests.get(AWS_URL_INSTANCES_INFO).text
+        else:
+            self.instance_ip = LOCAL_IP
+
         update_servers = redis.Redis(connection_pool=self.redis).get("SERVERS_INSTANCES_AVAILABLES")
 
         if update_servers is not None:
@@ -210,7 +209,8 @@ class BotManager(object):
             'new_question_event': new_question_event,
             'new_answer_event': new_answer_event,
             'last_time_update': datetime.now(),
-            'auth_token': bot.owner.uuid.hex
+            'auth_token': bot.owner.uuid.hex,
+            'private': bot.private
         }
 
     def _set_server_alive(self):
@@ -286,7 +286,9 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             language = json_body.get("language", None)
             bot_slug = json_body.get("slug", None)
             data = json.dumps(json_body.get("data", None))
-            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug)
+            private = json_body.get("private", False)
+
+            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug, private)
             bot.daemon = True
             bot.start()
         else:
@@ -295,9 +297,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             self.finish()
 
     def callback(self, data):
-        if data == (MSG_INFORMATION % INVALID_TOKEN):
-            self.set_status(401)
-        elif data == (MSG_INFORMATION % DB_FAIL):  # pragma: no cover
+        if data == (MSG_INFORMATION % DB_FAIL):  # pragma: no cover
             self.set_status(500)
         elif data == (MSG_INFORMATION % DUPLICATE_SLUG):
             self.set_status(409)
@@ -341,10 +341,38 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
         self.finish()
 
 
+class BotInformationsRequestHandler(tornado.web.RequestHandler):
+    """
+    Tornado request handler to get information of specific bot (intents, entities, etc)
+    """
+    @asynchronous
+    @coroutine
+    @token_required
+    def get(self):
+        bot_uuid = self.get_argument('uuid', None)
+        if bot_uuid:
+            with DATABASE.execution_context():
+                instance = Bot.select(Bot.uuid, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid)
+                if len(instance):
+                    instance = instance.get()
+                    if not instance.private:
+                        self.write(json.dumps(instance.intents))
+                    else:
+                        owner_profile = Profile.select().where(
+                            Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:])).get()
+                        if instance.owner == owner_profile:
+                            self.write(json.dumps(instance.intents))
+                        else:
+                            self.set_status(401)
+                            self.write(MSG_INFORMATION % INVALID_TOKEN)
+                self.finish()
+
+
 def make_app():  # pragma: no cover
     return Application([
         url(r'/auth', ProfileRequestHandler),
         url(r'/bots', BotRequestHandler, {'bm': BotManager()}),
+        url(r'/bots/informations', BotInformationsRequestHandler),
         url(r'/bots-redirect', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])

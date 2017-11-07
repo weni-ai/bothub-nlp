@@ -6,6 +6,15 @@ import peewee
 import json
 
 
+class JSONField(peewee.TextField):
+    def db_value(self, value):
+        return json.dumps(value)
+
+    def python_value(self, value):
+        if value is not None:
+            return json.loads(value)
+
+
 class Profile(BaseModel):
     uuid = peewee.UUIDField(primary_key=True, default=uuid.uuid4)
     created_at = peewee.DateTimeField(default=datetime.now)
@@ -33,6 +42,8 @@ class Bot(BaseModel):
     bot = peewee.BlobField()
     slug = peewee.CharField(unique=True, null=False)
     owner = peewee.ForeignKeyField(Profile)
+    intents = JSONField()
+    private = peewee.BooleanField(default=False)
     created_at = peewee.DateTimeField(default=datetime.now)
     updated_at = peewee.DateTimeField()
 
