@@ -4,7 +4,7 @@ import redis
 
 
 MAX_USAGE_MEMORY = config('MAX_USAGE_MEMORY', default=80, cast=int)
-DEBUG = True
+DEBUG = config('BOTHUB_DEBUG', default=False, cast=bool)
 
 # Timer to bot timeout (60 minutes)
 BOT_REMOVER_TIME = config('BOT_REMOVER_TIME', default=60, cast=int)
