@@ -2,8 +2,6 @@
 WEBAPP_HOME=/home/app/webapp
 PYTHON_VENV=/home/app/webapp/env
 PYTHON=$PYTHON_VENV/bin/python
-export LC_ALL=C.UTF-8
-export LANG=C.UTF-8
 git clone $APP_REPOSITORY_URL bothub
 cd bothub
 git checkout $APP_REPOSITORY_BRANCH

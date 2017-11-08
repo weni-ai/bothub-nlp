@@ -3,6 +3,8 @@ FROM ubuntu:16.04
 MAINTAINER vctrferreira
 ENV BASE_PATH=/home/app/webapp
 ENV CONTAINER_TIMEZONE=America/Sao_Paulo
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 WORKDIR ${BASE_PATH}
 
 RUN apt-get update
