@@ -42,8 +42,7 @@ before_script:
 
 script:
  - flake8
- - cd app
- - coverage run --concurrency=multiprocessing -m unittest tests
+ - coverage run --concurrency=multiprocessing -m unittest
 
 after_success:
   - coverage combine
