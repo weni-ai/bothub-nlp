@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /home/app/webapp/bothub
-python -m app --service=start_server 80
+/home/app/webapp/env/bin/python -m app --service=start_server 80

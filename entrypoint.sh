@@ -6,6 +6,7 @@ git clone $APP_REPOSITORY_URL bothub
 cd bothub
 git checkout $APP_REPOSITORY_BRANCH
 chmod +x app/server.py
+chmod +x supervisor_command.sh
 
 # Configure timezone
 if [ "$CONTAINER_TIMEZONE" ]; then
