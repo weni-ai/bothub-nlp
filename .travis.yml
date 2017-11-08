@@ -38,7 +38,7 @@ before_script:
   - export BOT_REMOVER_TIME=5
   - export GARBAGE_COLLECTOR_TIMER=20
   - python -m spacy download en
-  - PYTHONPATH=`pwd` python app/models/create_schema.py
+  - PYTHONPATH=`pwd` python -m app --service=create_schema
 
 script:
  - flake8
