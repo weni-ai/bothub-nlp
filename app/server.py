@@ -6,7 +6,6 @@ import tornado.ioloop
 import tornado.escape
 import json
 import cloudpickle
-import sys
 import requests
 import psutil
 import uuid
