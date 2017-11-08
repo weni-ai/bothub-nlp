@@ -188,7 +188,8 @@ class BotManager(object):
         logger.warning("Error remove bot in instance redis, trying again...")
         return self._remove_bot_instance_redis(bot_uuid)
 
-    def _start_bot_process(self, bot_uuid, model_bot):
+    @staticmethod
+    def _start_bot_process(bot_uuid, model_bot):
         answers_queue = Queue()
         questions_queue = Queue()
         new_question_event = Event()
@@ -248,8 +249,13 @@ class BotRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to predict data
     """
-    def initialize(self, bm):
-        self.bm = bm
+
+    def __init__(self, application, request, **kwargs):
+        super().__init__(application, request, **kwargs)
+        self.bot_manager = None
+
+    def initialize(self, bot_manager):
+        self.bot_manager = bot_manager
 
     @asynchronous
     @coroutine
@@ -259,7 +265,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
         uuid = self.get_argument('uuid', None)
         message = self.get_argument('msg', None)
         if message and uuid:
-            answer = self.bm.ask(message, uuid, auth_token)
+            answer = self.bot_manager.ask(message, uuid, auth_token)
             if answer != (MSG_INFORMATION % INVALID_TOKEN):
                 data = {
                     'bot_uuid': uuid,
@@ -310,7 +316,8 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
     Tornado request handler to predict data
     """
 
-    def _register_profile(self):
+    @staticmethod
+    def _register_profile():
         with DATABASE.execution_context():
             profile = Profile.create()
             profile.save()
@@ -373,7 +380,7 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
 def make_app():  # pragma: no cover
     return Application([
         url(r'/auth', ProfileRequestHandler),
-        url(r'/bots', BotRequestHandler, {'bm': BotManager()}),
+        url(r'/bots', BotRequestHandler, {'bot_manager': BotManager()}),
         url(r'/bots/informations', BotInformationsRequestHandler),
         url(r'/bots-redirect', BotRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)

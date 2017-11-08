@@ -21,10 +21,10 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
         with open('tests/training_data_sample.json') as json_data:
             self.data_training = self.data_training.join(json_data.readlines())
 
-        self.bm = BotManager(gc=False)
+        bot_manager = BotManager(gc=False)
         return Application([
             url(r'/auth', ProfileRequestHandler),
-            url(r'/bots', BotRequestHandler, {'bm': self.bm}),
+            url(r'/bots', BotRequestHandler, {'bot_manager': bot_manager}),
             url(r'/bots/informations', BotInformationsRequestHandler),
             url(r'/bots-redirect', BotRequestHandler),
             url(r'/train-bot', BotTrainerRequestHandler)
