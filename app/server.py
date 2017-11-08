@@ -6,7 +6,6 @@ import tornado.ioloop
 import tornado.escape
 import json
 import cloudpickle
-import redis
 import sys
 import requests
 import psutil
@@ -25,7 +24,6 @@ from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
 from app.settings import *
 from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION, MISSING_DATA
-
 
 logging.basicConfig(filename="bothub-nlp.log")
 logger = logging.getLogger('bothub NLP - Bot Manager')
@@ -214,7 +212,8 @@ class BotManager(object):
         }
 
     def _set_server_alive(self):
-        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True, ex=SERVER_ALIVE_TIMER):
+        if redis.Redis(connection_pool=self.redis).set("SERVER-ALIVE-%s" % self.instance_ip, True,
+                                                       ex=SERVER_ALIVE_TIMER):
             logger.info("Ping redis, i'm alive")
             return
         logger.warning("Error on ping redis, trying again...")  # pragma: no cover
@@ -277,6 +276,7 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to train bot
     """
+
     @asynchronous
     @token_required
     def post(self):
@@ -309,6 +309,7 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to predict data
     """
+
     def _register_profile(self):
         with DATABASE.execution_context():
             profile = Profile.create()
@@ -345,6 +346,7 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to get information of specific bot (intents, entities, etc)
     """
+
     @asynchronous
     @coroutine
     @token_required
