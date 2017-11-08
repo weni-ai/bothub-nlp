@@ -1,4 +1,4 @@
-from server import BotManager, ProfileRequestHandler, BotRequestHandler, BotTrainerRequestHandler, BotInformationsRequestHandler
+from app.server import BotManager, ProfileRequestHandler, BotRequestHandler, BotTrainerRequestHandler, BotInformationsRequestHandler
 from playhouse.test_utils import test_database
 from peewee import *
 from app.models.models import Profile, Bot
@@ -18,7 +18,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.data_training = ""
-        with open('tests/training_data_sample.json') as json_data:
+        with open('app/tests/training_data_sample.json') as json_data:
             self.data_training = self.data_training.join(json_data.readlines())
 
         bot_manager = BotManager(gc=False)
@@ -117,6 +117,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             }
             response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
+            print(response.body)
             self.assertEqual(json.loads(response.body).get('bot_uuid', None), data['uuid'])
             self.assertEqual(response.code, 200)
 

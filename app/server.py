@@ -11,9 +11,6 @@ import requests
 import psutil
 import uuid
 import logging
-import os
-
-sys.path.append(os.path.abspath(__file__).rsplit('/', 2)[0])
 
 from threading import Timer, Lock
 from tornado.web import Application, asynchronous, url
@@ -249,10 +246,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to predict data
     """
-
-    def __init__(self, application, request, **kwargs):
-        super().__init__(application, request, **kwargs)
-        self.bot_manager = None
+    bot_manager = None
 
     def initialize(self, bot_manager):
         self.bot_manager = bot_manager
@@ -392,7 +386,8 @@ def make_app():  # pragma: no cover
     ])
 
 
-if __name__ == '__main__':
+def start_server(port):
+    global app
     app = make_app()
-    app.listen(sys.argv[1])
+    app.listen(port)
     tornado.ioloop.IOLoop.current().start()

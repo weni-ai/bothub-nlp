@@ -12,3 +12,4 @@ peewee
 python-decouple
 psutil
 python-slugify
+click
