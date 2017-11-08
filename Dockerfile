@@ -30,6 +30,7 @@ RUN echo ${CONTAINER_TIMEZONE} >/etc/timezone
 RUN ln -sf /usr/share/zoneinfo/${CONTAINER_TIMEZONE} /etc/localtime
 RUN dpkg-reconfigure -f noninteractive tzdata
 
+COPY supervisor_command.sh ${BASE_PATH}
 COPY supervisor-app.conf /etc/supervisor/conf.d/
 COPY entrypoint.sh ${BASE_PATH}
 RUN chmod +x ${BASE_PATH}/entrypoint.sh
