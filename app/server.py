@@ -352,7 +352,7 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
         bot_uuid = self.get_argument('uuid', None)
         if bot_uuid:
             with DATABASE.execution_context():
-                instance = Bot.select(Bot.uuid, Bot.slug, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid) # bug here
+                instance = Bot.select(Bot.uuid, Bot.slug, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid)
                 if len(instance):
                     instance = instance.get()
                     informations = {
