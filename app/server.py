@@ -361,16 +361,21 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
         bot_uuid = self.get_argument('uuid', None)
         if bot_uuid:
             with DATABASE.execution_context():
-                instance = Bot.select(Bot.uuid, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid)
+                instance = Bot.select(Bot.uuid, Bot.slug, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid)
                 if len(instance):
                     instance = instance.get()
+                    informations = {
+                        'slug': instance.slug,
+                        'intents': instance.intents,
+                        'private': instance.private
+                    }
                     if not instance.private:
-                        self.write(json.dumps(instance.intents))
+                        self.write(informations)
                     else:
                         owner_profile = Profile.select().where(
                             Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:])).get()
                         if instance.owner == owner_profile:
-                            self.write(json.dumps(instance.intents))
+                            self.write(informations)
                         else:
                             self.set_status(401)
                             self.write(MSG_INFORMATION % INVALID_TOKEN)
