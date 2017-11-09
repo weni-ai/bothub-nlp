@@ -241,7 +241,7 @@ class BotManager(object):
         return self._set_usage_memory()  # pragma: no cover
 
 
-class BotRequestHandler(tornado.web.RequestHandler):
+class MessageRequestHandler(tornado.web.RequestHandler):
     """
     Tornado request handler to predict data
     """
@@ -255,7 +255,7 @@ class BotRequestHandler(tornado.web.RequestHandler):
     @token_required
     def get(self):
         auth_token = self.request.headers.get('Authorization')[7:]
-        uuid = self.get_argument('uuid', None)
+        uuid = self.get_argument('bot_uuid', None)
         message = self.get_argument('msg', None)
         if message and uuid:
             answer = self.bot_manager.ask(message, uuid, auth_token)
@@ -314,7 +314,9 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
         with DATABASE.execution_context():
             profile = Profile.create()
             profile.save()
-        return dict(uuid=profile.uuid.hex)
+
+        response = dict(uuid=profile.uuid.hex)
+        return dict(user=response)
 
     @asynchronous
     @coroutine
@@ -325,15 +327,17 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
                 Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:]))
 
             owner_profile = owner_profile.get()
-            bots = Bot.select(Bot.uuid, Bot.slug).where(
-                Bot.owner == owner_profile).dicts()
+            bots = Bot.select(Bot.uuid, Bot.slug).where(Bot.owner == owner_profile).dicts()
 
-        list_bots = list()
-        for bot in bots:
-            bot['uuid'] = str(bot['uuid'])
-            list_bots.append(bot)
-        self.write(json.dumps(list_bots))
+        bots_response = list(map(self._prepare_bot_response, bots))
+
+        self.write(dict(bots=bots_response))
         self.finish()
+
+    @staticmethod
+    def _prepare_bot_response(bot):
+        bot['uuid'] = str(bot['uuid'])
+        return bot
 
     @asynchronous
     @coroutine
@@ -378,9 +382,9 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
 def make_app():  # pragma: no cover
     return Application([
         url(r'/auth', ProfileRequestHandler),
-        url(r'/bots', BotRequestHandler, {'bot_manager': BotManager()}),
+        url(r'/message', MessageRequestHandler, {'bot_manager': BotManager()}),
         url(r'/bots/informations', BotInformationsRequestHandler),
-        url(r'/bots-redirect', BotRequestHandler),
+        url(r'/bots-redirect', MessageRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])
 

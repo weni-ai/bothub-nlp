@@ -1,4 +1,4 @@
-from app.server import BotManager, ProfileRequestHandler, BotRequestHandler, BotTrainerRequestHandler, BotInformationsRequestHandler
+from app.server import BotManager, ProfileRequestHandler, MessageRequestHandler, BotTrainerRequestHandler, BotInformationsRequestHandler
 from playhouse.test_utils import test_database
 from peewee import *
 from app.models.models import Profile, Bot
@@ -24,9 +24,9 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
         bot_manager = BotManager(gc=False)
         return Application([
             url(r'/auth', ProfileRequestHandler),
-            url(r'/bots', BotRequestHandler, {'bot_manager': bot_manager}),
+            url(r'/message', MessageRequestHandler, {'bot_manager': bot_manager}),
             url(r'/bots/informations', BotInformationsRequestHandler),
-            url(r'/bots-redirect', BotRequestHandler),
+            url(r'/bots-redirect', MessageRequestHandler),
             url(r'/train-bot', BotTrainerRequestHandler)
         ])
 
@@ -118,7 +118,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
             print(response.body)
-            self.assertEqual(json.loads(response.body).get('bot_uuid', None), data['uuid'])
+            self.assertEqual(json.loads(response.body).get('bot_uuid', None), data['bot_uuid'])
             self.assertEqual(response.code, 200)
 
             response = self.fetch('/auth', method='POST', body='')
