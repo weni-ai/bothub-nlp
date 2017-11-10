@@ -23,6 +23,9 @@ RUN pip3 install redis
 RUN virtualenv -p python3 env
 RUN env/bin/pip install psycopg2
 
+COPY requirements.txt ${BASE_PATH}
+RUN pip3 install -r requirements.txt
+
 # setup all the configfiles
 # COPY .ssh/ /root/.ssh
 # RUN chmod 400 /root/.ssh/id_rsa*
@@ -35,6 +38,7 @@ RUN dpkg-reconfigure -f noninteractive tzdata
 COPY supervisor_command.sh ${BASE_PATH}
 COPY supervisor-app.conf /etc/supervisor/conf.d/
 COPY entrypoint.sh ${BASE_PATH}
+
 RUN chmod +x ${BASE_PATH}/entrypoint.sh
 
 ENTRYPOINT ${BASE_PATH}/entrypoint.sh
