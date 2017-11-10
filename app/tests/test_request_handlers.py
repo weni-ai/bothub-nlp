@@ -33,17 +33,17 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
     def test_profile_handler(self):
         with test_database(test_db, (Profile, Bot)):
             response = self.fetch('/v1/auth', method='GET')
-            self.assertEqual(json.loads(response.body).get('info', None), WRONG_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/auth', method='GET', headers={'Authorization': '1234'})
-            self.assertEqual(json.loads(response.body).get('info', None), WRONG_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/auth', method='GET',
                                   headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
 
-            self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/auth', method='POST', body='')
@@ -62,16 +62,16 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 405)
 
             response = self.fetch('/v1/train', method='POST', body='')
-            self.assertEqual(json.loads(response.body).get('info', None), WRONG_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/train', method='POST', body='', headers={'Authorization': '12345'})
-            self.assertEqual(json.loads(response.body).get('info', None), WRONG_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training", "false"),
                                   headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
-            self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/auth', method='POST', body='')
@@ -82,7 +82,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
 
             response = self.fetch('/v1/train', method='POST', body='',
                                   headers={'Authorization': 'Bearer %s' % user_token})
-            self.assertEqual(json.loads(response.body).get('info', None), MISSING_DATA)
+            self.assertEqual(json.loads(response.body)['error']['message'], MISSING_DATA)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training", "false"),
@@ -91,7 +91,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
 
             response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training", "false"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
-            self.assertEqual(json.loads(response.body).get('info', None), DUPLICATE_SLUG)
+            self.assertEqual(json.loads(response.body)['error']['message'], DUPLICATE_SLUG)
 
             response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training-private", "true"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
@@ -127,7 +127,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             user_token = json.loads(response.body)['user']['uuid']
             response = self.fetch('/v1/message?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
-            self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
             self.assertEqual(response.code, 401)
 
     def test_information_handler(self):
@@ -155,7 +155,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
 
             response = self.fetch('/v1/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
-            self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
+            self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-predict-public", "false"),
