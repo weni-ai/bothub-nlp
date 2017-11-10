@@ -385,11 +385,11 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
 
 def make_app():  # pragma: no cover
     return Application([
-        url(r'/auth', ProfileRequestHandler),
-        url(r'/message', MessageRequestHandler, {'bot_manager': BotManager()}),
-        url(r'/bots', BotInformationsRequestHandler),
-        url(r'/bots-redirect', MessageRequestHandler),
-        url(r'/train', BotTrainerRequestHandler)
+        url(r'/v1/auth', ProfileRequestHandler),
+        url(r'/v1/message', MessageRequestHandler, {'bot_manager': BotManager()}),
+        url(r'/v1/bots', BotInformationsRequestHandler),
+        url(r'/v1/bots-redirect', MessageRequestHandler),
+        url(r'/v1/train', BotTrainerRequestHandler)
     ])
 
 
