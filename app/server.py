@@ -22,8 +22,7 @@ from app.rasabot import RasaBotProcess, RasaBotTrainProcess
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
 from app.settings import *
-from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, ERROR_PATTERN, MISSING_DATA, INVALID_BOT, \
-    validate_uuid
+from app.utils import INVALID_TOKEN, token_required, ERROR_PATTERN, MISSING_DATA, INVALID_BOT, validate_uuid
 
 logging.basicConfig(filename="bothub-nlp.log")
 logger = logging.getLogger('bothub NLP - Bot Manager')
