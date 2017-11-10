@@ -25,7 +25,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
         return Application([
             url(r'/auth', ProfileRequestHandler),
             url(r'/message', MessageRequestHandler, {'bot_manager': bot_manager}),
-            url(r'/bots/informations', BotInformationsRequestHandler),
+            url(r'/bots', BotInformationsRequestHandler),
             url(r'/bots-redirect', MessageRequestHandler),
             url(r'/train-bot', BotTrainerRequestHandler)
         ])
@@ -144,7 +144,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             data = {
                 'uuid': json.loads(response.body).get('uuid', None)
             }
-            response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
+            response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)
 
@@ -153,7 +153,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 200)
             user_token = json.loads(response.body)['user']['uuid']
 
-            response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
+            response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
             self.assertEqual(response.code, 401)
@@ -166,7 +166,7 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
                 'uuid': json.loads(response.body).get('uuid', None)
             }
 
-            response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
+            response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)
 

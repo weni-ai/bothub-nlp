@@ -384,7 +384,7 @@ def make_app():  # pragma: no cover
     return Application([
         url(r'/auth', ProfileRequestHandler),
         url(r'/message', MessageRequestHandler, {'bot_manager': BotManager()}),
-        url(r'/bots/informations', BotInformationsRequestHandler),
+        url(r'/bots', BotInformationsRequestHandler),
         url(r'/bots-redirect', MessageRequestHandler),
         url(r'/train-bot', BotTrainerRequestHandler)
     ])
