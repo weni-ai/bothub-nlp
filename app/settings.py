@@ -1,6 +1,7 @@
 from decouple import config
 
 import redis
+import logging
 
 
 MAX_USAGE_MEMORY = config('MAX_USAGE_MEMORY', default=80, cast=int)
@@ -20,3 +21,13 @@ AWS_URL_INSTANCES_INFO = 'http://169.254.169.254/latest/meta-data/local-ipv4'
 LOCAL_IP = config('LOCAL_IP', default='127.0.0.1')
 
 REDIS_CONNECTION = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))
+
+logging.basicConfig(filename="bothub-nlp.log")
+logger = logging.getLogger('bothub NLP - Bot Manager')
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)

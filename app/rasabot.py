@@ -3,7 +3,7 @@ from multiprocessing import Process
 from rasa_nlu.converters import load_rasa_data
 from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer, Metadata, Interpreter
-from tornado import web
+from tornado.web import HTTPError
 
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
@@ -59,7 +59,7 @@ class RasaBot():
             bot_exist = Bot.select().where(Bot.slug == bot_slug)
 
         if len(bot_exist):
-            return web.HTTPError(reason=DUPLICATE_SLUG, status_code=401)
+            return HTTPError(reason=DUPLICATE_SLUG, status_code=401)
 
         owner = owner.get()
         config = '{"pipeline": "spacy_sklearn", \
@@ -85,7 +85,7 @@ class RasaBot():
                 return dict(bot=bot.to_dict())
 
         logger.error("Fail when try insert new bot")
-        return web.HTTPError(reason=DB_FAIL, status_code=401)
+        return HTTPError(reason=DB_FAIL, status_code=401)
 
 
 class RasaBotProcess(Process):
