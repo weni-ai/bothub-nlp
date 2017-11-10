@@ -80,7 +80,7 @@ class RasaBot():
             bot.save()
             if bot.uuid:
                 logger.info("Success bot train...")
-                return dict(uuid=str(bot.uuid), slug=str(bot.slug), owner=bot.owner.uuid.hex)
+                return dict(bot=bot.to_dict())
 
         logger.error("Fail when try insert new bot")
         return MSG_INFORMATION % DB_FAIL

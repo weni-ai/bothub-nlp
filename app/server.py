@@ -377,6 +377,9 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
                         else:
                             self.set_status(401)
                             self.write(MSG_INFORMATION % INVALID_TOKEN)
+                else:
+                    self.set_status(401)
+                    self.write(MSG_INFORMATION % INVALID_TOKEN)
                 self.finish()
 
 
@@ -386,7 +389,7 @@ def make_app():  # pragma: no cover
         url(r'/message', MessageRequestHandler, {'bot_manager': BotManager()}),
         url(r'/bots', BotInformationsRequestHandler),
         url(r'/bots-redirect', MessageRequestHandler),
-        url(r'/train-bot', BotTrainerRequestHandler)
+        url(r'/train', BotTrainerRequestHandler)
     ])
 
 

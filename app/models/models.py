@@ -47,6 +47,13 @@ class Bot(BaseModel):
     created_at = peewee.DateTimeField(default=datetime.now)
     updated_at = peewee.DateTimeField()
 
+    def to_dict(self):
+        return {
+            'uuid': str(self.uuid),
+            'slug': self.slug,
+            'owner': self.owner.uuid.hex
+        }
+
     def save(self, *args, **kwargs):
         self.updated_at = datetime.now()
         return super(Bot, self).save(*args, **kwargs)
