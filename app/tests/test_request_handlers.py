@@ -47,13 +47,13 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/auth', method='POST', body='')
-            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
             self.assertEqual(response.code, 200)
 
-            user_token = json.loads(response.body).get('uuid', None)
+            user_token = json.loads(response.body)['user']['uuid']
 
             response = self.fetch('/auth', method='GET', headers={'Authorization': 'Bearer %s' % user_token})
-            self.assertEqual(json.loads(response.body), [])
+            self.assertEqual(json.loads(response.body), {"bots": []})
             self.assertEqual(response.code, 200)
 
     def test_training_handler(self):
@@ -75,10 +75,10 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 401)
 
             response = self.fetch('/auth', method='POST', body='')
-            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
             self.assertEqual(response.code, 200)
 
-            user_token = json.loads(response.body).get('uuid', None)
+            user_token = json.loads(response.body)['user']['uuid']
 
             response = self.fetch('/train-bot', method='POST', body='',
                                   headers={'Authorization': 'Bearer %s' % user_token})
@@ -100,10 +100,10 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
     def test_predict_handler(self):
         with test_database(test_db, (Profile, Bot)):
             response = self.fetch('/auth', method='POST', body='')
-            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
             self.assertEqual(response.code, 200)
 
-            user_token = json.loads(response.body).get('uuid', None)
+            user_token = json.loads(response.body)['user']['uuid']
             response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-predict", "true"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(response.code, 200)
@@ -112,21 +112,20 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 200)
 
             data = {
-                'uuid': json.loads(response.body)[0].get('uuid', None),
+                'bot': json.loads(response.body)['bots'][0]['uuid'],
                 'msg': 'I want eat chinese food'
             }
-            response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
+            response = self.fetch('/message?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
-            print(response.body)
-            self.assertEqual(json.loads(response.body).get('bot_uuid', None), data['bot_uuid'])
+            self.assertEqual(json.loads(response.body)['bot']['uuid'], data['bot'])
             self.assertEqual(response.code, 200)
 
             response = self.fetch('/auth', method='POST', body='')
-            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
             self.assertEqual(response.code, 200)
 
-            user_token = json.loads(response.body).get('uuid', None)
-            response = self.fetch('/bots?%s' % urllib.parse.urlencode(data), method='GET',
+            user_token = json.loads(response.body)['user']['uuid']
+            response = self.fetch('/message?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})
             self.assertEqual(json.loads(response.body).get('info', None), INVALID_TOKEN)
             self.assertEqual(response.code, 401)
@@ -134,9 +133,9 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
     def test_information_handler(self):
         with test_database(test_db, (Profile, Bot)):
             response = self.fetch('/auth', method='POST', body='')
-            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
             self.assertEqual(response.code, 200)
-            user_token = json.loads(response.body).get('uuid', None)
+            user_token = json.loads(response.body)['user']['uuid']
 
             response = self.fetch('/train-bot', method='POST', body=self.data_training % ("slug-predict-private", "true"),
                                   headers={'Authorization': 'Bearer %s' % user_token})
@@ -150,9 +149,9 @@ class RequestHandlersTest(testing.AsyncHTTPTestCase):
             self.assertEqual(response.code, 200)
 
             response = self.fetch('/auth', method='POST', body='')
-            self.assertEqual(len(json.loads(response.body).get('uuid', None)), 32)
+            self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
             self.assertEqual(response.code, 200)
-            user_token = json.loads(response.body).get('uuid', None)
+            user_token = json.loads(response.body)['user']['uuid']
 
             response = self.fetch('/bots/informations?%s' % urllib.parse.urlencode(data), method='GET',
                                   headers={'Authorization': 'Bearer %s' % user_token})

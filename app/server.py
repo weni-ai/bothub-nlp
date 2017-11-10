@@ -255,13 +255,14 @@ class MessageRequestHandler(tornado.web.RequestHandler):
     @token_required
     def get(self):
         auth_token = self.request.headers.get('Authorization')[7:]
-        uuid = self.get_argument('bot_uuid', None)
+        uuid = self.get_argument('bot', None)
         message = self.get_argument('msg', None)
+
         if message and uuid:
             answer = self.bot_manager.ask(message, uuid, auth_token)
             if answer != (MSG_INFORMATION % INVALID_TOKEN):
                 data = {
-                    'bot_uuid': uuid,
+                    'bot': dict(uuid=uuid),
                     'answer': answer
                 }
             else:
