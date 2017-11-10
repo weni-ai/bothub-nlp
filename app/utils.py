@@ -1,15 +1,17 @@
+import uuid
+
+from tornado import web
+
 from app.models.base_models import DATABASE
 from app.models.models import Profile
 
-import uuid
-
-
-INVALID_TOKEN = 'invalid_token'
-DB_FAIL = 'db_fail'
-DUPLICATE_SLUG = 'duplicated_slug'
-WRONG_TOKEN = 'auth_token_wrong'
-MISSING_DATA = 'missing_data'
-MSG_INFORMATION = '{"info": "%s"}'
+INVALID_TOKEN = 'Invalid token'
+DB_FAIL = 'Error or retrieving data from Database'
+DUPLICATE_SLUG = 'Slug already exists'
+WRONG_TOKEN = 'Auth token is wrong'
+MISSING_DATA = 'Missing data'
+INVALID_BOT = 'Bot not found'
+ERROR_PATTERN = '{"error": "%s"}'
 
 
 def token_required(f):
@@ -23,13 +25,21 @@ def token_required(f):
             if len(owner_profile) == 1:
                 return f(handler, *args, **kwargs)
 
-            handler.set_status(401)
-            handler.write(MSG_INFORMATION % INVALID_TOKEN)
-            handler.finish()
+            raise web.HTTPError(reason=INVALID_TOKEN, status_code=401)
         else:
-            handler.set_status(401)
-            handler.write(MSG_INFORMATION % WRONG_TOKEN)
-            handler.finish()
+            raise web.HTTPError(reason=WRONG_TOKEN, status_code=401)
+
     check.__doc__ = f.__doc__
     check.__name__ = f.__name__
     return check
+
+
+def validate_uuid(uuid_string):
+    try:
+        val = uuid.UUID(uuid_string, version=4)
+    except AttributeError:
+        return False
+    except ValueError:
+        return False
+
+    return str(val) == uuid_string

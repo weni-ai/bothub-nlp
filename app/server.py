@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """ This module start server """
+import traceback
 from multiprocessing import Queue, Event
 
 import tornado.ioloop
@@ -12,6 +13,8 @@ import uuid
 import logging
 
 from threading import Timer, Lock
+
+from tornado import web
 from tornado.web import Application, asynchronous, url
 from tornado.gen import coroutine
 from datetime import datetime, timedelta
@@ -19,7 +22,8 @@ from app.rasabot import RasaBotProcess, RasaBotTrainProcess
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
 from app.settings import *
-from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, MSG_INFORMATION, MISSING_DATA
+from app.utils import INVALID_TOKEN, DB_FAIL, DUPLICATE_SLUG, token_required, ERROR_PATTERN, MISSING_DATA, INVALID_BOT, \
+    validate_uuid
 
 logging.basicConfig(filename="bothub-nlp.log")
 logger = logging.getLogger('bothub NLP - Bot Manager')
@@ -64,13 +68,16 @@ class BotManager(object):
                 logger.info('Creating a new instance...')
 
                 with DATABASE.execution_context():
-                    instance = Bot.get(Bot.uuid == bot_uuid)
+                    try:
+                        instance = Bot.get(Bot.uuid == bot_uuid)
 
-                bot = cloudpickle.loads(instance.bot)
-                self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
-                bot_data = self._start_bot_process(bot_uuid, bot)
-                self._pool[bot_uuid] = bot_data
-                self._set_bot_on_instance_redis(bot_uuid)
+                        bot = cloudpickle.loads(instance.bot)
+                        self._set_bot_redis(bot_uuid, cloudpickle.dumps(bot))
+                        bot_data = self._start_bot_process(bot_uuid, bot)
+                        self._pool[bot_uuid] = bot_data
+                        self._set_bot_on_instance_redis(bot_uuid)
+                    except:
+                        raise web.HTTPError(reason=INVALID_BOT, status_code=401)
         return bot_data
 
     def _get_new_answer_event(self, bot_uuid):
@@ -90,7 +97,7 @@ class BotManager(object):
         answers_queue = self._get_answers_queue(bot_uuid)
 
         if not self._pool[bot_uuid]['auth_token'] == auth_token and self._pool[bot_uuid]['private']:
-            return MSG_INFORMATION % INVALID_TOKEN
+            raise web.HTTPError(reason=INVALID_TOKEN, status_code=401)
 
         questions_queue.put(question)
         new_question_event = self._get_new_question_event(bot_uuid)
@@ -241,7 +248,31 @@ class BotManager(object):
         return self._set_usage_memory()  # pragma: no cover
 
 
-class MessageRequestHandler(tornado.web.RequestHandler):
+class BothubBaseHandler(web.RequestHandler):
+
+    def write_error(self, status_code, **kwargs):
+        self.set_header('Content-Type', 'application/json')
+        if self.settings.get("serve_traceback") and "exc_info" in kwargs:
+            lines = []
+            for line in traceback.format_exception(*kwargs["exc_info"]):
+                lines.append(line)
+            self.finish(json.dumps({
+                'error': {
+                    'code': status_code,
+                    'message': self._reason,
+                    'traceback': lines,
+                }
+            }))
+        else:
+            self.finish(json.dumps({
+                'error': {
+                    'code': status_code,
+                    'message': self._reason,
+                }
+            }))
+
+
+class MessageRequestHandler(BothubBaseHandler):
     """
     Tornado request handler to predict data
     """
@@ -255,24 +286,25 @@ class MessageRequestHandler(tornado.web.RequestHandler):
     @token_required
     def get(self):
         auth_token = self.request.headers.get('Authorization')[7:]
-        uuid = self.get_argument('bot', None)
+        bot = self.get_argument('bot', None)
         message = self.get_argument('msg', None)
 
-        if message and uuid:
-            answer = self.bot_manager.ask(message, uuid, auth_token)
-            if answer != (MSG_INFORMATION % INVALID_TOKEN):
+        if message and bot and validate_uuid(bot):
+            answer = self.bot_manager.ask(message, bot, auth_token)
+            if answer != (ERROR_PATTERN % INVALID_TOKEN):
                 data = {
-                    'bot': dict(uuid=uuid),
+                    'bot': dict(uuid=bot),
                     'answer': answer
                 }
+                self.write(data)
+                self.finish()
             else:
-                data = MSG_INFORMATION % INVALID_TOKEN
-                self.set_status(401)
-            self.write(data)
-        self.finish()
+                raise web.HTTPError(reason=INVALID_TOKEN, status_code=401)
+        else:
+            raise web.HTTPError(reason=MISSING_DATA, status_code=401)
 
 
-class BotTrainerRequestHandler(tornado.web.RequestHandler):
+class BotTrainerRequestHandler(BothubBaseHandler):
     """
     Tornado request handler to train bot
     """
@@ -292,20 +324,19 @@ class BotTrainerRequestHandler(tornado.web.RequestHandler):
             bot.daemon = True
             bot.start()
         else:
-            self.set_status(401)
-            self.write(MSG_INFORMATION % MISSING_DATA)
-            self.finish()
+            raise web.HTTPError(reason=MISSING_DATA, status_code=401)
 
     def callback(self, data):
-        if data == (MSG_INFORMATION % DB_FAIL):  # pragma: no cover
-            self.set_status(500)
-        elif data == (MSG_INFORMATION % DUPLICATE_SLUG):
-            self.set_status(409)
+        if isinstance(data, web.HTTPError):
+            self.set_status(data.status_code, data.reason)
+            self.write_error(data.status_code)
+            return
+
         self.write(data)
         self.finish()
 
 
-class ProfileRequestHandler(tornado.web.RequestHandler):
+class ProfileRequestHandler(BothubBaseHandler):
     """
     Tornado request handler to predict data
     """
@@ -347,7 +378,7 @@ class ProfileRequestHandler(tornado.web.RequestHandler):
         self.finish()
 
 
-class BotInformationsRequestHandler(tornado.web.RequestHandler):
+class BotInformationsRequestHandler(BothubBaseHandler):
     """
     Tornado request handler to get information of specific bot (intents, entities, etc)
     """
@@ -357,30 +388,32 @@ class BotInformationsRequestHandler(tornado.web.RequestHandler):
     @token_required
     def get(self):
         bot_uuid = self.get_argument('uuid', None)
-        if bot_uuid:
+        if bot_uuid and validate_uuid(bot_uuid):
             with DATABASE.execution_context():
-                instance = Bot.select(Bot.uuid, Bot.slug, Bot.intents, Bot.private, Bot.owner).where(Bot.uuid == bot_uuid)
+                instance = Bot.select(Bot.uuid, Bot.slug, Bot.intents, Bot.private, Bot.owner)\
+                    .where(Bot.uuid == bot_uuid)
+
                 if len(instance):
                     instance = instance.get()
-                    informations = {
+                    information = {
                         'slug': instance.slug,
                         'intents': instance.intents,
                         'private': instance.private
                     }
                     if not instance.private:
-                        self.write(informations)
+                        self.write(information)
                     else:
                         owner_profile = Profile.select().where(
                             Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:])).get()
                         if instance.owner == owner_profile:
-                            self.write(informations)
+                            self.write(information)
                         else:
-                            self.set_status(401)
-                            self.write(MSG_INFORMATION % INVALID_TOKEN)
+                            raise web.HTTPError(reason=INVALID_TOKEN, status_code=401)
+                    self.finish()
                 else:
-                    self.set_status(401)
-                    self.write(MSG_INFORMATION % INVALID_TOKEN)
-                self.finish()
+                    raise web.HTTPError(reason=INVALID_BOT, status_code=401)
+        else:
+            raise web.HTTPError(reason=INVALID_BOT, status_code=401)
 
 
 def make_app():  # pragma: no cover
