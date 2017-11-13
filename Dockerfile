@@ -24,7 +24,7 @@ RUN virtualenv -p python3 env
 RUN env/bin/pip install psycopg2
 
 COPY requirements.txt ${BASE_PATH}
-RUN pip3 install -r requirements.txt
+RUN env/bin/pip install -r requirements.txt
 
 # setup all the configfiles
 # COPY .ssh/ /root/.ssh
