@@ -13,7 +13,6 @@ def make_app():  # pragma: no cover
         url(r'/v1/auth', ProfileRequestHandler),
         url(r'/v1/message', MessageRequestHandler, {'bot_manager': BotManager()}),
         url(r'/v1/bots', BotInformationsRequestHandler),
-        url(r'/v1/bots-redirect', MessageRequestHandler),
         url(r'/v1/train', BotTrainerRequestHandler)
     ])
 
