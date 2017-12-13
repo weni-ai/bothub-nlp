@@ -16,5 +16,4 @@ if [ "$CONTAINER_TIMEZONE" ]; then
 fi
 
 source $PYTHON_VENV/bin/activate
-python -m spacy download en
 supervisord -n
