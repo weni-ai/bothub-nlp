@@ -26,6 +26,14 @@ RUN env/bin/pip install psycopg2
 COPY requirements.txt ${BASE_PATH}
 RUN env/bin/pip install -r requirements.txt
 
+RUN env/bin/python -m spacy download en
+RUN env/bin/python -m spacy download de
+RUN env/bin/python -m spacy download es
+RUN env/bin/python -m spacy download pt
+RUN env/bin/python -m spacy download fr
+RUN env/bin/python -m spacy download it
+RUN env/bin/python -m spacy download nl
+
 # setup all the configfiles
 # COPY .ssh/ /root/.ssh
 # RUN chmod 400 /root/.ssh/id_rsa*
