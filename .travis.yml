@@ -46,5 +46,5 @@ script:
 
 after_success:
   - coverage combine
-  - coveralls --rcfile ../.coveragerc
-  - coverage report -i --rcfile ../.coveragerc  --fail-under=90
+  - coveralls --rcfile .coveragerc
+  - coverage report -i --rcfile .coveragerc  --fail-under=90
