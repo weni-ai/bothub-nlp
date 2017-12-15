@@ -9,10 +9,12 @@ import psutil
 from threading import Timer, Lock
 
 from datetime import datetime, timedelta
+from tornado.web import HTTPError
 from app.rasabot import RasaBotProcess
 from app.models.models import Bot
 from app.models.base_models import DATABASE
 from app.settings import *
+from app.utils import *
 
 
 class BotManager(object):
