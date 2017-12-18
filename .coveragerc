@@ -16,6 +16,7 @@ omit =
     *__init__*,
     *settings*
     *env*
+    *__main__*
 
 [html]
 directory = coverage_html_report

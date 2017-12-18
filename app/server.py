@@ -17,7 +17,7 @@ def make_app():  # pragma: no cover
     ])
 
 
-def start_server(port):
+def start_server(port): # pragma: no cover
     global app
     app = make_app()
     app.listen(port)
