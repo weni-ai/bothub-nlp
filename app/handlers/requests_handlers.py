@@ -6,20 +6,40 @@ import tornado.ioloop
 import tornado.escape
 import json
 import uuid
+import spacy
+import cloudpickle
+import logging
+import redis
 
 from tornado.web import HTTPError, RequestHandler, asynchronous
 from tornado.gen import coroutine
 from app.rasabot import RasaBotTrainProcess
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
+from app.settings import REDIS_CONNECTION, DEBUG
 from app.utils import INVALID_TOKEN, token_required, ERROR_PATTERN, MISSING_DATA, INVALID_BOT, validate_uuid
+from rasa_nlu.model import Metadata, Interpreter
+
+
+spacy_language = {
+    'en': spacy.load('en')
+}
+
+logger = logging.getLogger('bothub NLP - Request Handlers')
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 class BothubBaseHandler(RequestHandler):
 
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')
-        if self.settings.get("serve_traceback") and "exc_info" in kwargs:
+        if "exc_info" in kwargs and DEBUG:
             lines = []
             for line in traceback.format_exception(*kwargs["exc_info"]):
                 lines.append(line)
@@ -43,32 +63,35 @@ class MessageRequestHandler(BothubBaseHandler):
     """
     Tornado request handler to predict data
     """
-    bot_manager = None
-
-    def initialize(self, bot_manager):
-        self.bot_manager = bot_manager
-
     @asynchronous
     @coroutine
     @token_required
     def get(self):
         auth_token = self.request.headers.get('Authorization')[7:]
-        bot = self.get_argument('bot', None)
+        bot_uuid = self.get_argument('bot', None)
         message = self.get_argument('msg', None)
-
-        if message and bot and validate_uuid(bot):
-            answer = self.bot_manager.ask(message, bot, auth_token)
-            if answer != (ERROR_PATTERN % INVALID_TOKEN):
-                data = {
-                    'bot': dict(uuid=bot),
-                    'answer': answer
-                }
-                self.write(data)
-                self.finish()
-            else:
-                raise HTTPError(reason=INVALID_TOKEN, status_code=401)
+        redis_bot = redis.Redis(connection_pool=REDIS_CONNECTION).get(bot_uuid)
+        if redis_bot is not None:  # pragma: no cover
+            logger.info('Reusing from redis...')
+            redis_bot = cloudpickle.loads(redis_bot)
+            bot_language = 'en'
+            metadata = Metadata(redis_bot, None)
+            interpreter = Interpreter.load(metadata, {}, spacy_language[bot_language])
+            self.write(interpreter.parse(message))
         else:
-            raise HTTPError(reason=MISSING_DATA, status_code=401)
+            logger.info('Creating a new instance...')
+
+            with DATABASE.execution_context():
+                try:
+                    instance = Bot.get(Bot.uuid == bot_uuid)
+
+                    bot = cloudpickle.loads(instance.bot)
+                    bot_language = 'en'
+                    metadata = Metadata(bot, None)
+                    interpreter = Interpreter.load(metadata, {}, spacy_language[bot_language])
+                    self.write(interpreter.parse(message))
+                except:
+                    print('erro')
 
 
 class BotTrainerRequestHandler(BothubBaseHandler):
