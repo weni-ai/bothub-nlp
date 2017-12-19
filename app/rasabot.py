@@ -34,14 +34,8 @@ class RasaBot():
 
     This version load interpreter on initialization.
     """
-    def __init__(self, model_bot=None, training=False):
+    def __init__(self, model_bot=None):
         self.model_bot = model_bot
-        if not training:
-            metadata = Metadata(self.model_bot, None)
-            self.interpreter = Interpreter.load(metadata, None)
-
-    def ask(self, question):
-        return self.interpreter.parse(question)
 
     def training(self, language, data, auth_token, bot_slug, private):
         """
@@ -88,38 +82,6 @@ class RasaBot():
         return HTTPError(reason=DB_FAIL, status_code=401)
 
 
-class RasaBotProcess(Process):
-    """
-    This class is instantied when start a process bot and does all data process
-    """
-    def __init__(self, questions_queue, answers_queue, new_question_event,
-                 new_answer_event, model_bot, *args, **kwargs):
-        """
-        Args:
-            questions_queue: queue with question to this bot
-            answaers_queue: queue that will be put response after prediction
-            new_questions_event: event that will start new prediction
-            new_answer_event: event will be dispareted when rasa return prediction
-        """
-        super().__init__(*args, **kwargs)
-        self._bot = None
-        self.questions_queue = questions_queue
-        self.answers_queue = answers_queue
-        self.new_question_event = new_question_event
-        self.new_answer_event = new_answer_event
-        self.model_bot = model_bot
-
-    def run(self):
-        self._bot = RasaBot(self.model_bot)
-        while True:
-            self.new_question_event.wait()
-            self.new_question_event.clear()
-            logger.info('A new question arrived!')
-            answer = self._bot.ask(self.questions_queue.get())
-            self.answers_queue.put(answer)
-            self.new_answer_event.set()
-
-
 class RasaBotTrainProcess(Process):
     """
     This class is instantied when start a process bot to train
@@ -143,6 +105,6 @@ class RasaBotTrainProcess(Process):
         self.private = private
 
     def run(self):
-        self._bot = RasaBot(training=True)
+        self._bot = RasaBot()
         data = self._bot.training(self.language, self.data, self.auth_token, self.bot_slug, self.private)
         self.callback(data)
