@@ -37,26 +37,26 @@ class Profile(BaseModel):
         db_table = 'profiles'
 
 
-class Bot(BaseModel):
+class Repository(BaseModel):
     uuid = peewee.UUIDField(primary_key=True, default=uuid.uuid4)
     bot = peewee.BlobField()
     slug = peewee.CharField(unique=True, null=False)
-    owner = peewee.ForeignKeyField(Profile)
     intents = JSONField()
     private = peewee.BooleanField(default=False)
     created_at = peewee.DateTimeField(default=datetime.now)
+    created_by = peewee.ForeignKeyField(Profile, related_name='repository_created_by')
     updated_at = peewee.DateTimeField()
+    updated_by = peewee.ForeignKeyField(Profile, related_name='repository_updated_by')
 
     def to_dict(self):
         return {
             'uuid': str(self.uuid),
-            'slug': self.slug,
-            'owner': self.owner.uuid.hex
+            'slug': self.slug
         }
 
     def save(self, *args, **kwargs):
         self.updated_at = datetime.now()
-        return super(Bot, self).save(*args, **kwargs)
+        return super(Repository, self).save(*args, **kwargs)
 
     def __str__(self):  # pragma: no cover
         r = {}
@@ -68,4 +68,22 @@ class Bot(BaseModel):
         return str(r)
 
     class Meta:
-        db_table = 'bots'
+        db_table = 'repositories'
+
+
+class RepositoryAuthorization(BaseModel):
+    uuid = peewee.UUIDField(primary_key=True, default=uuid.uuid4)
+    profile = peewee.ForeignKeyField(Profile, related_name='profile')
+    repository = peewee.ForeignKeyField(Repository)
+    permission = peewee.SmallIntegerField()
+    created_at = peewee.DateTimeField(default=datetime.now)
+    created_by = peewee.ForeignKeyField(Profile, related_name='repository_authorization_created_by')
+    updated_at = peewee.DateTimeField()
+    updated_by = peewee.ForeignKeyField(Profile, related_name='repository_authorization_updated_by')
+
+    def save(self, *args, **kwargs):
+        self.updated_at = datetime.now()
+        return super(RepositoryAuthorization, self).save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'repositories_authorizations'
