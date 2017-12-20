@@ -23,9 +23,9 @@ class RepositoryManagerHandler(BothubBaseHandler):
                                                              .where(RepositoryAuthorization.profile == self.get_cleaned_token()) \
                                                              .where(RepositoryAuthorization.repository == repository_uuid)
             if user_repo_authorization.exists():
-                user_repo_authorization = user_repo_authorization.get()
+                user_repo_authorization = user_repo_authorization.get().permission
             else:
-                raise HTTPError(reason=INVALID_TOKEN, status_code=401)
+                user_repo_authorization = None
 
         if user_repo_authorization not in self.allowed_permissions and repository.private:
             raise HTTPError(reason=INVALID_TOKEN, status_code=401)
