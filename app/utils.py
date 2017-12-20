@@ -10,7 +10,7 @@ DB_FAIL = 'Error or retrieving data from Database'
 DUPLICATE_SLUG = 'Slug already exists'
 WRONG_TOKEN = 'Auth token is wrong'
 MISSING_DATA = 'Missing data'
-INVALID_BOT = 'Bot not found'
+INVALID_REPOSITORY = 'Bot not found'
 ERROR_PATTERN = '{"error": "%s"}'
 
 

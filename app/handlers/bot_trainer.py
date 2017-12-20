@@ -11,9 +11,9 @@ from rasa_nlu.config import RasaNLUConfig
 from rasa_nlu.model import Trainer
 from slugify import slugify
 from app.handlers.base import BothubBaseHandler, SPACY_LANGUAGES
-from app.models.models import Bot, Profile
+from app.models.models import Repository, Profile, RepositoryAuthorization
 from app.models.base_models import DATABASE
-from app.settings import DEBUG
+from app.settings import DEBUG, OWNER
 from app.utils import token_required, MISSING_DATA, DUPLICATE_SLUG, DB_FAIL
 
 
@@ -52,9 +52,9 @@ class BotTrainerRequestHandler(BothubBaseHandler):
 
             with DATABASE.execution_context():
                 owner = Profile.select().where(Profile.uuid == uuid.UUID(self.get_cleaned_token()))
-                bot_exist = Bot.select().where(Bot.slug == bot_slug)
+                bot = Repository.select().where(Repository.slug == bot_slug)
 
-            if bot_exist:
+            if bot.exists():
                 raise HTTPError(reason=DUPLICATE_SLUG, status_code=401)
 
             owner = owner.get()
@@ -73,14 +73,19 @@ class BotTrainerRequestHandler(BothubBaseHandler):
                     intents.append(common_example.get('intent'))
 
             with DATABASE.execution_context():
-                bot = Bot.create(bot=bot_data, owner=owner, slug=bot_slug, private=private, intents=intents)
-                bot.save()
-                if bot.uuid:
-                    if DEBUG:
-                        logger.info("Success bot train...")
-                    self.write(dict(bot=bot.to_dict()))
-                    self.finish()
-                    return
+                repository = Repository.create(bot=bot_data, slug=bot_slug, private=private,
+                                               intents=intents, created_by=owner, updated_by=owner)
+                repository.save()
+                if repository.uuid:
+                    authorization = RepositoryAuthorization.create(repository=repository, profile=owner,
+                                                                   permission=OWNER, created_by=owner, updated_by=owner)
+                    authorization.save()
+                    if authorization.uuid:
+                        if DEBUG:
+                            logger.info("Success bot train...")
+                        self.write(dict(repository=repository.to_dict()))
+                        self.finish()
+                        return
 
             if DEBUG:
                 logger.error("Fail when try insert new bot")

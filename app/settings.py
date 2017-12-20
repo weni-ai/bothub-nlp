@@ -22,6 +22,18 @@ LOCAL_IP = config('LOCAL_IP', default='127.0.0.1')
 
 REDIS_CONNECTION = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))
 
+READ = 0
+EDIT = 1
+OWNER = 2
+
+ALL_PERMISSIONS = [READ, EDIT, OWNER]
+
+REPOSITORY_PERMISSIONS = [
+    'Read',
+    'Edit',
+    'Owner'
+]
+
 logging.basicConfig(filename="bothub-nlp.log")
 logger = logging.getLogger('bothub NLP - Bot Manager')
 logger.setLevel(logging.DEBUG)
