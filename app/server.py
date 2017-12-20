@@ -4,7 +4,10 @@ import tornado.ioloop
 import tornado.escape
 
 from tornado.web import Application, url
-from app.handlers.requests_handlers import ProfileRequestHandler, MessageRequestHandler, BotInformationsRequestHandler, BotTrainerRequestHandler
+from app.handlers.bot_informations import BotInformationsRequestHandler
+from app.handlers.bot_trainer import BotTrainerRequestHandler
+from app.handlers.message import MessageRequestHandler
+from app.handlers.profile import ProfileRequestHandler
 
 
 def make_app():  # pragma: no cover
