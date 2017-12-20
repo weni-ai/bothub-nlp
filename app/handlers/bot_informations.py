@@ -1,47 +1,33 @@
 """ This module will manage bot informations. """
-import uuid
-
-from tornado.web import HTTPError, asynchronous
+from tornado.web import asynchronous
 from tornado.gen import coroutine
-from app.handlers.base import BothubBaseHandler
-from app.models.models import Bot, Profile
+from app.handlers.repository_manager import RepositoryManagerHandler
+from app.models.models import Repository
 from app.models.base_models import DATABASE
-from app.utils import INVALID_TOKEN, token_required, INVALID_BOT, validate_uuid
+from app.settings import ALL_PERMISSIONS
+from app.utils import token_required
 
 
-class BotInformationsRequestHandler(BothubBaseHandler):
+class BotInformationsRequestHandler(RepositoryManagerHandler):
     """
     Tornado request handler to get information of specific bot (intents, entities, etc).
     """
+    allowed_permissions = ALL_PERMISSIONS
 
     @asynchronous
     @coroutine
     @token_required
     def get(self):
         bot_uuid = self.get_argument('uuid', None)
-        if bot_uuid and validate_uuid(bot_uuid):
-            with DATABASE.execution_context():
-                instance = Bot.select(Bot.uuid, Bot.slug, Bot.intents, Bot.private, Bot.owner)\
-                    .where(Bot.uuid == bot_uuid)
+        self._check_repo_user_authorization(bot_uuid)
+        with DATABASE.execution_context():
+            instance = Repository.select(Repository.uuid, Repository.slug, Repository.intents, Repository.private)\
+                .where(Repository.uuid == bot_uuid).get()
 
-                if len(instance):
-                    instance = instance.get()
-                    information = {
-                        'slug': instance.slug,
-                        'intents': instance.intents,
-                        'private': instance.private
-                    }
-                    if not instance.private:
-                        self.write(information)
-                    else:
-                        owner_profile = Profile.select().where(
-                            Profile.uuid == uuid.UUID(self.get_cleaned_token())).get()
-                        if instance.owner == owner_profile:
-                            self.write(information)
-                        else:
-                            raise HTTPError(reason=INVALID_TOKEN, status_code=401)
-                    self.finish()
-                else:
-                    raise HTTPError(reason=INVALID_BOT, status_code=401)
-        else:
-            raise HTTPError(reason=INVALID_BOT, status_code=401)
+            information = {
+                'slug': instance.slug,
+                'intents': instance.intents,
+                'private': instance.private
+            }
+        self.write(information)
+        self.finish()
