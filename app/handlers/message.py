@@ -3,14 +3,14 @@ import logging
 import redis
 import cloudpickle
 
-from tornado.web import asynchronous, HTTPError
+from tornado.web import asynchronous
 from tornado.gen import coroutine
 from app.handlers.base import SPACY_LANGUAGES
 from app.handlers.repository_manager import RepositoryManagerHandler
 from app.models.base_models import DATABASE
 from app.models.models import Repository
 from app.settings import DEBUG, REDIS_CONNECTION, ALL_PERMISSIONS
-from app.utils import token_required, INVALID_REPOSITORY
+from app.utils import token_required
 from rasa_nlu.model import Metadata, Interpreter
 
 
