@@ -83,7 +83,7 @@ class BotTrainerRequestHandler(BothubBaseHandler):
                     if authorization.uuid:
                         if DEBUG:
                             logger.info("Success bot train...")
-                        self.write(dict(repository=repository.to_dict()))
+                        self.write(dict(bot=repository.to_dict()))
                         self.finish()
                         return
 
