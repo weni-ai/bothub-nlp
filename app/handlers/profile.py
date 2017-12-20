@@ -6,7 +6,7 @@ from tornado.web import asynchronous
 from tornado.gen import coroutine
 from app.handlers.base import BothubBaseHandler
 from app.models.base_models import DATABASE
-from app.models.models import Bot, Profile
+from app.models.models import Repository, Profile
 from app.settings import DEBUG
 from app.utils import token_required
 
@@ -46,7 +46,7 @@ class ProfileRequestHandler(BothubBaseHandler):
                 Profile.uuid == uuid.UUID(self.get_cleaned_token()))
 
             owner_profile = owner_profile.get()
-            bots = Bot.select(Bot.uuid, Bot.slug).where(Bot.owner == owner_profile).dicts()
+            bots = Repository.select(Repository.uuid, Repository.slug).where(Repository.owner == owner_profile).dicts()
 
         bots_response = list(map(self._prepare_bot_response, bots))
 
