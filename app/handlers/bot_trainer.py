@@ -1,16 +1,20 @@
 """ This module will train all bots. """
 import logging
 import json
+import uuid
 import tornado.escape
 
 from tornado.web import HTTPError, asynchronous
 from tornado.gen import coroutine
-from app.rasabot import RasaBotTrainProcess
-from app.handlers.base import BothubBaseHandler
+from rasa_nlu.converters import load_rasa_data
+from rasa_nlu.config import RasaNLUConfig
+from rasa_nlu.model import Trainer
+from slugify import slugify
+from app.handlers.base import BothubBaseHandler, SPACY_LANGUAGES
 from app.models.models import Bot, Profile
 from app.models.base_models import DATABASE
-from app.settings import DEBUG, REDIS_CONNECTION
-from app.utils import token_required, MISSING_DATA
+from app.settings import DEBUG
+from app.utils import token_required, MISSING_DATA, DUPLICATE_SLUG, DB_FAIL
 
 
 logger = logging.getLogger('bothub NLP - Bot Trainer Request Handler')
@@ -29,31 +33,57 @@ class BotTrainerRequestHandler(BothubBaseHandler):
     """
 
     @asynchronous
+    @coroutine
     @token_required
     def post(self):
         if self.request.body:
             json_body = tornado.escape.json_decode(self.request.body)
-            auth_token = self.request.headers.get('Authorization')[7:]
+
             language = json_body.get("language", None)
             bot_slug = json_body.get("slug", None)
             data = json.dumps(json_body.get("data", None))
-            private = json_body.get("private", False)
+            private = json_body.get("private", None)
 
-            bot = RasaBotTrainProcess(language, data, self.callback, auth_token, bot_slug, private)
-            bot.daemon = True
-            bot.start()
-        else:
-            raise HTTPError(reason=MISSING_DATA, status_code=401)
+            if None in [language, bot_slug, data, private]:
+                raise HTTPError(reason=MISSING_DATA, status_code=401)
 
-    def callback(self, data):
-        if isinstance(data, HTTPError):
-            self.set_status(data.status_code, data.reason)
-            self.write_error(data.status_code)
-            return
+            if DEBUG:
+                logger.info("Start training bot...")
 
-        self.write(data)
-        self.finish()
+            with DATABASE.execution_context():
+                owner = Profile.select().where(Profile.uuid == uuid.UUID(self.get_cleaned_token()))
+                bot_exist = Bot.select().where(Bot.slug == bot_slug)
 
+            if bot_exist:
+                raise HTTPError(reason=DUPLICATE_SLUG, status_code=401)
 
+            owner = owner.get()
+            config = '{"pipeline": "spacy_sklearn", "path" : "./models", \
+                      "data" : "./data.json", "language": "%s"}' % language
 
+            trainer = Trainer(RasaNLUConfig(config), SPACY_LANGUAGES[language])
+            trainer.train(load_rasa_data(data))
+            bot_data = trainer.persist()
+            bot_slug = slugify(bot_slug)
+            intents = []
+            common_examples = json.loads(data).get('rasa_nlu_data').get('common_examples')
 
+            for common_example in common_examples:
+                if common_example.get('intent') not in intents:
+                    intents.append(common_example.get('intent'))
+
+            with DATABASE.execution_context():
+                bot = Bot.create(bot=bot_data, owner=owner, slug=bot_slug, private=private, intents=intents)
+                bot.save()
+                if bot.uuid:
+                    if DEBUG:
+                        logger.info("Success bot train...")
+                    self.write(dict(bot=bot.to_dict()))
+                    self.finish()
+                    return
+
+            if DEBUG:
+                logger.error("Fail when try insert new bot")
+
+            raise HTTPError(reason=DB_FAIL, status_code=401)
+        raise HTTPError(reason=MISSING_DATA, status_code=401)
