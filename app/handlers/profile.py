@@ -43,7 +43,7 @@ class ProfileRequestHandler(BothubBaseHandler):
             logger.info("Consulting a profile...")
         with DATABASE.execution_context():
             owner_profile = Profile.select().where(
-                Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:]))
+                Profile.uuid == uuid.UUID(self.get_cleaned_token()))
 
             owner_profile = owner_profile.get()
             bots = Bot.select(Bot.uuid, Bot.slug).where(Bot.owner == owner_profile).dicts()

@@ -17,6 +17,9 @@ class BothubBaseHandler(RequestHandler):
     This class is a base request handler,
     others handler will extends of this base handler.
     """
+    def get_cleaned_token(self):
+        return self.request.headers.get('Authorization')[7:]
+
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')
         if "exc_info" in kwargs and DEBUG:

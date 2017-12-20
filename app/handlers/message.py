@@ -31,7 +31,7 @@ class MessageRequestHandler(BothubBaseHandler):
     @coroutine
     @token_required
     def get(self):
-        auth_token = self.request.headers.get('Authorization')[7:]
+        auth_token = self.get_cleaned_token()
         bot_uuid = self.get_argument('bot', None)
         message = self.get_argument('msg', None)
         redis_bot = redis.Redis(connection_pool=REDIS_CONNECTION).get(bot_uuid)

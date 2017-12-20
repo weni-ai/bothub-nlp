@@ -35,7 +35,7 @@ class BotInformationsRequestHandler(BothubBaseHandler):
                         self.write(information)
                     else:
                         owner_profile = Profile.select().where(
-                            Profile.uuid == uuid.UUID(self.request.headers.get('Authorization')[7:])).get()
+                            Profile.uuid == uuid.UUID(self.get_cleaned_token())).get()
                         if instance.owner == owner_profile:
                             self.write(information)
                         else:
