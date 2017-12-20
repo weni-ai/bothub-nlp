@@ -6,7 +6,6 @@ import spacy
 from tornado.web import RequestHandler
 from app.settings import DEBUG
 
-
 SPACY_LANGUAGES = {
     'en': spacy.load('en')
 }
