@@ -34,9 +34,7 @@ before_script:
   - export BOTHUB_REDIS=127.0.0.1
   - export BOTHUB_REDIS_PORT=6379
   - export BOTHUB_REDIS_DB=2
-  - export ASYNC_TEST_TIMEOUT=25
-  - export BOT_REMOVER_TIME=5
-  - export GARBAGE_COLLECTOR_TIMER=20
+  - export BOTHUB_DEBUG=true
   - python -m spacy download en
   - PYTHONPATH=`pwd` python -m app --service=create_schema
 
