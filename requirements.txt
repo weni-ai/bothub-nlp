@@ -5,7 +5,7 @@ git+https://github.com/push-flow/rasa_nlu.git@feature/direct_json_data
 scikit-learn
 scipy
 sklearn-crfsuite
-spacy-nightly
+spacy
 tornado
 redis
 peewee
