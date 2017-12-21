@@ -36,6 +36,12 @@ before_script:
   - export BOTHUB_REDIS_DB=2
   - export BOTHUB_DEBUG=true
   - python -m spacy download en
+  - python -m spacy download de
+  - python -m spacy download es
+  - python -m spacy download pt
+  - python -m spacy download fr
+  - python -m spacy download it
+  - python -m spacy download nl
   - PYTHONPATH=`pwd` python -m app --service=create_schema
 
 script:
