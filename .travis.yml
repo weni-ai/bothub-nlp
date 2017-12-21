@@ -46,7 +46,7 @@ before_script:
 
 script:
  - flake8
- - coverage run -m unittest
+ - travis_wait coverage run -m unittest
 
 after_success:
   - coverage combine
