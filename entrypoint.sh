@@ -6,6 +6,7 @@ git clone $APP_REPOSITORY_URL bothub
 cd bothub
 git checkout $APP_REPOSITORY_BRANCH
 chmod +x app/server.py
+chmod +x ../supervisor_command.sh
 
 # Configure timezone
 if [ "$CONTAINER_TIMEZONE" ]; then
@@ -15,7 +16,4 @@ if [ "$CONTAINER_TIMEZONE" ]; then
 fi
 
 source $PYTHON_VENV/bin/activate
-echo $WEBAPP_HOME/bothub/requirements.txt
-pip install -r $WEBAPP_HOME/bothub/requirements.txt
-python -m spacy download en
 supervisord -n
