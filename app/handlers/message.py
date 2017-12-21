@@ -47,9 +47,8 @@ class MessageRequestHandler(RepositoryManagerHandler):
                 logger.info('Reusing from redis...')
 
             redis_bot = cloudpickle.loads(redis_bot)
-            bot_language = 'en'
             metadata = Metadata(redis_bot, None)
-            interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[bot_language])
+            interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[redis_bot.get('language')])
             self.write({
                 'bot': dict(uuid=bot_uuid),
                 'answer': interpreter.parse(message)
@@ -64,9 +63,8 @@ class MessageRequestHandler(RepositoryManagerHandler):
 
             self._set_bot_on_redis(bot_uuid, cloudpickle.dumps(bot))
 
-            bot_language = 'en'
             metadata = Metadata(bot, None)
-            interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[bot_language])
+            interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[bot.get('language')])
             self.write({
                 'bot': dict(uuid=bot_uuid),
                 'answer': interpreter.parse(message)

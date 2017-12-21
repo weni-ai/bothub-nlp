@@ -1,4 +1,5 @@
 """ Base handler module. """
+import logging
 import traceback
 import json
 import spacy
@@ -6,9 +7,27 @@ import spacy
 from tornado.web import RequestHandler
 from app.settings import DEBUG
 
+
+logger = logging.getLogger('bothub NLP - Base Request Handler')
+logger.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+logger.info("Importing spacy languages...")
 SPACY_LANGUAGES = {
-    'en': spacy.load('en')
+    'en': spacy.load('en'),
+    'de': spacy.load('de'),
+    'es': spacy.load('es'),
+    'pt': spacy.load('pt'),
+    'fr': spacy.load('fr'),
+    'it': spacy.load('it'),
+    'nl': spacy.load('nl')
 }
+logger.info("Spacy languages imported.")
 
 
 class BothubBaseHandler(RequestHandler):
