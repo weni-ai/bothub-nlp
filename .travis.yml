@@ -40,7 +40,7 @@ before_script:
 
 script:
  - flake8
- - coverage run --concurrency=multiprocessing -m unittest
+ - coverage run -m unittest
 
 after_success:
   - coverage combine
