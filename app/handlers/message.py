@@ -49,7 +49,7 @@ class MessageRequestHandler(RepositoryManagerHandler):
             redis_bot = cloudpickle.loads(redis_bot)
             bot_language = 'en'
             metadata = Metadata(redis_bot, None)
-            interpreter = Interpreter.load(metadata, {}, SPACY_LANGUAGES[bot_language])
+            interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[bot_language])
             self.write({
                 'bot': dict(uuid=bot_uuid),
                 'answer': interpreter.parse(message)
@@ -66,7 +66,7 @@ class MessageRequestHandler(RepositoryManagerHandler):
 
             bot_language = 'en'
             metadata = Metadata(bot, None)
-            interpreter = Interpreter.load(metadata, {}, SPACY_LANGUAGES[bot_language])
+            interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[bot_language])
             self.write({
                 'bot': dict(uuid=bot_uuid),
                 'answer': interpreter.parse(message)
