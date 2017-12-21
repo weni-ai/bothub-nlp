@@ -1,7 +1,6 @@
 from decouple import config
 
 import redis
-import logging
 
 
 DEBUG = config('BOTHUB_DEBUG', default=False, cast=bool)
