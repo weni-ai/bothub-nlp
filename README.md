@@ -1,5 +1,5 @@
 # Bothub Demo
-[![Coverage Status](https://coveralls.io/repos/github/push-flow/bothub-nlp/badge.svg?branch=feature%2Fauth-api)](https://coveralls.io/github/push-flow/bothub-nlp?branch=master) [![Build Status](https://travis-ci.org/push-flow/bothub-nlp.svg?branch=master)](https://travis-ci.org/push-flow/bothub-nlp)
+[![Coverage Status](https://coveralls.io/repos/github/push-flow/bothub-nlp/badge.svg?branch=master)](https://coveralls.io/github/push-flow/bothub-nlp?branch=master) [![Build Status](https://travis-ci.org/push-flow/bothub-nlp.svg?branch=master)](https://travis-ci.org/push-flow/bothub-nlp)
 
  ##### How to run 
  #
