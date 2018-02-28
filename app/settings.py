@@ -1,20 +1,11 @@
-from decouple import config
-
 import redis
 
+from decouple import config
 
-DEBUG = config('BOTHUB_DEBUG', default=False, cast=bool)
 
-REDIS_CONNECTION = redis.ConnectionPool(host=config('BOTHUB_REDIS'), port=config('BOTHUB_REDIS_PORT'), db=config('BOTHUB_REDIS_DB'))
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-READ = 0
-EDIT = 1
-OWNER = 2
-
-ALL_PERMISSIONS = [READ, EDIT, OWNER]
-
-REPOSITORY_PERMISSIONS = [
-    'Read',
-    'Edit',
-    'Owner'
-]
+REDIS_CONNECTION = redis.ConnectionPool(
+    host=config('REDIS'),
+    port=config('REDIS_PORT'),
+    db=config('REDIS_DB'))
