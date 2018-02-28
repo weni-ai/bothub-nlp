@@ -45,7 +45,12 @@ class BothubBaseHandler(RequestHandler):
         if not authorization_uuid:
             return False
         
-        return True
+        try:
+            repository_authorization = RepositoryAuthorization.objects.get(uuid=authorization_uuid)
+        except RepositoryAuthorization.DoesNotExist:
+            return False
+
+        return repository_authorization
 
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')
