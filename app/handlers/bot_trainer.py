@@ -73,5 +73,8 @@ class BotTrainerRequestHandler(BothubBaseHandler):
         ])
 
         self.write({
+            'repository_uuid': repository.uuid.hex,
+            'language': language,
             'intents': intents,
+            'data': data,
         })
