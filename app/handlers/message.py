@@ -1,11 +1,12 @@
 """ This module will manage all predict data. """
 import logging
-import redis
 import cloudpickle
+import base64
 
 from tornado.web import asynchronous, HTTPError
 from tornado.gen import coroutine
-from app.handlers.base import BothubBaseHandler
+from rasa_nlu.model import Metadata, Interpreter
+from app.handlers.base import BothubBaseHandler, SPACY_LANGUAGES
 from app.settings import REDIS_CONNECTION
 from app.utils import authorization_required
 
@@ -24,9 +25,6 @@ class MessageRequestHandler(BothubBaseHandler):
     """
     Tornado request handler to predict data.
     """
-    def _set_bot_on_redis(self, bot_uuid, bot):
-        redis.Redis(connection_pool=REDIS_CONNECTION).set(bot_uuid, bot)
-
     @asynchronous
     @coroutine
     @authorization_required
@@ -35,6 +33,21 @@ class MessageRequestHandler(BothubBaseHandler):
         if not msg:
             raise HTTPError(reason='msg is required', status_code=400)
         
+        language = self.get_argument('language', default=None)
+        if not language:
+            raise HTTPError(reason='language is required', status_code=400)
+        
+        repository_authorization = self.repository_authorization()
+        repository = repository_authorization.repository
+
+        bot_data = base64.b64decode(repository.last_trained_update(language).bot_data)
+        bot = cloudpickle.loads(bot_data)
+        metadata = Metadata(bot, None)
+        interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[language])
+        
         self.write({
+            'repository_uuid': repository.uuid.hex,
+            'language': language,
             'msg': msg,
+            'answer': interpreter.parse(msg),
         })
