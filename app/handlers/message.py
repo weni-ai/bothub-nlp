@@ -7,7 +7,7 @@ from tornado.web import asynchronous, HTTPError
 from tornado.gen import coroutine
 from app.handlers.base import BothubBaseHandler
 from app.settings import REDIS_CONNECTION
-from app.utils import token_required
+from app.utils import authorization_required
 
 
 logger = logging.getLogger('bothub NLP - Message Request Handler')
@@ -29,7 +29,12 @@ class MessageRequestHandler(BothubBaseHandler):
 
     @asynchronous
     @coroutine
-    @token_required
-    def get(self):
-        raise HTTPError(status_code=401)
+    @authorization_required
+    def post(self):
+        msg = self.get_argument('msg', default=None)
+        if not msg:
+            raise HTTPError(reason='msg is required', status_code=400)
         
+        self.write({
+            'msg': msg,
+        })
