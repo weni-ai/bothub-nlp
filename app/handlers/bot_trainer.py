@@ -3,6 +3,7 @@ import logging
 import json
 import uuid
 import tornado.escape
+import base64
 
 from tornado.web import HTTPError, asynchronous
 from tornado.gen import coroutine
@@ -66,7 +67,7 @@ class BotTrainerRequestHandler(BothubBaseHandler):
         intents = list(set(map(lambda x: x.get('intent'), common_examples)))
 
         current_update.trained_at = timezone.now()
-        current_update.bot_data = bot_data
+        current_update.bot_data = base64.b64encode(bot_data).decode('utf8')
         current_update.save(update_fields=[
             'trained_at',
             'bot_data',
