@@ -22,12 +22,12 @@ logger.addHandler(ch)
 logger.info('Importing spacy languages...')
 SPACY_LANGUAGES = {
     'en': spacy.load('en'),
-    # 'de': spacy.load('de'),
-    # 'es': spacy.load('es'),
-    # 'pt': spacy.load('pt'),
-    # 'fr': spacy.load('fr'),
-    # 'it': spacy.load('it'),
-    # 'nl': spacy.load('nl')
+    'de': spacy.load('de'),
+    'es': spacy.load('es'),
+    'pt': spacy.load('pt'),
+    'fr': spacy.load('fr'),
+    'it': spacy.load('it'),
+    'nl': spacy.load('nl')
 }
 logger.info('Spacy languages imported.')
 
