@@ -40,13 +40,15 @@ class MessageRequestHandler(BothubBaseHandler):
         repository_authorization = self.repository_authorization()
         repository = repository_authorization.repository
 
-        bot_data = base64.b64decode(repository.last_trained_update(language).bot_data)
+        update = repository.last_trained_update(language)
+        bot_data = base64.b64decode(update.bot_data)
         bot = cloudpickle.loads(bot_data)
         metadata = Metadata(bot, None)
         interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[language])
         
         self.write({
             'repository_uuid': repository.uuid.hex,
+            'update_id': update.id,
             'language': language,
             'msg': msg,
             'answer': interpreter.parse(msg),
