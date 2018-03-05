@@ -13,3 +13,4 @@ psutil
 python-slugify
 click
 git+https://github.com/push-flow/bothub-app.git@start-app
+coverage
