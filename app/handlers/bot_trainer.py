@@ -3,16 +3,12 @@ import logging
 import json
 import uuid
 import tornado.escape
-import base64
 
 from tornado.web import HTTPError, asynchronous
 from tornado.gen import coroutine
-from rasa_nlu.model import Trainer
-from rasa_nlu.config import RasaNLUConfig
-from rasa_nlu.converters import load_rasa_data
-from django.utils import timezone
-from app.handlers.base import BothubBaseHandler, SPACY_LANGUAGES
+from app.handlers.base import BothubBaseHandler
 from app.utils import authorization_required
+from app.core.train import train_update
 
 
 logger = logging.getLogger('bothub NLP - Bot Trainer Request Handler')
@@ -42,40 +38,11 @@ class BotTrainerRequestHandler(BothubBaseHandler):
             raise HTTPError(reason='language is required', status_code=400)
         
         current_update = repository.current_update(language)
-        current_update.by = repository_authorization.user
-        current_update.training_started_at = timezone.now()
-        current_update.save(update_fields=[
-            'by',
-            'training_started_at',
-        ])
-            
-        rasa_nlu_config = {
-            'pipeline': 'spacy_sklearn',
-            'path' : './models',
-            'data' : './data.json',
-            'language': language
-        }
-        data = {
-            'rasa_nlu_data': current_update.rasa_nlu_data,
-        }
-        
-        trainer = Trainer(RasaNLUConfig(json.dumps(rasa_nlu_config)), SPACY_LANGUAGES[language])
-        trainer.train(load_rasa_data(json.dumps(data)))
-        bot_data = trainer.persist()
-        common_examples = data.get('rasa_nlu_data').get('common_examples')
-
-        intents = list(set(map(lambda x: x.get('intent'), common_examples)))
-
-        current_update.trained_at = timezone.now()
-        current_update.bot_data = base64.b64encode(bot_data).decode('utf8')
-        current_update.save(update_fields=[
-            'trained_at',
-            'bot_data',
-        ])
+        train = train_update(current_update, language, repository_authorization.user)
 
         self.write({
             'repository_uuid': repository.uuid.hex,
             'language': language,
-            'intents': intents,
-            'data': data,
+            'intents': train.get('intents'),
+            'data': train.get('data'),
         })
