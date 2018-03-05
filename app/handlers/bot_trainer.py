@@ -38,7 +38,7 @@ class BotTrainerRequestHandler(BothubBaseHandler):
             raise HTTPError(reason='language is required', status_code=400)
         
         current_update = repository.current_update(language)
-        train = train_update(current_update, language, repository_authorization.user)
+        train = train_update(current_update, repository_authorization.user)
 
         self.write({
             'repository_uuid': repository.uuid.hex,

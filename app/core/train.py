@@ -9,7 +9,7 @@ from django.utils import timezone
 from app.handlers.base import SPACY_LANGUAGES
 
 
-def train_update(update, language, by):
+def train_update(update, by):
     update.by = by
     update.training_started_at = timezone.now()
     update.save(update_fields=[
@@ -21,13 +21,13 @@ def train_update(update, language, by):
         'pipeline': 'spacy_sklearn',
         'path' : './models',
         'data' : './data.json',
-        'language': language
+        'language': update.language,
     }
     data = {
         'rasa_nlu_data': update.rasa_nlu_data,
     }
     
-    trainer = Trainer(RasaNLUConfig(json.dumps(rasa_nlu_config)), SPACY_LANGUAGES[language])
+    trainer = Trainer(RasaNLUConfig(json.dumps(rasa_nlu_config)), SPACY_LANGUAGES[update.language])
     trainer.train(load_rasa_data(json.dumps(data)))
     bot_data = trainer.persist()
     common_examples = data.get('rasa_nlu_data').get('common_examples')
