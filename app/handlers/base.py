@@ -37,14 +37,14 @@ class BothubBaseHandler(RequestHandler):
     This class is a base request handler,
     others handler will extends of this base handler.
     """
-    
+
     def repository_authorization(self):
         authorization_header_value = self.request.headers.get('Authorization')
         authorization_uuid = authorization_header_value and authorization_header_value[7:]
-        
+
         if not authorization_uuid:
             return False
-        
+
         try:
             repository_authorization = RepositoryAuthorization.objects.get(uuid=authorization_uuid)
         except RepositoryAuthorization.DoesNotExist:

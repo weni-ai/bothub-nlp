@@ -90,11 +90,11 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         super(RequestHandlersTest, self).setUp()
 
         self.test_language = 'en'
-        
+
         self.user = User.objects.create(
             email='fake@user.com',
             nick='fake')
-        
+
         self.repository = Repository.objects.create(
             owner=self.user,
             slug='test')
@@ -121,7 +121,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
                         start=entity_mockup.get('start'),
                         end=entity_mockup.get('end'),
                         entity=entity_mockup.get('entity'))
-        
+
         fill_examples(self.repository)
         fill_examples(self.trained_repository)
 
@@ -130,7 +130,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
     def get_app(self):
         from app.server import make_app
         return make_app()
-    
+
     def test_train_handler(self):
         response = self.fetch(
             '/v1/train',
@@ -138,7 +138,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
             headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
             body='language={}'.format(self.test_language))
         self.assertEqual(response.code, 200)
-    
+
     def test_train_handler_language_required(self):
         response = self.fetch(
             '/v1/train',
@@ -158,7 +158,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         content_data = json.loads(response.body)
         self.assertEqual(response.code, 200)
         self.assertEqual(content_data.get('answer', {}).get('intent', {}).get('name'), 'greet')
-    
+
     def test_message_handler_without_authorization(self):
         response = self.fetch(
             '/v1/message',
@@ -168,7 +168,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
                 self.test_language,
                 'hi'))
         self.assertEqual(response.code, 401)
-    
+
     def test_message_handler_with_invalid_authorization(self):
         response = self.fetch(
             '/v1/message',
@@ -178,7 +178,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
                 self.test_language,
                 'hi'))
         self.assertEqual(response.code, 401)
-    
+
     def test_message_handler_without_msg(self):
         response = self.fetch(
             '/v1/message',
@@ -186,7 +186,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
             headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
             body='language={}'.format(self.test_language))
         self.assertEqual(response.code, 400)
-    
+
     def test_message_handler_without_language(self):
         response = self.fetch(
             '/v1/message',
@@ -194,6 +194,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
             headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
             body='msg={}'.format('hi'))
         self.assertEqual(response.code, 400)
+
 
 if __name__ == '__main__':
     unittest.main()

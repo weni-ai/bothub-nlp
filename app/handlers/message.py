@@ -7,7 +7,6 @@ from tornado.web import asynchronous, HTTPError
 from tornado.gen import coroutine
 from rasa_nlu.model import Metadata, Interpreter
 from app.handlers.base import BothubBaseHandler, SPACY_LANGUAGES
-from app.settings import REDIS_CONNECTION
 from app.utils import authorization_required
 
 
@@ -32,11 +31,11 @@ class MessageRequestHandler(BothubBaseHandler):
         msg = self.get_argument('msg', default=None)
         if not msg:
             raise HTTPError(reason='msg is required', status_code=400)
-        
+
         language = self.get_argument('language', default=None)
         if not language:
             raise HTTPError(reason='language is required', status_code=400)
-        
+
         repository_authorization = self.repository_authorization()
         repository = repository_authorization.repository
 
@@ -45,7 +44,7 @@ class MessageRequestHandler(BothubBaseHandler):
         bot = cloudpickle.loads(bot_data)
         metadata = Metadata(bot, None)
         interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[language])
-        
+
         self.write({
             'repository_uuid': repository.uuid.hex,
             'update_id': update.id,

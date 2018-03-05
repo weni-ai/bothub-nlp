@@ -16,17 +16,17 @@ def train_update(update, by):
         'by',
         'training_started_at',
     ])
-        
+
     rasa_nlu_config = {
         'pipeline': 'spacy_sklearn',
-        'path' : './models',
-        'data' : './data.json',
+        'path': './models',
+        'data': './data.json',
         'language': update.language,
     }
     data = {
         'rasa_nlu_data': update.rasa_nlu_data,
     }
-    
+
     trainer = Trainer(RasaNLUConfig(json.dumps(rasa_nlu_config)), SPACY_LANGUAGES[update.language])
     trainer.train(load_rasa_data(json.dumps(data)))
     bot_data = trainer.persist()

@@ -1,5 +1,3 @@
-import uuid
-
 from tornado.web import HTTPError
 
 

@@ -1,8 +1,5 @@
 """ This module will train all bots. """
 import logging
-import json
-import uuid
-import tornado.escape
 
 from tornado.web import HTTPError, asynchronous
 from tornado.gen import coroutine
@@ -36,7 +33,7 @@ class BotTrainerRequestHandler(BothubBaseHandler):
         language = self.get_argument('language', default=None)
         if not language:
             raise HTTPError(reason='language is required', status_code=400)
-        
+
         current_update = repository.current_update(language)
         train = train_update(current_update, repository_authorization.user)
 
