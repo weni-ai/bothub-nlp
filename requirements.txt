@@ -12,5 +12,5 @@ python-decouple
 psutil
 python-slugify
 click
-git+https://github.com/push-flow/bothub-app.git@start-app
+git+https://github.com/push-flow/bothub-app.git
 coverage
