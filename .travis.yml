@@ -8,15 +8,9 @@ install:
   - pip install coveralls
   - pip install flake8
 env:
-  - SECRET_KEY=SK REDIS=127.0.0.1 REDIS_PORT=6379 REDIS_DB=0
+  - SECRET_KEY=SK REDIS=127.0.0.1 REDIS_PORT=6379 REDIS_DB=0 SUPPORTED_LANGUAGES=en
 before_script:
   - python -m spacy download en
-  - python -m spacy download de
-  - python -m spacy download es
-  - python -m spacy download pt
-  - python -m spacy download fr
-  - python -m spacy download it
-  - python -m spacy download nl
   - django-admin migrate --settings bothub.settings
 script:
  - flake8
