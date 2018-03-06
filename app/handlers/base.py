@@ -7,7 +7,7 @@ import spacy
 from tornado.web import RequestHandler
 from bothub.common.models import RepositoryAuthorization
 
-from app.settings import DEBUG
+from app.settings import DEBUG, SUPPORTED_LANGUAGES
 
 
 logger = logging.getLogger('bothub NLP - Base Request Handler')
@@ -20,15 +20,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 logger.info('Importing spacy languages...')
-SPACY_LANGUAGES = {
-    'en': spacy.load('en'),
-    'de': spacy.load('de'),
-    'es': spacy.load('es'),
-    'pt': spacy.load('pt'),
-    'fr': spacy.load('fr'),
-    'it': spacy.load('it'),
-    'nl': spacy.load('nl')
-}
+SPACY_LANGUAGES = dict(map(lambda language: (language, spacy.load(language),), SUPPORTED_LANGUAGES))
 logger.info('Spacy languages imported.')
 
 
