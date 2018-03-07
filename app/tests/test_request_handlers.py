@@ -97,7 +97,8 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
 
         self.repository = Repository.objects.create(
             owner=self.user,
-            slug='test')
+            slug='test',
+            name='Testing')
         self.authorization = RepositoryAuthorization.objects.create(
             user=self.user,
             repository=self.repository)
