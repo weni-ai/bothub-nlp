@@ -140,14 +140,6 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
             body='language={}'.format(self.test_language))
         self.assertEqual(response.code, 200)
 
-    def test_train_handler_language_required(self):
-        response = self.fetch(
-            '/v1/train',
-            method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
-            body='')
-        self.assertEqual(response.code, 400)
-
     def test_message_handler(self):
         response = self.fetch(
             '/v1/message',
