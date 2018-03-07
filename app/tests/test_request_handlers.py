@@ -1,165 +1,199 @@
-import urllib
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bothub.settings')
+django.setup()
+
 import unittest
 import json
+import uuid
 
-from app.handlers.bot_informations import BotInformationsRequestHandler
-from app.handlers.bot_trainer import BotTrainerRequestHandler
-from app.handlers.profile import ProfileRequestHandler
-from app.handlers.message import MessageRequestHandler
-from app.utils import WRONG_TOKEN, INVALID_TOKEN, MISSING_DATA, DUPLICATE_SLUG
-from tornado import testing
-from tornado.web import Application, url
+from tornado.testing import AsyncHTTPTestCase
+from django.test import TestCase
+
+from bothub.authentication.models import User
+from bothub.common.models import Repository
+from bothub.common.models import RepositoryExample
+from bothub.common.models import RepositoryExampleEntity
+from bothub.common.models import RepositoryAuthorization
+
+from app.core.train import train_update
 
 
-class RequestHandlersTest(testing.AsyncHTTPTestCase):
+EXAMPLES_MOCKUP = [
+    {
+        'text': 'hey',
+        'intent': 'greet',
+    },
+    {
+        'text': 'hey there',
+        'intent': 'greet',
+    },
+    {
+        'text': 'hello',
+        'intent': 'greet',
+    },
+    {
+        'text': 'hi',
+        'intent': 'greet',
+    },
+    {
+        'text': 'hello, my name is Douglas',
+        'intent': 'greet',
+        'entities': [
+            {
+                'start': 18,
+                'end': 25,
+                'entity': 'name',
+            },
+        ]
+    },
+    {
+        'text': 'hi, my name is Douglas',
+        'intent': 'greet',
+        'entities': [
+            {
+                'start': 15,
+                'end': 22,
+                'entity': 'name',
+            },
+        ]
+    },
+    {
+        'text': 'my name is Douglas',
+        'intent': 'greet',
+        'entities': [
+            {
+                'start': 11,
+                'end': 18,
+                'entity': 'name',
+            },
+        ]
+    },
+    {
+        'text': 'bye',
+        'intent': 'goodbye',
+    },
+    {
+        'text': 'goodbye',
+        'intent': 'goodbye',
+    },
+    {
+        'text': 'good bye',
+        'intent': 'goodbye',
+    },
+]
+
+
+class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
+    def setUp(self):
+        super(RequestHandlersTest, self).setUp()
+
+        self.test_language = 'en'
+
+        self.user = User.objects.create(
+            email='fake@user.com',
+            nick='fake')
+
+        self.repository = Repository.objects.create(
+            owner=self.user,
+            slug='test')
+        self.authorization = RepositoryAuthorization.objects.create(
+            user=self.user,
+            repository=self.repository)
+
+        self.trained_repository = Repository.objects.create(
+            owner=self.user,
+            slug='test2')
+        self.trained_authorization = RepositoryAuthorization.objects.create(
+            user=self.user,
+            repository=self.trained_repository)
+
+        def fill_examples(repository):
+            for example_mockup in EXAMPLES_MOCKUP:
+                example = RepositoryExample.objects.create(
+                    repository_update=repository.current_update(self.test_language),
+                    text=example_mockup.get('text'),
+                    intent=example_mockup.get('intent'))
+                for entity_mockup in example_mockup.get('entities', []):
+                    RepositoryExampleEntity.objects.create(
+                        repository_example=example,
+                        start=entity_mockup.get('start'),
+                        end=entity_mockup.get('end'),
+                        entity=entity_mockup.get('entity'))
+
+        fill_examples(self.repository)
+        fill_examples(self.trained_repository)
+
+        train_update(self.trained_repository.current_update(self.test_language), self.user)
 
     def get_app(self):
-        self.data_training = ""
-        with open('app/tests/training_data_sample.json') as json_data:
-            self.data_training = self.data_training.join(json_data.readlines())
+        from app.server import make_app
+        return make_app()
 
-        return Application([
-            url(r'/v1/auth', ProfileRequestHandler),
-            url(r'/v1/message', MessageRequestHandler),
-            url(r'/v1/bots', BotInformationsRequestHandler),
-            url(r'/v1/train', BotTrainerRequestHandler)
-        ])
+    def test_train_handler(self):
+        response = self.fetch(
+            '/v1/train',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            body='language={}'.format(self.test_language))
+        self.assertEqual(response.code, 200)
 
-    def test_profile_handler(self):
-        response = self.fetch('/v1/auth', method='GET')
-        self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
+    def test_train_handler_language_required(self):
+        response = self.fetch(
+            '/v1/train',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            body='')
+        self.assertEqual(response.code, 400)
+
+    def test_message_handler(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
+            body='language={};msg={}'.format(
+                self.test_language,
+                'hi'))
+        content_data = json.loads(response.body)
+        self.assertEqual(response.code, 200)
+        self.assertEqual(content_data.get('answer', {}).get('intent', {}).get('name'), 'greet')
+
+    def test_message_handler_without_authorization(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={},
+            body='language={};msg={}'.format(
+                self.test_language,
+                'hi'))
         self.assertEqual(response.code, 401)
 
-        response = self.fetch('/v1/auth', method='GET', headers={'Authorization': '1234'})
-        self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
+    def test_message_handler_with_invalid_authorization(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(uuid.uuid4())},
+            body='language={};msg={}'.format(
+                self.test_language,
+                'hi'))
         self.assertEqual(response.code, 401)
 
-        response = self.fetch('/v1/auth', method='GET',
-                              headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
+    def test_message_handler_without_msg(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
+            body='language={}'.format(self.test_language))
+        self.assertEqual(response.code, 400)
 
-        self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
-        self.assertEqual(response.code, 401)
-
-        response = self.fetch('/v1/auth', method='POST', body='')
-        self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
-        self.assertEqual(response.code, 200)
-
-        user_token = json.loads(response.body)['user']['uuid']
-
-        response = self.fetch('/v1/auth', method='GET', headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body), {"bots": []})
-        self.assertEqual(response.code, 200)
-
-    def test_training_handler(self):
-        response = self.fetch('/v1/train', method='GET')
-        self.assertEqual(response.code, 405)
-
-        response = self.fetch('/v1/train', method='POST', body='')
-        self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
-        self.assertEqual(response.code, 401)
-
-        response = self.fetch('/v1/train', method='POST', body='', headers={'Authorization': '12345'})
-        self.assertEqual(json.loads(response.body)['error']['message'], WRONG_TOKEN)
-        self.assertEqual(response.code, 401)
-
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training", "false"),
-                              headers={'Authorization': 'Bearer 12345678901234567890123456789012'})
-        self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
-        self.assertEqual(response.code, 401)
-
-        response = self.fetch('/v1/auth', method='POST', body='')
-        self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
-        self.assertEqual(response.code, 200)
-
-        user_token = json.loads(response.body)['user']['uuid']
-
-        response = self.fetch('/v1/train', method='POST', body='',
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['error']['message'], MISSING_DATA)
-        self.assertEqual(response.code, 401)
-
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training", "false"),
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['bot']['slug'], "slug-training")
-
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training", "false"),
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['error']['message'], DUPLICATE_SLUG)
-
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-training-private", "true"),
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['bot']['slug'], "slug-training-private")
-
-    def test_predict_handler(self):
-        response = self.fetch('/v1/auth', method='POST', body='')
-        self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
-        self.assertEqual(response.code, 200)
-
-        user_token = json.loads(response.body)['user']['uuid']
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-predict", "true"),
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(response.code, 200)
-
-        response = self.fetch('/v1/auth', method='GET', headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(response.code, 200)
-
-        data = {
-            'bot': json.loads(response.body)['bots'][0]['uuid'],
-            'msg': 'I want eat chinese food'
-        }
-        response = self.fetch('/v1/message?%s' % urllib.parse.urlencode(data), method='GET',
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['bot']['uuid'], data['bot'])
-        self.assertEqual(response.code, 200)
-
-        response = self.fetch('/v1/auth', method='POST', body='')
-        self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
-        self.assertEqual(response.code, 200)
-
-        user_token = json.loads(response.body)['user']['uuid']
-        response = self.fetch('/v1/message?%s' % urllib.parse.urlencode(data), method='GET',
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
-        self.assertEqual(response.code, 401)
-
-    def test_information_handler(self):
-        response = self.fetch('/v1/auth', method='POST', body='')
-        self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
-        self.assertEqual(response.code, 200)
-        user_token = json.loads(response.body)['user']['uuid']
-
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-predict-private", "true"),
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(response.code, 200)
-
-        data = {
-            'uuid': json.loads(response.body)['bot']['uuid']
-        }
-        response = self.fetch('/v1/bots?%s' % urllib.parse.urlencode(data), method='GET',
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(response.code, 200)
-
-        response = self.fetch('/v1/auth', method='POST', body='')
-        self.assertEqual(len(json.loads(response.body)['user']['uuid']), 32)
-        self.assertEqual(response.code, 200)
-        user_token = json.loads(response.body)['user']['uuid']
-
-        response = self.fetch('/v1/bots?%s' % urllib.parse.urlencode(data), method='GET',
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(json.loads(response.body)['error']['message'], INVALID_TOKEN)
-        self.assertEqual(response.code, 401)
-
-        response = self.fetch('/v1/train', method='POST', body=self.data_training % ("slug-predict-public", "false"),
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(response.code, 200)
-
-        data = {
-            'uuid': json.loads(response.body)['bot']['uuid']
-        }
-
-        response = self.fetch('/v1/bots?%s' % urllib.parse.urlencode(data), method='GET',
-                              headers={'Authorization': 'Bearer %s' % user_token})
-        self.assertEqual(response.code, 200)
+    def test_message_handler_without_language(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
+            body='msg={}'.format('hi'))
+        self.assertEqual(response.code, 400)
 
 
 if __name__ == '__main__':

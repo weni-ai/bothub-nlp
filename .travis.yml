@@ -1,54 +1,20 @@
-sudo: required
-
 language: python
 python:
-  - "3.6.2"
-
-addons:
-  apt:
-    packages:
-      - postgresql-9.4-postgis-2.3
-      - python3
-      - python3-pip
-  postgresql: "9.4"
-
+  - "3.6"
 services:
   - redis-server
-
 install:
-  # install all Python dependencies
-  - pip install --upgrade pip
-  - pip --version
-  - pip install -r requirements.txt --upgrade
+  - pip install -r requirements.txt
   - pip install coveralls
   - pip install flake8
-
+env:
+  - SECRET_KEY=SK REDIS=127.0.0.1 REDIS_PORT=6379 REDIS_DB=0 SUPPORTED_LANGUAGES=en
 before_script:
-  # setup test database
-  - psql -U postgres -c "CREATE DATABASE bothub;"
-  - export BOTHUB_POSTGRES_USER=postgres
-  - export BOTHUB_POSTGRES_PASSWORD=postgres
-  - export BOTHUB_POSTGRES_DB=bothub
-  - export BOTHUB_POSTGRES=127.0.0.1
-  - export BOTHUB_POSTGRES_PORT=5432
-  - export BOTHUB_REDIS=127.0.0.1
-  - export BOTHUB_REDIS_PORT=6379
-  - export BOTHUB_REDIS_DB=2
-  - export BOTHUB_DEBUG=true
   - python -m spacy download en
-  - python -m spacy download de
-  - python -m spacy download es
-  - python -m spacy download pt
-  - python -m spacy download fr
-  - python -m spacy download it
-  - python -m spacy download nl
-  - PYTHONPATH=`pwd` python -m app --service=create_schema
-
+  - django-admin migrate --settings bothub.settings
 script:
  - flake8
  - travis_wait coverage run -m unittest
-
+ - coverage report
 after_success:
-  - coverage combine
-  - coveralls --rcfile .coveragerc
-  - coverage report -i --rcfile .coveragerc  --fail-under=90
+  - coveralls

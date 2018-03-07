@@ -1,16 +1,6 @@
 # .coveragerc to control coverage.py
 [run]
 source = ./
-
-[report]
-ignore_errors = True
-precision = 0
-show_missing = True
-skip_covered = True
-exclude_lines = 
-    pragma: no cover
-    if __name__ == .__main__.:
-
 omit =
     *tests*,
     *__init__*,
@@ -18,5 +8,8 @@ omit =
     *env*
     *__main__*
 
-[html]
-directory = coverage_html_report
+[report]
+fail_under = 90
+exclude_lines = 
+    pragma: no cover
+    if __name__ == .__main__.:
