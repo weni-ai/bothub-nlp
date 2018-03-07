@@ -32,5 +32,6 @@ bothub-nlp.log
 
 #tests
 tests.db
+.coverage
 
 settings.ini
