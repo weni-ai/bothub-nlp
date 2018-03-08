@@ -47,10 +47,10 @@ class BothubBaseHandler(RequestHandler):
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')
         if 'exc_info' in kwargs and DEBUG:
-            lines = []
-            for line in traceback.format_exception(*kwargs['exc_info']):
-                lines.append(line)
-            self.finish(json.dumps({
+            lines = []  # pragma: no cover
+            for line in traceback.format_exception(*kwargs['exc_info']):  # pragma: no cover
+                lines.append(line)  # pragma: no cover
+            self.finish(json.dumps({  # pragma: no cover
                 'error': {
                     'code': status_code,
                     'message': self._reason,

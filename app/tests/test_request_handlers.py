@@ -97,7 +97,8 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
 
         self.repository = Repository.objects.create(
             owner=self.user,
-            slug='test')
+            slug='test',
+            name='Testing')
         self.authorization = RepositoryAuthorization.objects.create(
             user=self.user,
             repository=self.repository)
@@ -138,14 +139,6 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
             headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
             body='language={}'.format(self.test_language))
         self.assertEqual(response.code, 200)
-
-    def test_train_handler_language_required(self):
-        response = self.fetch(
-            '/v1/train',
-            method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
-            body='')
-        self.assertEqual(response.code, 400)
 
     def test_message_handler(self):
         response = self.fetch(
