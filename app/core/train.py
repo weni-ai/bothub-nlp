@@ -27,7 +27,9 @@ def train_update(update, by):
         'rasa_nlu_data': update.rasa_nlu_data,
     }
 
-    trainer = Trainer(RasaNLUConfig(json.dumps(rasa_nlu_config)), SPACY_LANGUAGES[update.language])
+    trainer = Trainer(
+        RasaNLUConfig(json.dumps(rasa_nlu_config)),
+        SPACY_LANGUAGES[update.language])
     trainer.train(load_rasa_data(json.dumps(data)))
     bot_data = trainer.persist()
     common_examples = data.get('rasa_nlu_data').get('common_examples')
