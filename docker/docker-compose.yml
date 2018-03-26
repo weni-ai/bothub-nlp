@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  bothub-nlp:
+    image: $DOCKER_HUB_REPO:$COMMIT
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - SECRET_KEY
+      - DEBUG
+      - ALLOWED_HOSTS
+      - DEFAULT_DATABASE
+      - LANGUAGE_CODE
+      - TIME_ZONE
+      - SUPPORTED_LANGUAGES
+      - REDIS
+      - REDIS_PORT
+      - REDIS_DB
