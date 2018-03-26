@@ -1,7 +1,6 @@
 """ This module will manage all predict data. """
 import logging
 import cloudpickle
-import base64
 
 from tornado.web import asynchronous, HTTPError
 from tornado.gen import coroutine
@@ -41,7 +40,7 @@ class MessageRequestHandler(BothubBaseHandler):
         repository = repository_authorization.repository
 
         update = repository.last_trained_update(language)
-        bot_data = base64.b64decode(update.bot_data)
+        bot_data = update.get_bot_data()
         bot = cloudpickle.loads(bot_data)
         metadata = Metadata(bot, None)
         interpreter = Interpreter.create(
