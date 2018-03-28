@@ -4,21 +4,21 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bothub.settings')
 django.setup()
 
-import unittest
-import json
-import uuid
+import unittest  # noqa: E402
+import json  # noqa: E402
+import uuid  # noqa: E402
 
-from tornado.testing import AsyncHTTPTestCase
-from django.test import TestCase
+from tornado.testing import AsyncHTTPTestCase  # noqa: E402
+from django.test import TestCase  # noqa: E402
 
-from bothub.authentication.models import User
-from bothub.common import languages
-from bothub.common.models import Repository
-from bothub.common.models import RepositoryExample
-from bothub.common.models import RepositoryExampleEntity
-from bothub.common.models import RepositoryAuthorization
+from bothub.authentication.models import User  # noqa: E402
+from bothub.common import languages  # noqa: E402
+from bothub.common.models import Repository  # noqa: E402
+from bothub.common.models import RepositoryExample  # noqa: E402
+from bothub.common.models import RepositoryExampleEntity  # noqa: E402
+from bothub.common.models import RepositoryAuthorization  # noqa: E402
 
-from app.core.train import train_update
+from app.core.train import train_update  # noqa: E402
 
 
 EXAMPLES_MOCKUP = [
@@ -114,7 +114,8 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         def fill_examples(repository):
             for example_mockup in EXAMPLES_MOCKUP:
                 example = RepositoryExample.objects.create(
-                    repository_update=repository.current_update(self.test_language),
+                    repository_update=repository.current_update(
+                        self.test_language),
                     text=example_mockup.get('text'),
                     intent=example_mockup.get('intent'))
                 for entity_mockup in example_mockup.get('entities', []):
@@ -127,7 +128,9 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         fill_examples(self.repository)
         fill_examples(self.trained_repository)
 
-        train_update(self.trained_repository.current_update(self.test_language), self.user)
+        train_update(
+            self.trained_repository.current_update(self.test_language),
+            self.user)
 
     def get_app(self):
         from app.server import make_app
@@ -137,7 +140,10 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         response = self.fetch(
             '/v1/train',
             method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            headers={
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
             body='language={}'.format(self.test_language))
         self.assertEqual(response.code, 200)
 
@@ -145,13 +151,18 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         response = self.fetch(
             '/v1/message',
             method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
+            headers={
+                'Authorization': 'Bearer {}'.format(
+                    self.trained_authorization.uuid),
+            },
             body='language={};msg={}'.format(
                 self.test_language,
                 'hi'))
         content_data = json.loads(response.body)
         self.assertEqual(response.code, 200)
-        self.assertEqual(content_data.get('answer', {}).get('intent', {}).get('name'), 'greet')
+        self.assertEqual(
+            content_data.get('answer', {}).get('intent', {}).get('name'),
+            'greet')
 
     def test_message_handler_without_authorization(self):
         response = self.fetch(
@@ -177,7 +188,10 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         response = self.fetch(
             '/v1/message',
             method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
+            headers={
+                'Authorization': 'Bearer {}'.format(
+                    self.trained_authorization.uuid),
+            },
             body='language={}'.format(self.test_language))
         self.assertEqual(response.code, 400)
 
@@ -185,7 +199,10 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         response = self.fetch(
             '/v1/message',
             method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
+            headers={
+                'Authorization': 'Bearer {}'.format(
+                    self.trained_authorization.uuid),
+            },
             body='msg={}'.format('hi'))
         self.assertEqual(response.code, 400)
 
@@ -193,7 +210,8 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         response = self.fetch(
             '/v1/message',
             method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            headers={'Authorization': 'Bearer {}'.format(
+                self.authorization.uuid)},
             body='language={};msg={}'.format(languages.LANGUAGE_EN, 'hi'))
         self.assertEqual(response.code, 400)
 

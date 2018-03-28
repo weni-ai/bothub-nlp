@@ -14,7 +14,8 @@ logger.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
@@ -41,12 +42,17 @@ class MessageRequestHandler(BothubBaseHandler):
         update = repository.last_trained_update(language)
 
         if not update:
-            raise HTTPError(reason='This repository has never been trained', status_code=400)
+            raise HTTPError(
+                reason='This repository has never been trained',
+                status_code=400)
 
         bot_data = update.get_bot_data()
         bot = cloudpickle.loads(bot_data)
         metadata = Metadata(bot, None)
-        interpreter = Interpreter.create(metadata, {}, SPACY_LANGUAGES[language])
+        interpreter = Interpreter.create(
+            metadata,
+            {},
+            SPACY_LANGUAGES[language])
 
         self.write({
             'repository_uuid': repository.uuid.hex,

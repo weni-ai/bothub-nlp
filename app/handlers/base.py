@@ -15,12 +15,15 @@ logger.setLevel(logging.DEBUG)
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 logger.info('Importing spacy languages...')
-SPACY_LANGUAGES = dict(map(lambda language: (language, spacy.load(language),), SUPPORTED_LANGUAGES))
+SPACY_LANGUAGES = dict(map(
+    lambda language: (language, spacy.load(language),),
+    SUPPORTED_LANGUAGES))
 logger.info('Spacy languages imported.')
 
 
@@ -32,13 +35,15 @@ class BothubBaseHandler(RequestHandler):
 
     def repository_authorization(self):
         authorization_header_value = self.request.headers.get('Authorization')
-        authorization_uuid = authorization_header_value and authorization_header_value[7:]
+        authorization_uuid = authorization_header_value and\
+            authorization_header_value[7:]
 
         if not authorization_uuid:
             return False
 
         try:
-            repository_authorization = RepositoryAuthorization.objects.get(uuid=authorization_uuid)
+            repository_authorization = RepositoryAuthorization.objects.get(
+                uuid=authorization_uuid)
         except RepositoryAuthorization.DoesNotExist:
             return False
 
@@ -48,7 +53,8 @@ class BothubBaseHandler(RequestHandler):
         self.set_header('Content-Type', 'application/json')
         if 'exc_info' in kwargs and DEBUG:
             lines = []  # pragma: no cover
-            for line in traceback.format_exception(*kwargs['exc_info']):  # pragma: no cover
+            for line in traceback.format_exception(
+                    *kwargs['exc_info']):  # pragma: no cover
                 lines.append(line)  # pragma: no cover
             self.finish(json.dumps({  # pragma: no cover
                 'error': {
