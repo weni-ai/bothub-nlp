@@ -12,6 +12,7 @@ from tornado.testing import AsyncHTTPTestCase
 from django.test import TestCase
 
 from bothub.authentication.models import User
+from bothub.common import languages
 from bothub.common.models import Repository
 from bothub.common.models import RepositoryExample
 from bothub.common.models import RepositoryExampleEntity
@@ -186,6 +187,14 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
             method='POST',
             headers={'Authorization': 'Bearer {}'.format(self.trained_authorization.uuid)},
             body='msg={}'.format('hi'))
+        self.assertEqual(response.code, 400)
+
+    def test_never_trained(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            body='language={};msg={}'.format(languages.LANGUAGE_EN, 'hi'))
         self.assertEqual(response.code, 400)
 
 
