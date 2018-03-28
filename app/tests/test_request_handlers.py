@@ -94,7 +94,7 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
 
         self.user = User.objects.create(
             email='fake@user.com',
-            nick='fake')
+            nickname='fake')
 
         self.repository = Repository.objects.create(
             owner=self.user,
