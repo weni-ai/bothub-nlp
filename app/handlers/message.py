@@ -42,7 +42,9 @@ class MessageRequestHandler(BothubBaseHandler):
         update = repository.last_trained_update(language)
 
         if not update:
-            raise HTTPError(reason='This repository has never been trained', status_code=400)
+            raise HTTPError(
+                reason='This repository has never been trained',
+                status_code=400)
 
         bot_data = update.get_bot_data()
         bot = cloudpickle.loads(bot_data)

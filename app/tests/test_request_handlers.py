@@ -210,7 +210,8 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
         response = self.fetch(
             '/v1/message',
             method='POST',
-            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            headers={'Authorization': 'Bearer {}'.format(
+                self.authorization.uuid)},
             body='language={};msg={}'.format(languages.LANGUAGE_EN, 'hi'))
         self.assertEqual(response.code, 400)
 
