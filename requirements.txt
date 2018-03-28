@@ -12,5 +12,5 @@ python-decouple
 psutil
 python-slugify
 click
-https://github.com/push-flow/bothub-app/archive/1.0.0.zip
+https://github.com/push-flow/bothub-app/archive/1.1.0.zip
 coverage
