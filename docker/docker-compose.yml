@@ -1,0 +1,26 @@
+version: '3.3'
+
+services:
+  scipy:
+    image: ilha/scipy:python3.6-alpine3.7
+    build:
+      context: ..
+      dockerfile: docker/scipy.Dockerfile
+  bothub-nlp:
+    image: $DOCKER_HUB_REPO:$TAG
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - SECRET_KEY
+      - DEBUG
+      - ALLOWED_HOSTS
+      - DEFAULT_DATABASE
+      - LANGUAGE_CODE
+      - TIME_ZONE
+      - SUPPORTED_LANGUAGES
+      - REDIS
+      - REDIS_PORT
+      - REDIS_DB

@@ -1,0 +1,7 @@
+.vscode/
+env/
+__pycache__/
+*.py[cod]
+.coverage
+settings.ini
+db.sqlite3
