@@ -4,7 +4,7 @@ ENV WORKDIR /home/app
 WORKDIR $WORKDIR
 
 RUN apk update && apk upgrade
-RUN apk add alpine-sdk postgresql postgresql-dev libpng openblas-dev
+RUN apk add alpine-sdk postgresql-dev libpng openblas-dev
 
 COPY . .
 RUN pip install --exists-action w -r requirements.txt
