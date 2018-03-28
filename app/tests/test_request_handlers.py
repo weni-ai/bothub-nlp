@@ -12,6 +12,7 @@ from tornado.testing import AsyncHTTPTestCase  # noqa: E402
 from django.test import TestCase  # noqa: E402
 
 from bothub.authentication.models import User  # noqa: E402
+from bothub.common import languages  # noqa: E402
 from bothub.common.models import Repository  # noqa: E402
 from bothub.common.models import RepositoryExample  # noqa: E402
 from bothub.common.models import RepositoryExampleEntity  # noqa: E402
@@ -203,6 +204,14 @@ class RequestHandlersTest(AsyncHTTPTestCase, TestCase):
                     self.trained_authorization.uuid),
             },
             body='msg={}'.format('hi'))
+        self.assertEqual(response.code, 400)
+
+    def test_never_trained(self):
+        response = self.fetch(
+            '/v1/message',
+            method='POST',
+            headers={'Authorization': 'Bearer {}'.format(self.authorization.uuid)},
+            body='language={};msg={}'.format(languages.LANGUAGE_EN, 'hi'))
         self.assertEqual(response.code, 400)
 
 
