@@ -16,3 +16,6 @@ indent_size = 2
 
 [*.{py,yml}]
 insert_final_newline = true
+
+[Makefile]
+indent_style = tab
