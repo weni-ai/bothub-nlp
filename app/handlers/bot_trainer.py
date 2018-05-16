@@ -31,12 +31,27 @@ class BotTrainerRequestHandler(BothubBaseHandler):
     def post(self):
         repository_authorization = self.repository_authorization()
         repository = repository_authorization.repository
+        languages_report = {}
 
         for language in SUPPORTED_LANGUAGES:
             current_update = repository.current_update(language)
-            train_update(current_update, repository_authorization.user)
+            if not current_update.ready_for_train:
+                languages_report[language] = {  # pragma: no cover
+                    'status': 'not_ready_for_train',
+                }
+                continue  # pragma: no cover
+            try:
+                train_update(current_update, repository_authorization.user)
+                languages_report[language] = {
+                    'status': 'trained',
+                }
+            except Exception as e:  # pragma: no cover
+                languages_report[language] = {  # pragma: no cover
+                    'status': 'failed',
+                    'error': str(e),
+                }
 
         self.write({
-            'repository_uuid': repository.uuid.hex,
-            'languages': SUPPORTED_LANGUAGES,
+            'repository_uuid': str(repository.uuid),
+            'languages_report': languages_report,
         })

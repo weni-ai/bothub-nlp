@@ -42,12 +42,10 @@ class BothubBaseHandler(RequestHandler):
             return False
 
         try:
-            repository_authorization = RepositoryAuthorization.objects.get(
+            return RepositoryAuthorization.objects.get(
                 uuid=authorization_uuid)
         except RepositoryAuthorization.DoesNotExist:
             return False
-
-        return repository_authorization
 
     def write_error(self, status_code, **kwargs):
         self.set_header('Content-Type', 'application/json')
@@ -64,7 +62,7 @@ class BothubBaseHandler(RequestHandler):
                 }
             }))
         else:
-            self.finish(json.dumps({
+            self.finish(json.dumps({  # pragma: no cover
                 'error': {
                     'code': status_code,
                     'message': self._reason,
