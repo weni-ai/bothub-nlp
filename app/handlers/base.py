@@ -62,7 +62,7 @@ class BothubBaseHandler(RequestHandler):
                 }
             }))
         else:
-            self.finish(json.dumps({
+            self.finish(json.dumps({  # pragma: no cover
                 'error': {
                     'code': status_code,
                     'message': self._reason,
