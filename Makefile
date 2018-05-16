@@ -53,3 +53,8 @@ test:
 	make migrate
 	$(ENV_DIR)bin/coverage run -m unittest
 	$(ENV_DIR)bin/coverage report -m
+
+start:
+	make check_ready_for_development
+	make migrate
+	$(ENV_DIR)bin/python -m app --service start_server 8001
