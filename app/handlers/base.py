@@ -68,3 +68,14 @@ class BothubBaseHandler(RequestHandler):
                     'message': self._reason,
                 }
             }))
+
+    def set_default_headers(self):
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization')
+        self.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+
+    def options(self):
+        self.set_status(204)
+        self.finish()
