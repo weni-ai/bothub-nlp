@@ -1,6 +1,7 @@
 ENV_DIR=./env/
 SETTINGS_FILE=settings.ini
 DJANGO_SETTINGS_MODULE=bothub.settings
+EXTRA_MODELS_DIR=./spacy-lang-models/models/
 
 help:
 	@cat Makefile-help.txt
@@ -10,16 +11,16 @@ init_envoriment:
 	$(ENV_DIR)bin/pip install --upgrade pip
 	make install_requirements
 
+clone_spacy_lang_models:
+	git clone https://github.com/push-flow/spacy-lang-models.git
+
 check_envoriment:
 	if [ ! -d "$(ENV_DIR)" ]; then make init_envoriment; fi
+	if [ ! -d "$(EXTRA_MODELS_DIR)" ]; then make clone_spacy_lang_models; fi
 
 install_requirements:
 	make check_envoriment
 	$(ENV_DIR)bin/pip install -r requirements.txt
-
-update_requirements:
-	make check_envoriment
-	$(ENV_DIR)bin/pip freeze > requirements.txt
 
 lint:
 	make check_envoriment
@@ -38,15 +39,9 @@ migrate:
 	make check_envoriment
 	DJANGO_SETTINGS_MODULE=$(DJANGO_SETTINGS_MODULE) $(ENV_DIR)bin/django-admin migrate
 
-install_languages:
+import_languages:
 	make check_envoriment
-	$(ENV_DIR)bin/python -m spacy download en
-	$(ENV_DIR)bin/python -m spacy download de
-	$(ENV_DIR)bin/python -m spacy download es
-	$(ENV_DIR)bin/python -m spacy download pt
-	$(ENV_DIR)bin/python -m spacy download fr
-	$(ENV_DIR)bin/python -m spacy download it
-	$(ENV_DIR)bin/python -m spacy download nl
+	$(ENV_DIR)bin/python -m bothub-nlp import_langs -e=${EXTRA_MODELS_DIR} en de es pt fr it nl
 
 test:
 	make check_ready_for_development
