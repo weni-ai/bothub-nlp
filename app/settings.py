@@ -7,8 +7,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 SUPPORTED_LANGUAGES = config(
     'SUPPORTED_LANGUAGES',
-    default='en,de,es,pt,fr,it,nl',
-    cast=lambda v: [s.strip() for s in v.split(',')])
+    cast=lambda v: v.split())
 
 REDIS_CONNECTION = redis.ConnectionPool(
     host=config('REDIS'),

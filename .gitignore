@@ -17,3 +17,6 @@ tests.db
 
 settings.ini
 db.sqlite3
+
+## extra models
+spacy-lang-models/

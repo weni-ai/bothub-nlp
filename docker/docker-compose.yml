@@ -7,7 +7,7 @@ services:
       context: ..
       dockerfile: docker/scipy.Dockerfile
   bothub-nlp:
-    image: $DOCKER_HUB_REPO:$TAG
+    image: "${DOCKER_IMAGE_NAME}":"${TAG}"
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -20,7 +20,19 @@ services:
       - DEFAULT_DATABASE
       - LANGUAGE_CODE
       - TIME_ZONE
+      - ADMINS
+      - DEFAULT_FROM_EMAIL
+      - SERVER_EMAIL
+      - EMAIL_HOST
+      - EMAIL_PORT
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - EMAIL_USE_SSL
+      - EMAIL_USE_TLS
+      - BOTHUB_WEBAPP_BASE_URL
+      - BOTHUB_NLP_BASE_URL
       - SUPPORTED_LANGUAGES
       - REDIS
       - REDIS_PORT
       - REDIS_DB
+      - SPACY_LANG_MODELS_REPOSITORY
