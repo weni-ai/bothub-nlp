@@ -6,15 +6,13 @@ WORKDIR $WORKDIR
 RUN apk update && apk upgrade
 RUN apk add alpine-sdk postgresql-dev libpng openblas-dev
 
+RUN pip install cython==0.27.3 cymem==1.31.2 preshed==1.0.0 murmurhash==0.28.0 thinc==6.10.2
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
 COPY . .
-RUN pip install --exists-action w -r requirements.txt
-RUN python -m spacy download en
-RUN python -m spacy download de
-RUN python -m spacy download es
-RUN python -m spacy download pt
-RUN python -m spacy download fr
-RUN python -m spacy download it
-RUN python -m spacy download nl
 
 RUN chmod +x ./docker/entrypoint.sh
 RUN chmod +x ./app/server.py
