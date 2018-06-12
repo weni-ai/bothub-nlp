@@ -4,6 +4,7 @@ python:
 services:
   - redis-server
 install:
+  - pip install cython==0.27.3
   - pip install -r requirements.txt
   - pip install coveralls
   - pip install flake8
