@@ -1,9 +1,7 @@
 if __name__ == '__main__':
     import plac
     import sys
-
     from .cli import import_lang, import_langs
-
 
     commands = {
         'import_lang': import_lang,
