@@ -2,6 +2,7 @@ ENV_DIR=./env/
 SETTINGS_FILE=settings.ini
 DJANGO_SETTINGS_MODULE=bothub.settings
 EXTRA_MODELS_DIR=./spacy-lang-models/models/
+SUPPORTED_LANGUAGES=en de es pt fr it nl
 
 help:
 	@cat Makefile-help.txt
@@ -41,7 +42,7 @@ migrate:
 
 import_languages:
 	make check_envoriment
-	$(ENV_DIR)bin/python -m bothub-nlp import_langs -e=${EXTRA_MODELS_DIR} en de es pt fr it nl
+	$(ENV_DIR)bin/python -m bothub-nlp import_langs -e=${EXTRA_MODELS_DIR} ${SUPPORTED_LANGUAGES}
 
 test:
 	make check_ready_for_development
