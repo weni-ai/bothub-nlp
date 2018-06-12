@@ -9,5 +9,4 @@ Commands:
     make lint - Show lint warnings and errors
     make test - Run unit tests and show coverage report
     make migrate - Update DB shema, apply migrations
-    make import_languages - Import all languages supported by Spacy
-
+    make import_languages [languages] - Import languages to Spacy
