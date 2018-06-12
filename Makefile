@@ -1,9 +1,9 @@
-ENV_DIR=./env/
-SETTINGS_FILE=settings.ini
-DJANGO_SETTINGS_MODULE=bothub.settings
-EXTRA_MODELS_DIR=./spacy-lang-models/models/
-SUPPORTED_LANGUAGES=en de es pt fr it nl
-SPACY_LANG_MODELS_REPOSITORY=https://github.com/push-flow/spacy-lang-models.git
+ENV_DIR := ./env/
+SETTINGS_FILE := settings.ini
+DJANGO_SETTINGS_MODULE := bothub.settings
+EXTRA_MODELS_DIR := ./spacy-lang-models/models/
+SUPPORTED_LANGUAGES := en de es pt fr it nl
+SPACY_LANG_MODELS_REPOSITORY := https://github.com/push-flow/spacy-lang-models.git
 
 
 help:
