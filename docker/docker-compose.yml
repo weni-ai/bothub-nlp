@@ -7,7 +7,7 @@ services:
       context: ..
       dockerfile: docker/scipy.Dockerfile
   bothub-nlp:
-    image: $DOCKER_IMAGE_NAME:$TAG
+    image: "${DOCKER_IMAGE_NAME}":"${TAG}"
     build:
       context: ..
       dockerfile: docker/Dockerfile
