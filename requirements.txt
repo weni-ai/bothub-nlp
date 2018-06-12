@@ -3,7 +3,7 @@ scipy
 matplotlib
 cython==0.27.3
 cymem==1.31.2
-preshed==1.0.1
+preshed==1.0.0
 murmurhash==0.28.0
 thinc==6.10.2
 scikit-learn==0.19.1
