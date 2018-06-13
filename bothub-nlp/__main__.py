@@ -1,11 +1,12 @@
 if __name__ == '__main__':
     import plac
     import sys
-    from .cli import import_lang, import_langs
+    from .cli import import_lang, import_langs, import_supported_languages
 
     commands = {
         'import_lang': import_lang,
         'import_langs': import_langs,
+        'import_supported_languages': import_supported_languages,
     }
 
     if len(sys.argv) == 1:
