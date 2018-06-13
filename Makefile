@@ -5,6 +5,7 @@ EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR := ./extra-models/
 EXTRA_LANGUAGE_MODELS_DIR := "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}models/"
 IS_PRODUCTION := false
 CHECK_ENVIRONMENT := true
+PORT := 8001
 
 # Utils
 
@@ -89,4 +90,4 @@ import_languages:
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@pipenv run python -m app --service start_server 8001
+	@pipenv run python -m app --service start_server ${PORT}
