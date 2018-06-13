@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+plac = "*"
+tornado = "*"
+bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
+rasa_nlu = {file = "https://github.com/push-flow/rasa_nlu/archive/feature/direct_json_data.zip"}
+spacy = {file = "https://github.com/push-flow/spaCy/archive/feature/new-langs.zip"}
+sklearn-crfsuite = "*"
+scikit-learn = "*"
+scipy = "*"
+click = "*"
+
+[dev-packages]
+"flake8" = "*"
+coverage = "*"
+
+[requires]
+python_version = "3.6"
