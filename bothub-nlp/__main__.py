@@ -1,12 +1,23 @@
+import os
+import django
+
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bothub.settings')
+django.setup()
+
 if __name__ == '__main__':
     import plac
     import sys
-    from .cli import import_lang, import_langs, import_supported_languages
+    from .cli import import_lang
+    from .cli import import_langs
+    from .cli import import_supported_languages
+    from .cli import start
 
     commands = {
         'import_lang': import_lang,
         'import_langs': import_langs,
         'import_supported_languages': import_supported_languages,
+        'start': start,
     }
 
     if len(sys.argv) == 1:
