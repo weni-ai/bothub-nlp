@@ -42,7 +42,7 @@ migrate:
 
 clone_extra_language_models_repository:
 	@echo "${INFO}Cloning extra language models repository:${NC}"
-	@echo "${DEBUG}  From: ${EXTRA_LANGUAGE_MODELS_REPOSITORY}${NC}"
+	@echo "  From: ${EXTRA_LANGUAGE_MODELS_REPOSITORY}"
 	@git clone --depth 1 --single-branch "${EXTRA_LANGUAGE_MODELS_REPOSITORY}" "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}" \
 		&& echo "${SUCCESS}✔${NC} Repository cloned"
 
@@ -67,12 +67,11 @@ SUCCESS = \033[0;32m
 INFO = \033[0;36m
 WARNING = \033[0;33m
 DANGER = \033[0;31m
-DEBUG = \033[0;37m
 NC = \033[0m
 
 create_environment_vars_file:
 	@echo "SECRET_KEY=SK" > "${ENVIRONMENT_VARS_FILE}"
-	@echo "DEBUG=True" >> "${ENVIRONMENT_VARS_FILE}"
+	@echo "DEBUG=true" >> "${ENVIRONMENT_VARS_FILE}"
 	@echo "SUPPORTED_LANGUAGES=en de es pt fr it nl" >> "${ENVIRONMENT_VARS_FILE}"
 	@echo "${SUCCESS}✔${NC} Settings file created"
 
