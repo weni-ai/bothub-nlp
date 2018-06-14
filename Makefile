@@ -7,6 +7,48 @@ IS_PRODUCTION ?= false
 CHECK_ENVIRONMENT := true
 PORT ?= 8001
 
+
+# Commands
+
+help:
+	@cat Makefile-help.txt
+	@exit 0
+
+check_environment:
+	@if [[ ${CHECK_ENVIRONMENT} = true ]]; then make _check_environment; fi
+
+install_requirements:
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then make install_production_requirements; \
+		else make install_development_requirements; fi
+
+lint:
+	@make development_mode_guard
+	@make check_environment
+	@pipenv run flake8
+	@echo "${SUCCESS}✔${NC} The code is following the PEP8"
+
+test:
+	@make development_mode_guard
+	@make check_environment
+	@make migrate CHECK_ENVIRONMENT=false
+	@pipenv run coverage run -m unittest
+	@pipenv run coverage report -m
+
+migrate:
+	@make check_environment
+	@DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate
+
+import_languages:
+	@make check_environment
+	@pipenv run python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"
+
+start:
+	@make check_environment
+	@make migrate CHECK_ENVIRONMENT=false
+	@pipenv run python -m app --service start_server ${PORT}
+
+
 # Utils
 
 ## Colors
@@ -51,43 +93,3 @@ _check_environment:
 	@if [[ ! -f "${ENVIRONMENT_VARS_FILE}" ]]; then make create_environment_vars_file; fi
 	@make install_requirements
 	@echo "${SUCCESS}✔${NC} Environment checked"
-
-
-# Commands
-
-help:
-	@cat Makefile-help.txt
-
-check_environment:
-	@if [[ ${CHECK_ENVIRONMENT} = true ]]; then make _check_environment; fi
-
-install_requirements:
-	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then make install_production_requirements; \
-		else make install_development_requirements; fi
-
-lint:
-	@make development_mode_guard
-	@make check_environment
-	@pipenv run flake8
-	@echo "${SUCCESS}✔${NC} The code is following the PEP8"
-
-test:
-	@make development_mode_guard
-	@make check_environment
-	@make migrate CHECK_ENVIRONMENT=false
-	@pipenv run coverage run -m unittest
-	@pipenv run coverage report -m
-
-migrate:
-	@make check_environment
-	@DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate
-
-import_languages:
-	@make check_environment
-	@pipenv run python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"
-
-start:
-	@make check_environment
-	@make migrate CHECK_ENVIRONMENT=false
-	@pipenv run python -m app --service start_server ${PORT}
