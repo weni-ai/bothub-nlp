@@ -5,7 +5,6 @@ EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR := ./extra-models/
 EXTRA_LANGUAGE_MODELS_DIR := "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}models/"
 IS_PRODUCTION ?= false
 CHECK_ENVIRONMENT := true
-PORT ?= 8001
 
 
 # Commands
@@ -56,8 +55,8 @@ start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m app --service start_server ${PORT}; \
-		else pipenv run python -m app --service start_server ${PORT}; fi
+		then python -m bothub-nlp start; \
+		else pipenv run python -m tornado.autoreload -m bothub-nlp.cli.start; fi
 
 
 # Utils

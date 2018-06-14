@@ -1,8 +1,7 @@
-def start():
-    import os
-    import tornado.ioloop
-    import tornado.autoreload
+app = None
 
+
+def load_app():
     from .. import settings
     from ..server import make_app
 
@@ -10,13 +9,26 @@ def start():
     app = make_app()
     app.listen(settings.PORT)
 
+
+def start():
+    import tornado.ioloop
+
+    from .. import settings
+
+    load_app()
+
     print('Starting server in {} port'.format(settings.PORT))
 
+    tornado.ioloop.IOLoop.current().start()
+
+if __name__ == '__main__':
+    import os
+    import tornado.autoreload
+
     tornado.autoreload.start()
-    tornado.autoreload.add_reload_hook(start)
-    for dir, _, files in os.walk('static'):
+    for dir, _, files in os.walk('bothub-nlp'):
         for f in files:
             if not f.startswith('.'):
                 tornado.autoreload.watch('{dir}/{name}'.format(dir=dir, name=f))
 
-    tornado.ioloop.IOLoop.current().start()
+    start()

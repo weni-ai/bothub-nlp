@@ -8,4 +8,4 @@ class ParseHandler(ApiHandler):
     @asynchronous
     @coroutine
     def get(self):
-        self.finish('OK!')
+        self.finish('OK')
