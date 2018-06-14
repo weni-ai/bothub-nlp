@@ -20,7 +20,7 @@ Use ```make``` commands to ```check_environment```, ```install_requirements```, 
 
 ## Production
 
-Docker images available in [Bothub's Docker Hub repository](https://hub.docker.com/r/ilha/bothub/).
+Docker images available in [Bothub NLP's Docker Hub repository](https://hub.docker.com/r/ilha/bothub-nlp/).
 
 
 ## Environment Variables
