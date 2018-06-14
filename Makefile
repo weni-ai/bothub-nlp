@@ -40,6 +40,12 @@ migrate:
 		then DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate; \
 		else DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate; fi
 
+clone_extra_language_models_repository:
+	@echo "${INFO}Cloning extra language models repository:${NC}"
+	@echo "${DEBUG}  From: ${EXTRA_LANGUAGE_MODELS_REPOSITORY}${NC}"
+	@git clone --depth 1 --single-branch "${EXTRA_LANGUAGE_MODELS_REPOSITORY}" "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}" \
+		&& echo "${SUCCESS}✔${NC} Repository cloned"
+
 import_languages:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
@@ -63,12 +69,6 @@ WARNING = \033[0;33m
 DANGER = \033[0;31m
 DEBUG = \033[0;37m
 NC = \033[0m
-
-clone_extra_language_models_repository:
-	@echo "${INFO}Cloning extra language models repository:${NC}"
-	@echo "${DEBUG}  From: ${EXTRA_LANGUAGE_MODELS_REPOSITORY}${NC}"
-	@git clone --depth 1 --single-branch "${EXTRA_LANGUAGE_MODELS_REPOSITORY}" "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}" \
-		&& echo "${SUCCESS}✔${NC} Repository cloned"
 
 create_environment_vars_file:
 	@echo "SECRET_KEY=SK" > "${ENVIRONMENT_VARS_FILE}"

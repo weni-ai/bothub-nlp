@@ -15,6 +15,7 @@ Use ```make``` commands to ```check_environment```, ```install_requirements```, 
 | make lint | Show lint warnings and errors
 | make test | Run unit tests and show coverage report
 | make migrate | Update DB shema, apply migrations
+| make clone_extra_language_models_repository | Clone extra language models repository
 | make import_languages [languages] | Import languages to Spacy
 | make start | Start web server
 
