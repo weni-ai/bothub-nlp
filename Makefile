@@ -3,9 +3,9 @@ DJANGO_SETTINGS_MODULE := bothub.settings
 EXTRA_LANGUAGE_MODELS_REPOSITORY := https://github.com/push-flow/spacy-lang-models.git
 EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR := ./extra-models/
 EXTRA_LANGUAGE_MODELS_DIR := "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}models/"
-IS_PRODUCTION := false
+IS_PRODUCTION ?= false
 CHECK_ENVIRONMENT := true
-PORT := 8001
+PORT ?= 8001
 
 # Utils
 
@@ -36,13 +36,8 @@ install_development_requirements:
 
 install_production_requirements:
 	@echo "${INFO}Installing production requirements...${NC}"
-	@pipenv install --system &> /dev/null
+	@pipenv install --system
 	@echo "${SUCCESS}✔${NC} Requirements installed"
-
-install_requirements:
-	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then make install_production_requirements; \
-		else make install_development_requirements; fi
 
 development_mode_guard:
 	@(${IS_PRODUCTION} && echo "${DANGER}Just run this command in development mode${NC}" && exit 1) || exit 0
@@ -57,14 +52,19 @@ _check_environment:
 	@make install_requirements
 	@echo "${SUCCESS}✔${NC} Environment checked"
 
-check_environment:
-	@if [[ ${CHECK_ENVIRONMENT} = true ]]; then make _check_environment; fi
-
 
 # Commands
 
 help:
 	@cat Makefile-help.txt
+
+check_environment:
+	@if [[ ${CHECK_ENVIRONMENT} = true ]]; then make _check_environment; fi
+
+install_requirements:
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then make install_production_requirements; \
+		else make install_development_requirements; fi
 
 lint:
 	@make development_mode_guard
