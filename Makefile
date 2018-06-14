@@ -32,21 +32,26 @@ test:
 	@make development_mode_guard
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@pipenv run coverage run -m unittest
-	@pipenv run coverage report -m
+	@pipenv run coverage run -m unittest && pipenv run coverage report -m
 
 migrate:
 	@make check_environment
-	@DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate; \
+		else DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate; fi
 
 import_languages:
 	@make check_environment
-	@pipenv run python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
+		else pipenv run python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
 
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@pipenv run python -m app --service start_server ${PORT}
+	@@if [[ ${IS_PRODUCTION} = true ]]; \
+		then python -m app --service start_server ${PORT}; \
+		else pipenv run python -m app --service start_server ${PORT}; fi
 
 
 # Utils
@@ -90,6 +95,6 @@ development_mode_guard:
 _check_environment:
 	@type pipenv &> /dev/null || (echo "${DANGER}☓${NC} Install pipenv to continue..." && exit 1)
 	@echo "${SUCCESS}✔${NC} pipenv installed"
-	@if [[ ! -f "${ENVIRONMENT_VARS_FILE}" && ${IS_PRODUCTION} == false ]]; then make create_environment_vars_file; fi
+	@if [[ ! -f "${ENVIRONMENT_VARS_FILE}" && ${IS_PRODUCTION} = false ]]; then make create_environment_vars_file; fi
 	@make install_requirements
 	@echo "${SUCCESS}✔${NC} Environment checked"
