@@ -7,9 +7,17 @@ name = "pypi"
 plac = "*"
 click = "*"
 tornado = "*"
+python-decouple = "*"
+django = "==2.0.2"
+dj-database-url = "*"
+djangorestframework = "==3.7.7"
+django-filter = "==1.1.0"
+django-cors-headers = "==2.2.0"
+coreapi = "==2.3.3"
 bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
 numpy = "==1.14.5"
 scipy = "==1.1.0"
+cython = "*"
 murmurhash = "==0.28.0"
 cymem = "==1.31.2"
 preshed = "==1.0.0"
@@ -23,7 +31,6 @@ spacy = {file = "https://github.com/push-flow/spaCy/archive/feature/new-langs.zi
 scikit-learn = "*"
 sklearn-crfsuite = "*"
 rasa_nlu = {file = "https://github.com/push-flow/rasa_nlu/archive/feature/direct_json_data.zip"}
-cython = "*"
 
 [dev-packages]
 "flake8" = "*"
