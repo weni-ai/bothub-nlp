@@ -23,4 +23,4 @@ COPY . .
 RUN chmod +x ./docker/bothub-nlp/entrypoint.sh
 RUN chmod +x ./app/server.py
 EXPOSE 80
-ENTRYPOINT $WORKDIR/docker/entrypoint.sh
+ENTRYPOINT $WORKDIR/docker/bothub-nlp/entrypoint.sh
