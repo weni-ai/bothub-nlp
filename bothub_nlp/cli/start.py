@@ -26,7 +26,7 @@ if __name__ == '__main__':
     import tornado.autoreload
 
     tornado.autoreload.start()
-    for dir, _, files in os.walk('bothub-nlp'):
+    for dir, _, files in os.walk('bothub_nlp'):
         for f in files:
             if not f.startswith('.'):
                 tornado.autoreload.watch('{dir}/{name}'.format(dir=dir, name=f))

@@ -16,7 +16,7 @@ env:
     - DJANGO_SETTINGS_MODULE=bothub.settings
 before_script:
   - git clone --depth 1 --single-branch "${EXTRA_LANGUAGE_MODELS_REPOSITORY}" "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}"
-  - python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"
+  - python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"
   - DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate
 script:
  - flake8 --exclude ./extra-models/

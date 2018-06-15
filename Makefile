@@ -48,15 +48,15 @@ clone_extra_language_models_repository:
 import_languages:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
-		else pipenv run python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
+		then python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
+		else pipenv run python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
 
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub-nlp start; \
-		else pipenv run python -m tornado.autoreload -m bothub-nlp.cli.start; fi
+		then python -m bothub_nlp start; \
+		else pipenv run python -m tornado.autoreload -m bothub_nlp.cli.start; fi
 
 
 # Utils
