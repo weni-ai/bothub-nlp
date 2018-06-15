@@ -18,6 +18,7 @@ simplejson = "==3.15.0"
 "boto3" = "==1.7.37"
 cloudpickle = "==0.5.3"
 future = "==0.16.0"
+jsonschema = "==2.6.0"
 bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
 numpy = "==1.14.5"
 scipy = "==1.1.0"
