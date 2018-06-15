@@ -13,6 +13,7 @@ logger.setLevel(settings.LOGGER_LEVEL)
 
 spacyLanguages = SpacyLanguages()
 
+
 def make_app():
     if settings.IMPORT_ALL_LANGUAGES_BEFORE_MAKE_APP:
         global spacyLanguages
