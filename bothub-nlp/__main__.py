@@ -1,10 +1,10 @@
 if __name__ == '__main__':
     import plac
     import sys
-    from .cli import import_lang
-    from .cli import import_langs
-    from .cli import import_supported_languages
-    from .cli import start
+    from .cli.import_lang import import_lang
+    from .cli.import_langs import import_langs
+    from .cli.import_supported_languages import import_supported_languages
+    from .cli.start import start
 
     commands = {
         'import_lang': import_lang,
