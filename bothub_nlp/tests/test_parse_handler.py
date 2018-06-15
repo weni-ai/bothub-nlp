@@ -1,5 +1,6 @@
 from tornado.testing import AsyncHTTPTestCase
 from django.test import TestCase
+from rest_framework import status
 
 
 class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
@@ -15,5 +16,6 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             '/parse/',
             method='GET',
         )
-        print(response)
-        print(response.code)
+        self.assertEqual(
+            response.code,
+            status.HTTP_200_OK)
