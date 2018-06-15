@@ -1,3 +1,5 @@
+import json
+
 from tornado.testing import AsyncHTTPTestCase
 from django.test import TestCase
 from rest_framework import status
@@ -19,3 +21,34 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
         self.assertEqual(
             response.code,
             status.HTTP_200_OK)
+
+    def test_parse_valid_request(self):
+        text = 'hi, my name is Douglas'
+
+        response = self.fetch(
+            '/parse/',
+            method='POST',
+            body=json.dumps({
+                'text': text,
+            }),
+            headers={
+                'Content-Type': 'application/json',
+            },
+        )
+
+        self.assertEqual(
+            response.code,
+            status.HTTP_200_OK)
+
+        content_data = json.loads(response.body)
+
+        self.assertIn(
+            'text',
+            content_data.keys())
+        self.assertEqual(
+            content_data.get('text'),
+            text)
+
+        self.assertIn(
+            'language',
+            content_data.keys())
