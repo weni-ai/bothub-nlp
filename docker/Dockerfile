@@ -15,8 +15,10 @@ RUN python -m spacy download pt
 RUN python -m spacy download fr
 RUN python -m spacy download it
 RUN python -m spacy download nl
+RUN pip install gunicorn
 
 RUN chmod +x ./docker/entrypoint.sh
 RUN chmod +x ./app/server.py
+COPY docker/gunicorn.conf.py .
 EXPOSE 8080
 ENTRYPOINT $WORKDIR/docker/entrypoint.sh

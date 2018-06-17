@@ -1,9 +1,4 @@
-import os
-import django
 import click
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bothub.settings')
-django.setup()
 
 
 @click.command()
