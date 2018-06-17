@@ -14,7 +14,6 @@ def train_update(update, by):
     try:
         rasa_nlu_config = {
             'pipeline': 'spacy_sklearn',
-            'path': './models',
             'data': tempfile.NamedTemporaryFile(suffix='.json').name,
             'language': update.language,
         }
