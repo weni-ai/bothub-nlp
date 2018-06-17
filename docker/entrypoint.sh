@@ -1,2 +1,2 @@
 #!/bin/sh
-python -m app --service=start_server 8080
+gunicorn -k tornado -c gunicorn.conf.py app.server:app
