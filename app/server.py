@@ -13,6 +13,9 @@ app = Application([
     url(r'/v1/train', BotTrainerRequestHandler)
 ])
 
+def make_app():
+    return app
+
 
 def start_server(port):  # pragma: no cover
     global app
