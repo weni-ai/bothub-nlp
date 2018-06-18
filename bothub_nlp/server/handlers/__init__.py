@@ -1,8 +1,12 @@
 import tornado.escape
+import traceback
 
 from tornado.web import RequestHandler
 from rest_framework import status
 from bothub.common.models import RepositoryAuthorization
+
+from ... import settings
+from ..utils import ApiError, ValidationError
 
 
 class ApiHandler(RequestHandler):
@@ -29,6 +33,26 @@ class ApiHandler(RequestHandler):
         if self.json_data:
             return self.json_data.get(arg, default)
         return super().get_argument(arg, default)
+
+    def write_error(self, status_code, exc_info):
+        r = {}
+        if exc_info:
+            error_class, error, traceback_instance = exc_info
+            if settings.DEBUG:
+                r['traceback'] = traceback.format_exception(
+                    error_class, error, traceback_instance)
+            if isinstance(error, ValidationError):
+                r[error.field] = error.msg
+                self.set_status(status.HTTP_400_BAD_REQUEST)
+            elif isinstance(error, ApiError):
+                r['details'] = error.msg
+                if error.status:
+                    self.set_status(error.status)
+            else:
+                from .. import logger
+                logger.error(' '.join(traceback.format_exception(
+                    error_class, error, traceback_instance)))
+        self.finish(r)
 
     def repository_authorization(self):
         authorization_header_value = self.request.headers.get('Authorization')
