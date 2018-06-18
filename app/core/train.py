@@ -1,4 +1,5 @@
 import json
+import tempfile
 
 from rasa_nlu.model import Trainer
 from rasa_nlu.config import RasaNLUConfig
@@ -13,8 +14,7 @@ def train_update(update, by):
     try:
         rasa_nlu_config = {
             'pipeline': 'spacy_sklearn',
-            'path': './models',
-            'data': './data.json',
+            'data': tempfile.NamedTemporaryFile(suffix='.json').name,
             'language': update.language,
         }
         data = {
