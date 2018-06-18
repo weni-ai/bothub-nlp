@@ -43,11 +43,8 @@ class ApiHandler(RequestHandler):
                     error_class, error, traceback_instance)
             if isinstance(error, ValidationError):
                 r[error.field] = error.msg
-                self.set_status(status.HTTP_400_BAD_REQUEST)
             elif isinstance(error, ApiError):
                 r['details'] = error.msg
-                if error.status:
-                    self.set_status(error.status)
             else:
                 from .. import logger
                 logger.error(' '.join(traceback.format_exception(
