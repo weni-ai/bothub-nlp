@@ -3,6 +3,7 @@ from tornado.gen import coroutine
 
 from . import ApiHandler
 from ..utils import ValidationError
+from ..utils import authorization_required
 
 
 class ParseHandler(ApiHandler):
@@ -14,6 +15,7 @@ class ParseHandler(ApiHandler):
 
     @asynchronous
     @coroutine
+    @authorization_required
     def post(self):
         text = self.get_argument('text', default=None)
         language = self.get_argument('language', default=None)

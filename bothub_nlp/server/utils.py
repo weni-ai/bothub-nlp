@@ -15,3 +15,24 @@ class ValidationError(ApiError):
             status_code=status.HTTP_400_BAD_REQUEST,
             **kwargs)
         self.field = field
+
+
+class AuthorizationIsRequired(ApiError):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            'Authorization is required',
+            *args,
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            **kwargs)
+
+
+def authorization_required(f):
+    def check(handler, *args, **kwargs):
+        repository_authorization = handler.repository_authorization()
+        if not repository_authorization:
+            raise AuthorizationIsRequired()
+        return f(handler, *args, **kwargs)
+
+    check.__doc__ = f.__doc__
+    check.__name__ = f.__name__
+    return check
