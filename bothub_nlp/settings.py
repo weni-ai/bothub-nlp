@@ -20,8 +20,3 @@ LOGGER_LEVEL = config(
     'LOGGER_LEVEL',
     default=logging.DEBUG,
     cast=int)
-
-IMPORT_ALL_LANGUAGES_BEFORE_MAKE_APP = config(
-    'IMPORT_ALL_LANGUAGES_BEFORE_MAKE_APP',
-    default=False,
-    cast=bool)

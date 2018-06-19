@@ -3,7 +3,6 @@ import logging
 from tornado.web import Application, url
 
 from .. import settings
-from ..utils import SpacyLanguages
 from .handlers.parse import ParseHandler
 
 
@@ -15,20 +14,8 @@ logging.getLogger('tornado').disabled = True
 logging.getLogger('tornado.access').disabled = True
 logging.getLogger('tornado.application').disabled = True
 
-spacyLanguages = SpacyLanguages()
-
 
 def make_app():
-    if settings.IMPORT_ALL_LANGUAGES_BEFORE_MAKE_APP:
-        global spacyLanguages
-        logger.debug('Importing spacy languages: {}'.format(
-            ', '.join(settings.SUPPORTED_LANGUAGES),
-        ))
-        for language in settings.SUPPORTED_LANGUAGES:
-            spacyLanguages[language]
-            logger.debug('{} imported'.format(language))
-        logger.info('Spacy languages imported!')
-
     return Application([
         url('/', ParseHandler),
         url('/parse/', ParseHandler),
