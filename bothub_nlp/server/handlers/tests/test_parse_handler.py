@@ -7,6 +7,9 @@ from bothub.authentication.models import User
 from bothub.common.models import Repository
 from bothub.common.models import RepositoryAuthorization
 
+from ....tests.utils import fill_examples
+from ....tests.utils import EXAMPLES_MOCKUP
+
 
 class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
     def setUp(self):
@@ -38,6 +41,8 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             status.HTTP_200_OK)
 
     def test_valid_request(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+
         text = 'hi, my name is Douglas'
 
         response = self.fetch(
@@ -57,14 +62,40 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             response.code,
             status.HTTP_200_OK)
 
-        content_data = json.loads(response.body)
+        # content_data = json.loads(response.body)
 
-        self.assertIn(
-            'text',
-            content_data.keys())
+        # self.assertIn(
+        #     'text',
+        #     content_data.keys())
+        # self.assertEqual(
+        #     content_data.get('text'),
+        #     text)
+
+        # self.assertIn(
+        #     'language',
+        #     content_data.keys())
+
+    def test_bot_not_trained(self):
+        text = 'hi, my name is Douglas'
+
+        response = self.fetch(
+            '/parse/',
+            method='POST',
+            body=json.dumps({
+                'text': text,
+            }),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
+        )
+
         self.assertEqual(
-            content_data.get('text'),
-            text)
+            response.code,
+            status.HTTP_400_BAD_REQUEST)
+
+        content_data = json.loads(response.body)
 
         self.assertIn(
             'language',
