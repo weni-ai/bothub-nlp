@@ -4,6 +4,7 @@ from tornado.gen import coroutine
 from . import ApiHandler
 from ..utils import ValidationError
 from ..utils import authorization_required
+from ... import settings
 
 
 class ParseHandler(ApiHandler):
@@ -22,6 +23,11 @@ class ParseHandler(ApiHandler):
 
         if not text:
             raise ValidationError('text field is required', field='text')
+
+        if language not in settings.SUPPORTED_LANGUAGES:
+            raise ValidationError(
+                'Language \'{}\' not supported by now.'.format(language),
+                field='language')
 
         repository_authorization = self.repository_authorization()
         repository = repository_authorization.repository

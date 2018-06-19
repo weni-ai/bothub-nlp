@@ -130,3 +130,28 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
         self.assertEqual(
             response.code,
             status.HTTP_401_UNAUTHORIZED)
+
+    def test_language_not_supported(self):
+        response = self.fetch(
+            '/parse/',
+            method='POST',
+            body=json.dumps({
+                'text': 'මගේ නම ඩග්ලස්',
+                'language': 'si',
+            }),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
+        )
+
+        self.assertEqual(
+            response.code,
+            status.HTTP_400_BAD_REQUEST)
+
+        content_data = json.loads(response.body)
+
+        self.assertIn(
+            'language',
+            content_data.keys())
