@@ -4,38 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-plac = "*"
-click = "*"
 tornado = "*"
-python-decouple = "*"
-django = "==2.0.2"
-dj-database-url = "==0.5.0"
-djangorestframework = "==3.7.7"
-django-filter = "==1.1.0"
-django-cors-headers = "==2.2.0"
-coreapi = "==2.3.3"
-simplejson = "==3.15.0"
-"boto3" = "==1.7.37"
-cloudpickle = "==0.5.3"
-future = "==0.16.0"
-jsonschema = "==2.6.0"
+spacy = "*"
 bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
-numpy = "==1.14.5"
-scipy = "==1.1.0"
-cython = "*"
-murmurhash = "==0.28.0"
-cymem = "==1.31.2"
-preshed = "==1.0.0"
-thinc = "==6.10.2"
-pathlib = "*"
-ujson = "==1.35"
-dill = "==0.2.7.1"
-regex = "==2017.4.5"
-requests = "==2.18.4"
-spacy = {file = "https://github.com/push-flow/spaCy/archive/feature/new-langs.zip"}
+rasa-nlu = "*"
 scikit-learn = "*"
 sklearn-crfsuite = "*"
-rasa_nlu = {file = "https://github.com/push-flow/rasa_nlu/archive/feature/direct_json_data.zip"}
+scipy = "==1.1.0"
+numpy = "==1.14.5"
 
 [dev-packages]
 "flake8" = "*"
