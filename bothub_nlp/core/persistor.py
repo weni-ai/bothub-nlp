@@ -1,5 +1,3 @@
-import os
-
 from tempfile import NamedTemporaryFile
 
 from rasa_nlu.persistor import Persistor
@@ -19,7 +17,7 @@ class BothubPersistor(Persistor):
         tar_name = self._tar_name(model_name, project)
 
         tar_data = self.update.get_bot_data()
-        tar_file = NamedTemporaryFile(delete=False)
+        tar_file = NamedTemporaryFile(suffix=tar_name, delete=False)
         tar_file.write(tar_data)
         tar_file.close()
 

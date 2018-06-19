@@ -12,6 +12,7 @@ def get_rasa_nlu_config_from_update(update):
         'pipeline': 'spacy_sklearn',
     })
 
+
 class UpdateInterpreters(object):
     interpreters = {}
 
@@ -21,6 +22,9 @@ class UpdateInterpreters(object):
             return interpreter
         persistor = BothubPersistor(update)
         model_directory = mkdtemp()
-        persistor.retrieve(str(update.repository.uuid), str(update.id), model_directory)
+        persistor.retrieve(
+            str(update.repository.uuid),
+            str(update.id),
+            model_directory)
         self.interpreters[update.id] = Interpreter.load(model_directory)
         return self.get(update)
