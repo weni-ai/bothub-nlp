@@ -24,7 +24,7 @@ class ParseHandler(ApiHandler):
         if not text:
             raise ValidationError('text field is required', field='text')
 
-        if language not in settings.SUPPORTED_LANGUAGES:
+        if language and language not in settings.SUPPORTED_LANGUAGES:
             raise ValidationError(
                 'Language \'{}\' not supported by now.'.format(language),
                 field='language')
