@@ -5,6 +5,7 @@ from . import ApiHandler
 from ..utils import ValidationError
 from ..utils import authorization_required
 from ... import settings
+from ...core.parse import parse_text
 
 
 class ParseHandler(ApiHandler):
@@ -38,4 +39,10 @@ class ParseHandler(ApiHandler):
                 'This repository has never been trained',
                 field='language')
 
-        self.finish({'text': text, 'language': language})
+        answer = parse_text(update, text, language)
+
+        self.finish({
+            'text': text,
+            'language': language,
+            'answer': answer,
+        })
