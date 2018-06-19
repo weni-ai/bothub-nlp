@@ -6,6 +6,9 @@ from rest_framework import status
 from bothub.authentication.models import User
 from bothub.common.models import Repository
 from bothub.common.models import RepositoryAuthorization
+from bothub.common import languages
+
+from ....core.train import train_update
 
 from ....tests.utils import fill_examples
 from ....tests.utils import EXAMPLES_MOCKUP
@@ -22,7 +25,8 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
         self.repository = Repository.objects.create(
             owner=self.user,
             slug='test',
-            name='Testing')
+            name='Testing',
+            language=languages.LANGUAGE_EN)
         self.authorization = RepositoryAuthorization.objects.create(
             user=self.user,
             repository=self.repository)
@@ -42,6 +46,7 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
 
     def test_valid_request(self):
         fill_examples(EXAMPLES_MOCKUP, self.repository)
+        train_update(self.repository.current_update(), self.user)
 
         text = 'hi, my name is Douglas'
 
@@ -62,18 +67,18 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             response.code,
             status.HTTP_200_OK)
 
-        # content_data = json.loads(response.body)
+        content_data = json.loads(response.body)
 
-        # self.assertIn(
-        #     'text',
-        #     content_data.keys())
-        # self.assertEqual(
-        #     content_data.get('text'),
-        #     text)
+        self.assertIn(
+            'text',
+            content_data.keys())
+        self.assertEqual(
+            content_data.get('text'),
+            text)
 
-        # self.assertIn(
-        #     'language',
-        #     content_data.keys())
+        self.assertIn(
+            'language',
+            content_data.keys())
 
     def test_bot_not_trained(self):
         text = 'hi, my name is Douglas'
