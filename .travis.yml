@@ -3,9 +3,7 @@ python:
   - "3.6"
 install:
   - pip install pipenv
-  - pipenv install --system
-  - pip install coverage
-  - pip install flake8
+  - pipenv install --dev
   - pip install coveralls
 env:
   global:
