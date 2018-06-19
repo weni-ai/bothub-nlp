@@ -1,7 +1,6 @@
 FROM ilha/scipy:python3.6-alpine3.7
 
 ENV WORKDIR /home/app
-ENV EXTRA_MODELS_DIR /home/extra-models
 ENV IS_PRODUCTION true
 ENV PORT 80
 
