@@ -23,4 +23,13 @@ class ParseHandler(ApiHandler):
         if not text:
             raise ValidationError('text field is required', field='text')
 
+        repository_authorization = self.repository_authorization()
+        repository = repository_authorization.repository
+        update = repository.last_trained_update(language)
+
+        if not update:
+            raise ValidationError(
+                'This repository has never been trained',
+                field='language')
+
         self.finish({'text': text, 'language': language})
