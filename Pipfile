@@ -6,12 +6,12 @@ name = "pypi"
 [packages]
 tornado = "*"
 spacy = "*"
-bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
 rasa-nlu = "*"
 scikit-learn = "*"
 sklearn-crfsuite = "*"
 scipy = "==1.1.0"
 numpy = "==1.14.5"
+bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
 
 [dev-packages]
 "flake8" = "*"
