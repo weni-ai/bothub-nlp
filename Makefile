@@ -5,7 +5,6 @@ EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR := ./extra-models/
 EXTRA_LANGUAGE_MODELS_DIR := "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}models/"
 IS_PRODUCTION ?= false
 CHECK_ENVIRONMENT := true
-PORT ?= 8001
 
 
 # Commands
@@ -32,7 +31,7 @@ test:
 	@make development_mode_guard
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@pipenv run coverage run -m unittest && pipenv run coverage report -m
+	@SUPPORTED_LANGUAGES="en pt" pipenv run coverage run -m unittest && pipenv run coverage report -m
 
 migrate:
 	@make check_environment
@@ -49,15 +48,15 @@ clone_extra_language_models_repository:
 import_languages:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
-		else pipenv run python -m bothub-nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
+		then python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
+		else pipenv run python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
 
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m app --service start_server ${PORT}; \
-		else pipenv run python -m app --service start_server ${PORT}; fi
+		then python -m bothub_nlp start; \
+		else pipenv run python -m tornado.autoreload -m bothub_nlp.cli.start; fi
 
 
 # Utils
@@ -86,7 +85,8 @@ install_production_requirements:
 	@echo "${SUCCESS}✔${NC} Requirements installed"
 
 development_mode_guard:
-	@(${IS_PRODUCTION} && echo "${DANGER}Just run this command in development mode${NC}" && exit 1) || exit 0
+	@if [[ ${IS_PRODUCTION} = true ]]; then echo "${DANGER}Just run this command in development mode${NC}"; fi
+	@if [[ ${IS_PRODUCTION} = true ]]; then exit 1; fi
 
 
 # Checkers
