@@ -11,7 +11,7 @@ scikit-learn = "*"
 sklearn-crfsuite = "*"
 scipy = "==1.1.0"
 numpy = "==1.14.5"
-bothub = {file = "https://github.com/push-flow/bothub/archive/1.8.8.tar.gz"}
+bothub = {git = "https://github.com/push-flow/bothub.git", editable = true}
 
 [dev-packages]
 "flake8" = "*"
