@@ -12,6 +12,7 @@ env:
     - SUPPORTED_LANGUAGES=en pt
 before_script:
   - django-admin migrate
+  - make import_languages
 script:
   - flake8
   - travis_wait coverage run -m unittest
