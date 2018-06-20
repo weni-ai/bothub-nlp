@@ -35,12 +35,15 @@ class ApiHandler(RequestHandler):
         return super().get_argument(arg, default)
 
     def write_error(self, status_code, exc_info):
+        print(status_code, exc_info)
         r = {}
         if exc_info:
             error_class, error, traceback_instance = exc_info
+
             if settings.DEBUG:
                 r['traceback'] = traceback.format_exception(
                     error_class, error, traceback_instance)
+
             if isinstance(error, ValidationError):
                 r[error.field] = error.msg
             elif isinstance(error, ApiError):
@@ -49,6 +52,7 @@ class ApiHandler(RequestHandler):
                 from .. import logger
                 logger.error(' '.join(traceback.format_exception(
                     error_class, error, traceback_instance)))
+
         self.finish(r)
 
     def repository_authorization(self):

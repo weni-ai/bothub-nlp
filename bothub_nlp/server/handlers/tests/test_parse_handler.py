@@ -84,7 +84,6 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             'answer',
             content_data.keys())
 
-
     def test_bot_not_trained(self):
         text = 'hi, my name is Douglas'
 
