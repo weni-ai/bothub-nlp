@@ -9,11 +9,12 @@ env:
   global:
     - SECRET_KEY=SK
     - DJANGO_SETTINGS_MODULE=bothub.settings
+    - SUPPORTED_LANGUAGES=en pt
 before_script:
-  - DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate
+  - django-admin migrate
 script:
   - flake8
-  - travis_wait coverage run -m unittest && coverage report -m
+  - travis_wait coverage run -m unittest
 after_success:
   - coveralls
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
