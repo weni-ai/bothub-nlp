@@ -7,7 +7,7 @@ ENV PORT 80
 WORKDIR $WORKDIR
 
 RUN apk update && apk upgrade
-RUN apk add alpine-sdk postgresql-dev libpng openblas-dev
+RUN apk add alpine-sdk postgresql-dev libpng openblas-dev freetype-dev libpng-dev
 
 RUN pip install pipenv
 
