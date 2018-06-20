@@ -85,7 +85,8 @@ install_production_requirements:
 	@echo "${SUCCESS}✔${NC} Requirements installed"
 
 development_mode_guard:
-	@(${IS_PRODUCTION} && echo "${DANGER}Just run this command in development mode${NC}" && exit 1) || exit 0
+	@if [[ ${IS_PRODUCTION} = true ]]; then echo "${DANGER}Just run this command in development mode${NC}"; fi
+	@if [[ ${IS_PRODUCTION} = true ]]; then exit 1; fi
 
 
 # Checkers
