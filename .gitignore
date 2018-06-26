@@ -15,5 +15,9 @@ bothub-nlp.log
 tests.db
 .coverage
 
+.env
 settings.ini
 db.sqlite3
+
+## extra models
+extra-models/

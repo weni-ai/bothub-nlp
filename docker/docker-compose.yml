@@ -4,15 +4,15 @@ services:
   scipy:
     image: ilha/scipy:python3.6-alpine3.7
     build:
-      context: ..
-      dockerfile: docker/scipy.Dockerfile
+      context: ./scipy
+      dockerfile: Dockerfile
   bothub-nlp:
-    image: $DOCKER_HUB_REPO:$TAG
+    image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${TAG:-latest}
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/bothub-nlp/Dockerfile
     ports:
-      - 8080:8080
+      - 80:80
     environment:
       - SECRET_KEY
       - DEBUG
@@ -20,7 +20,17 @@ services:
       - DEFAULT_DATABASE
       - LANGUAGE_CODE
       - TIME_ZONE
+      - ADMINS
+      - DEFAULT_FROM_EMAIL
+      - SERVER_EMAIL
+      - EMAIL_HOST
+      - EMAIL_PORT
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - EMAIL_USE_SSL
+      - EMAIL_USE_TLS
+      - BOTHUB_WEBAPP_BASE_URL
+      - BOTHUB_NLP_BASE_URL
       - SUPPORTED_LANGUAGES
-      - REDIS
-      - REDIS_PORT
-      - REDIS_DB
+      - LOGGER_FORMAT
+      - LOGGER_LEVEL

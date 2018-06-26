@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+tornado = "*"
+spacy = "*"
+rasa-nlu = "*"
+scikit-learn = "*"
+sklearn-crfsuite = "*"
+scipy = "==1.1.0"
+numpy = "==1.14.5"
+bothub = {git = "https://github.com/Ilhasoft/bothub-engine", editable = true}
+
+[dev-packages]
+"flake8" = "*"
+coverage = "*"
+
+[requires]
+python_version = "3.6"

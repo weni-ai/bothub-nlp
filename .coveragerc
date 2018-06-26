@@ -4,12 +4,13 @@ source = ./
 omit =
     *tests*,
     *__init__*,
-    *settings*
-    *env*
-    *__main__*
+    *settings*,
+    *env*,
+    *__main__*,
+    bothub_nlp/cli/*.py
 
 [report]
 fail_under = 90
-exclude_lines = 
+exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:

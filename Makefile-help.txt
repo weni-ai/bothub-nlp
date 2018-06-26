@@ -1,13 +1,10 @@
----
-Just use make commands to development environment,
-     use Docker container to production environment.
----
-
-Commands:
-    make install_requirements - Install project requirements, just pip packages
-    make update_requirements - Update requirements.txt file
+Make commands:
+    make help - Show make commands help
+    make check_environment - Check if all dependencies was installed
+    make install_requirements - Install pip dependencies
     make lint - Show lint warnings and errors
     make test - Run unit tests and show coverage report
     make migrate - Update DB shema, apply migrations
-    make install_languages - Install all languages supported by Spacy
-
+    make clone_extra_language_models_repository - Clone extra language models repository
+    make import_languages [languages] - Import languages to Spacy
+    make start - Start web server

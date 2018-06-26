@@ -1,7 +1,23 @@
-.vscode/
 env/
-__pycache__/
-*.py[cod]
+.vscode
+.ipynb_checkpoints
+.~*
+*.pyc
+.DS_Store
+app/dump.rdb
+etc/
+bothub-nlp.log
+
+## File-based project format:
+*.iws
+
+#tests
+tests.db
 .coverage
+
+.env
 settings.ini
 db.sqlite3
+
+## extra models
+extra-models/
