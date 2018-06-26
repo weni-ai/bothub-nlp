@@ -16,7 +16,7 @@ def train_update(update, by):
             example.get_text(update.language),
             example.intent,
             [
-                entity.to_rasa_nlu_data
+                entity.rasa_nlu_data
                 for entity in example.get_entities(update.language)])
         for example in update.examples]
 
