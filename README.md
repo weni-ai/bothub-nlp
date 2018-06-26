@@ -1,6 +1,6 @@
 # bothub NLP
 
-[![Coverage Status](https://coveralls.io/repos/github/push-flow/bothub-nlp/badge.svg?branch=master)](https://coveralls.io/github/push-flow/bothub-nlp?branch=master) [![Build Status](https://travis-ci.org/push-flow/bothub-nlp.svg?branch=master)](https://travis-ci.org/push-flow/bothub-nlp) [![Python Version](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/) [![License GPL-3.0](https://img.shields.io/badge/license-%20GPL--3.0-yellow.svg)](https://github.com/push-flow/bothub/blob/master/LICENSE)
+[![Coverage Status](https://coveralls.io/repos/github/Ilhasoft/bothub-nlp/badge.svg?branch=master)](https://coveralls.io/github/Ilhasoft/bothub-nlp?branch=master) [![Build Status](https://travis-ci.org/Ilhasoft/bothub-nlp.svg?branch=master)](https://travis-ci.org/Ilhasoft/bothub-nlp) [![Python Version](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/) [![License GPL-3.0](https://img.shields.io/badge/license-%20AGPL--3.0-yellow.svg)](https://github.com/Ilhasoft/bothub-nlp/blob/refactor/LICENSE)
 
 
 ## Development
@@ -34,4 +34,4 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 | LOGGER_FORMAT | ```string``` | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` | Logger format
 | LOGGER_LEVEL | ```int``` | DEBUG = ```10`` | Logger level, use logging (Python Package) pattern
 
-Check another valid environment variables in [Bothub repository](https://github.com/push-flow/bothub/).
+Check another valid environment variables in [Bothub repository](https://github.com/Ilhasoft/bothub-engine).

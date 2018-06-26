@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3c5eaaa3f667bc0c717aa6b8a9756262dca17fdf2ccef6aea572c7caef0e342b"
+            "sha256": "0d71e41e13a6ebb92753c74eb195afbe36f28a263980c8489c6a924b544eb451"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,21 +32,21 @@
         },
         "bothub": {
             "editable": true,
-            "git": "https://github.com/push-flow/bothub.git"
+            "git": "https://github.com/Ilhasoft/bothub-engine"
         },
         "boto3": {
             "hashes": [
-                "sha256:40249ecdb5935e7aa212f1c65dbcd5c0b5f945948027360bb41227ff8d519e11",
-                "sha256:a7851c92084576fe02d82ae5caae01b51f1ef28b917fabc9e6d5006e5cd0473c"
+                "sha256:5fcbfea71d7bf818ffc51a380b53899502b7046ca6ba52cca9c44bbfe20bb275",
+                "sha256:7ba18f6edb603db7ef77733427f6f76a300aab217a9259649ddc91d4521b226f"
             ],
-            "version": "==1.7.41"
+            "version": "==1.7.45"
         },
         "botocore": {
             "hashes": [
-                "sha256:230b911215c11f862af31e496bebd3eeb7b5fa46cf780fc1ff263e6cdbfb4583",
-                "sha256:f70bb748064a061a37cb31b7ccf106e8ee2d70b074bf7869fc7f0f4d594e3ff1"
+                "sha256:62519fe407354052befda5f928b988c9059a56292e75dba9d0fac31d9344e279",
+                "sha256:e62645374cbb01f65324fe479c2a389b414344db96db2f62b0f8a55701fe3416"
             ],
-            "version": "==1.10.41"
+            "version": "==1.10.45"
         },
         "certifi": {
             "hashes": [
@@ -162,9 +162,9 @@
         },
         "dill": {
             "hashes": [
-                "sha256:97fd758f5fe742d42b11ec8318ecfcff8776bccacbfcec05dfd6276f5d450f73"
+                "sha256:624dc244b94371bb2d6e7f40084228a2edfff02373fe20e018bef1ee92fdd5b3"
             ],
-            "version": "==0.2.7.1"
+            "version": "==0.2.8.2"
         },
         "dj-database-url": {
             "hashes": [
@@ -571,6 +571,7 @@
                 "sha256:1adb80e7a782c12e52ef9a8182bebeb73f1d7e24e374397af06fb4956c8dc5c0",
                 "sha256:e27001de32f627c22380a688bcc43ce83504a7bc5da472209b4c70f02829f0b8"
             ],
+            "markers": "python_version >= '2.7'",
             "version": "==2.7.3"
         },
         "python-decouple": {
