@@ -1,4 +1,4 @@
-# bothub NLP
+# Bothub NLP
 
 [![Coverage Status](https://coveralls.io/repos/github/Ilhasoft/bothub-nlp/badge.svg?branch=master)](https://coveralls.io/github/Ilhasoft/bothub-nlp?branch=master) [![Build Status](https://travis-ci.org/Ilhasoft/bothub-nlp.svg?branch=master)](https://travis-ci.org/Ilhasoft/bothub-nlp) [![Python Version](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/) [![License GPL-3.0](https://img.shields.io/badge/license-%20AGPL--3.0-yellow.svg)](https://github.com/Ilhasoft/bothub-nlp/blob/refactor/LICENSE)
 
