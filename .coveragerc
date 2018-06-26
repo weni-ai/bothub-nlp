@@ -7,10 +7,10 @@ omit =
     *settings*,
     *env*,
     *__main__*,
-    bothub-nlp/cli/*.py
+    bothub_nlp/cli/*.py
 
 [report]
 fail_under = 90
-exclude_lines = 
+exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:

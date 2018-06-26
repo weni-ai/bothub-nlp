@@ -1,28 +1,21 @@
 language: python
 python:
   - "3.6"
-services:
-  - redis-server
 install:
-  - pip install cython==0.27.3 cymem==1.31.2 preshed==1.0.0 murmurhash==0.28.0 thinc==6.10.2
-  - pip install -r requirements.txt
+  - pip install pipenv
+  - pipenv install --system --dev
   - pip install coveralls
-  - pip install flake8
 env:
   global:
     - SECRET_KEY=SK
-    - REDIS=127.0.0.1
-    - REDIS_PORT=6379
-    - REDIS_DB=0
-    - SUPPORTED_LANGUAGES=en
-    - DOCKER_IMAGE_NAME=ilha/bothub-nlp
+    - DJANGO_SETTINGS_MODULE=bothub.settings
+    - SUPPORTED_LANGUAGES="en pt"
 before_script:
-  - python -m bothub-nlp import_langs ${SUPPORTED_LANGUAGES}
-  - django-admin migrate --settings bothub.settings
+  - django-admin migrate
+  - make import_languages
 script:
- - flake8
- - travis_wait coverage run -m unittest
- - coverage report
+  - flake8
+  - travis_wait coverage run -m unittest
 after_success:
   - coveralls
   - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
