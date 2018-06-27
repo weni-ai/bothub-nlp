@@ -10,6 +10,7 @@ RUN apk update && apk upgrade
 RUN apk add alpine-sdk postgresql-dev libpng openblas-dev freetype-dev libpng-dev
 
 RUN pip install pipenv
+RUN pip install psycopg2-binary
 
 COPY Makefile .
 COPY Pipfile .
