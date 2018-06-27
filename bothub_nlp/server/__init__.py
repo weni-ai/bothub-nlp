@@ -5,6 +5,7 @@ from tornado.web import Application, url
 from .. import settings
 from .handlers.parse import ParseHandler
 from .handlers.train import TrainHandler
+from .handlers.info import InfoHandler
 
 
 logging.basicConfig(format=settings.LOGGER_FORMAT)
@@ -17,4 +18,5 @@ def make_app():
         url('/', ParseHandler),
         url('/parse/', ParseHandler),
         url('/train/', TrainHandler),
+        url('/info/', InfoHandler),
     ])
