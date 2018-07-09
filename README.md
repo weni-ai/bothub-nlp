@@ -28,7 +28,7 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 |--|--|--|--|
 | IS_PRODUCTION | ```boolean``` | ```false``` | Use ```true``` to force pipenv use system envoriment
 | PORT | ```int``` | ```8001``` | Port to run web server
-| SUPPORTED_LANGUAGES | ```list``` | In development mode: ```en de es pt fr it nl``` | Supported languages, common environment variable to bothub, bothub-webapp and bothub-nlp
+| SUPPORTED_LANGUAGES | ```list``` | In development mode: ```en|pt``` | Supported languages, common environment variable to bothub, bothub-webapp and bothub-nlp
 | LOGGER_FORMAT | ```string``` | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` | Logger format
 | LOGGER_LEVEL | ```int``` | DEBUG = ```10`` | Logger level, use logging (Python Package) pattern
 

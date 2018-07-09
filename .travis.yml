@@ -9,7 +9,7 @@ env:
   global:
     - SECRET_KEY=SK
     - DJANGO_SETTINGS_MODULE=bothub.settings
-    - SUPPORTED_LANGUAGES="en pt"
+    - SUPPORTED_LANGUAGES="en|pt"
     - DOCKER_IMAGE_NAME=ilha/bothub-nlp
 before_script:
   - django-admin migrate

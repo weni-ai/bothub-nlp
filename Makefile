@@ -28,7 +28,7 @@ test:
 	@make development_mode_guard
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@SUPPORTED_LANGUAGES="en pt" pipenv run coverage run -m unittest && pipenv run coverage report -m
+	@SUPPORTED_LANGUAGES="en|pt" pipenv run coverage run -m unittest && pipenv run coverage report -m
 
 migrate:
 	@make check_environment
@@ -56,7 +56,7 @@ NC = \033[0m
 create_environment_vars_file:
 	@echo "SECRET_KEY=SK" > "${ENVIRONMENT_VARS_FILE}"
 	@echo "DEBUG=true" >> "${ENVIRONMENT_VARS_FILE}"
-	@echo "SUPPORTED_LANGUAGES=en de es pt fr it nl" >> "${ENVIRONMENT_VARS_FILE}"
+	@echo "SUPPORTED_LANGUAGES=en|pt" >> "${ENVIRONMENT_VARS_FILE}"
 	@echo "${SUCCESS}✔${NC} Settings file created"
 
 install_development_requirements:

@@ -2,12 +2,15 @@ import logging
 
 from decouple import config
 
+from bothub.utils import cast_supported_languages
+
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 SUPPORTED_LANGUAGES = config(
     'SUPPORTED_LANGUAGES',
-    cast=lambda v: v.split())
+    default='en|pt',
+    cast=cast_supported_languages)
 
 PORT = config('PORT', default=8001, cast=int)
 
