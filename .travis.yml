@@ -13,7 +13,8 @@ env:
     - DOCKER_IMAGE_NAME=ilha/bothub-nlp
 before_script:
   - django-admin migrate
-  - make import_languages
+  - python -m spacy download en
+  - python -m spacy download pt
 script:
   - flake8
   - travis_wait coverage run -m unittest

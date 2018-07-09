@@ -1,8 +1,5 @@
 ENVIRONMENT_VARS_FILE := .env
 DJANGO_SETTINGS_MODULE := bothub.settings
-EXTRA_LANGUAGE_MODELS_REPOSITORY := https://github.com/push-flow/spacy-lang-models.git
-EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR := ./extra-models/
-EXTRA_LANGUAGE_MODELS_DIR := "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}models/"
 IS_PRODUCTION ?= false
 CHECK_ENVIRONMENT := true
 
@@ -38,18 +35,6 @@ migrate:
 	@if [[ ${IS_PRODUCTION} = true ]]; \
 		then DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate; \
 		else DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate; fi
-
-clone_extra_language_models_repository:
-	@echo "${INFO}Cloning extra language models repository:${NC}"
-	@echo "  From: ${EXTRA_LANGUAGE_MODELS_REPOSITORY}"
-	@git clone --depth 1 --single-branch "${EXTRA_LANGUAGE_MODELS_REPOSITORY}" "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}" \
-		&& echo "${SUCCESS}✔${NC} Repository cloned"
-
-import_languages:
-	@make check_environment
-	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
-		else pipenv run python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
 
 start:
 	@make check_environment
