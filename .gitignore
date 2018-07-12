@@ -18,6 +18,3 @@ tests.db
 .env
 settings.ini
 db.sqlite3
-
-## extra models
-extra-models/

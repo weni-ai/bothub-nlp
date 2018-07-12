@@ -22,7 +22,7 @@ class TrainHandler(ApiHandler):
 
         languages_report = {}
 
-        for language in settings.SUPPORTED_LANGUAGES:
+        for language in settings.SUPPORTED_LANGUAGES.keys():
             current_update = repository.current_update(language)
 
             if not current_update.ready_for_train:
@@ -43,6 +43,6 @@ class TrainHandler(ApiHandler):
                 }
 
         self.finish({
-            'SUPPORTED_LANGUAGES': settings.SUPPORTED_LANGUAGES,
+            'SUPPORTED_LANGUAGES': list(settings.SUPPORTED_LANGUAGES.keys()),
             'languages_report': languages_report,
         })

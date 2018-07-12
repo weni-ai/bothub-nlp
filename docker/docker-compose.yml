@@ -12,7 +12,7 @@ services:
       context: ..
       dockerfile: docker/bothub-nlp/Dockerfile
     ports:
-      - 80:80
+      - 2657:2657
     environment:
       - SECRET_KEY
       - DEBUG

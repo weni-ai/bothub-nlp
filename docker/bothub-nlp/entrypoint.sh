@@ -1,3 +1,3 @@
 #!/bin/sh
-make import_languages
+make download_supported_languages
 make start

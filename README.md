@@ -5,7 +5,7 @@
 
 ## Development
 
-Use ```make``` commands to ```check_environment```, ```install_requirements```, ```lint```, ```test```, ```migrate```, ```import_languages``` and ```start```.
+Use ```make``` commands to ```check_environment```, ```install_requirements```, ```lint```, ```test```, ```migrate``` and ```start```.
 
 | Command | Description |
 |--|--|
@@ -15,8 +15,7 @@ Use ```make``` commands to ```check_environment```, ```install_requirements```, 
 | make lint | Show lint warnings and errors
 | make test | Run unit tests and show coverage report
 | make migrate | Update DB shema, apply migrations
-| make clone_extra_language_models_repository | Clone extra language models repository
-| make import_languages [languages] | Import languages to Spacy
+| make download_supported_languages | Download and link all supported languages
 | make start | Start web server
 
 ## Production
@@ -28,10 +27,11 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-| IS_PRODUCTION | ```boolean``` | ```false``` | Use ```true``` to force pipenv use system envoriment
-| PORT | ```int``` | ```8001``` | Port to run web server
-| SUPPORTED_LANGUAGES | ```list``` | In development mode: ```en de es pt fr it nl``` | Supported languages, common environment variable to bothub, bothub-webapp and bothub-nlp
-| LOGGER_FORMAT | ```string``` | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` | Logger format
-| LOGGER_LEVEL | ```int``` | DEBUG = ```10`` | Logger level, use logging (Python Package) pattern
+| IS_PRODUCTION | ```boolean``` | ```false``` | Use ```true``` to force pipenv use system envoriment.
+| DEVELOPMENT_MODE | ```boolean``` | ```DEBUG``` value | When ```true```, tornado's autoreload is enabled.
+| PORT | ```int``` | ```2657``` | Port to run web server.
+| SUPPORTED_LANGUAGES | ```string``` | In development mode: ```en|pt``` | Set supported languages. Separe languages using ```|```. You can set location follow the format: [LANGUAGE_CODE]:[LANGUAGE_LOCATION].
+| LOGGER_FORMAT | ```string``` | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` | Logger format.
+| LOGGER_LEVEL | ```int``` | DEBUG = ```10`` | Logger level, use logging (Python Package) pattern.
 
 Check another valid environment variables in [Bothub repository](https://github.com/Ilhasoft/bothub-engine).
