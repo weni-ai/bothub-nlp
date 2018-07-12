@@ -15,6 +15,7 @@ Use ```make``` commands to ```check_environment```, ```install_requirements```, 
 | make lint | Show lint warnings and errors
 | make test | Run unit tests and show coverage report
 | make migrate | Update DB shema, apply migrations
+| make download_supported_languages | Download and link all supported languages
 | make start | Start web server
 
 ## Production
@@ -29,7 +30,7 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 | IS_PRODUCTION | ```boolean``` | ```false``` | Use ```true``` to force pipenv use system envoriment.
 | DEVELOPMENT_MODE | ```boolean``` | ```DEBUG``` value | When ```true```, tornado's autoreload is enabled.
 | PORT | ```int``` | ```2657``` | Port to run web server.
-| SUPPORTED_LANGUAGES | ```string``` | In development mode: ```en|pt``` | Set supported languages. Separe languages using |. You can set location follow the format: [LANGUAGE_CODE]:[LANGUAGE_LOCATION].
+| SUPPORTED_LANGUAGES | ```string``` | In development mode: ```en|pt``` | Set supported languages. Separe languages using ```|```. You can set location follow the format: [LANGUAGE_CODE]:[LANGUAGE_LOCATION].
 | LOGGER_FORMAT | ```string``` | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` | Logger format.
 | LOGGER_LEVEL | ```int``` | DEBUG = ```10`` | Logger level, use logging (Python Package) pattern.
 

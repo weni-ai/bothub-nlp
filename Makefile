@@ -36,10 +36,16 @@ migrate:
 		then DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate; \
 		else DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate; fi
 
+download_supported_languages:
+	@make check_environment
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then python -m bothub_nlp.cli download_supported_languages; \
+		else pipenv run python -m bothub_nlp.cli download_supported_languages; fi
+
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@@if [[ ${IS_PRODUCTION} = true ]]; \
+	@if [[ ${IS_PRODUCTION} = true ]]; \
 		then python -m bothub_nlp.server; \
 		else pipenv run python -m tornado.autoreload -m bothub_nlp.server; fi
 

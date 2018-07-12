@@ -5,4 +5,5 @@ Make commands:
     make lint - Show lint warnings and errors
     make test - Run unit tests and show coverage report
     make migrate - Update DB shema, apply migrations
+    make download_supported_languages - Download and link all supported languages
     make start - Start web server
