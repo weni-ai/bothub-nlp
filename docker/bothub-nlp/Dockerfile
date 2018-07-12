@@ -2,7 +2,7 @@ FROM ilha/scipy:python3.6-alpine3.7
 
 ENV WORKDIR /home/app
 ENV IS_PRODUCTION true
-ENV PORT 80
+ENV PORT 2657
 
 WORKDIR $WORKDIR
 
@@ -21,5 +21,5 @@ RUN make check_environment
 COPY . .
 
 RUN chmod +x ./docker/bothub-nlp/entrypoint.sh
-EXPOSE 80
+EXPOSE 2657
 ENTRYPOINT $WORKDIR/docker/bothub-nlp/entrypoint.sh
