@@ -9,7 +9,7 @@ SUPPORTED_LANGUAGES = config(
     'SUPPORTED_LANGUAGES',
     cast=lambda v: v.split())
 
-PORT = config('PORT', default=8001, cast=int)
+PORT = config('PORT', default=2657, cast=int)
 
 LOGGER_FORMAT = config(
     'LOGGER_FORMAT',
