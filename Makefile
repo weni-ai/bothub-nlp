@@ -1,8 +1,5 @@
 ENVIRONMENT_VARS_FILE := .env
 DJANGO_SETTINGS_MODULE := bothub.settings
-EXTRA_LANGUAGE_MODELS_REPOSITORY := https://github.com/push-flow/spacy-lang-models.git
-EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR := ./extra-models/
-EXTRA_LANGUAGE_MODELS_DIR := "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}models/"
 IS_PRODUCTION ?= false
 CHECK_ENVIRONMENT := true
 
@@ -31,7 +28,7 @@ test:
 	@make development_mode_guard
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@SUPPORTED_LANGUAGES="en pt" pipenv run coverage run -m unittest && pipenv run coverage report -m
+	@SUPPORTED_LANGUAGES="en|pt" pipenv run coverage run -m unittest && pipenv run coverage report -m
 
 migrate:
 	@make check_environment
@@ -39,24 +36,18 @@ migrate:
 		then DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate; \
 		else DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate; fi
 
-clone_extra_language_models_repository:
-	@echo "${INFO}Cloning extra language models repository:${NC}"
-	@echo "  From: ${EXTRA_LANGUAGE_MODELS_REPOSITORY}"
-	@git clone --depth 1 --single-branch "${EXTRA_LANGUAGE_MODELS_REPOSITORY}" "${EXTRA_LANGUAGE_MODELS_REPOSITORY_DIR}" \
-		&& echo "${SUCCESS}✔${NC} Repository cloned"
-
-import_languages:
+download_supported_languages:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; \
-		else pipenv run python -m bothub_nlp import_supported_languages -e="${EXTRA_LANGUAGE_MODELS_DIR}"; fi
+		then python -m bothub_nlp.cli download_supported_languages; \
+		else pipenv run python -m bothub_nlp.cli download_supported_languages; fi
 
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub_nlp start; \
-		else pipenv run python -m tornado.autoreload -m bothub_nlp.cli.start; fi
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then python -m bothub_nlp.server; \
+		else pipenv run python -m tornado.autoreload -m bothub_nlp.server; fi
 
 
 # Utils
@@ -71,7 +62,7 @@ NC = \033[0m
 create_environment_vars_file:
 	@echo "SECRET_KEY=SK" > "${ENVIRONMENT_VARS_FILE}"
 	@echo "DEBUG=true" >> "${ENVIRONMENT_VARS_FILE}"
-	@echo "SUPPORTED_LANGUAGES=en de es pt fr it nl" >> "${ENVIRONMENT_VARS_FILE}"
+	@echo "SUPPORTED_LANGUAGES=en|pt" >> "${ENVIRONMENT_VARS_FILE}"
 	@echo "${SUCCESS}✔${NC} Settings file created"
 
 install_development_requirements:

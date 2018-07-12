@@ -72,7 +72,7 @@ class TrainHandlerTestCase(AsyncHTTPTestCase, TestCase):
             content_data.keys())
         self.assertEqual(
             content_data.get('SUPPORTED_LANGUAGES'),
-            settings.SUPPORTED_LANGUAGES)
+            list(settings.SUPPORTED_LANGUAGES.keys()))
 
         self.assertIn(
             'languages_report',

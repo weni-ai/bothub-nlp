@@ -9,12 +9,13 @@ env:
   global:
     - SECRET_KEY=SK
     - DJANGO_SETTINGS_MODULE=bothub.settings
-    - SUPPORTED_LANGUAGES="en pt"
+    - SUPPORTED_LANGUAGES="en|pt"
     - DOCKER_IMAGE_NAME=ilha/bothub-nlp
     - SEND_EMAILS=false
 before_script:
   - django-admin migrate
-  - make import_languages
+  - python -m spacy download en
+  - python -m spacy download pt
 script:
   - flake8
   - travis_wait coverage run -m unittest
