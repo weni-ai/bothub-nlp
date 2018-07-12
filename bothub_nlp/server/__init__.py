@@ -1,4 +1,5 @@
 import logging
+import tornado.ioloop
 
 from tornado.web import Application, url
 
@@ -8,12 +9,9 @@ from .handlers.train import TrainHandler
 from .handlers.info import InfoHandler
 
 
-logging.basicConfig(format=settings.LOGGER_FORMAT)
-logger = logging.getLogger('bothub NLP server')
-logger.setLevel(settings.LOGGER_LEVEL)
-
-
 app = None
+
+logger = logging.getLogger('bothub.server')
 
 
 def make_app():
@@ -32,8 +30,6 @@ def load_app():
 
 
 def start():
-    import tornado.ioloop
-
     load_app()
 
     logger.info('Starting server in {} port'.format(settings.PORT))

@@ -1,5 +1,12 @@
+import logging
+
 from . import start
 from .. import settings
+
+
+logging.basicConfig(
+    format=settings.LOGGER_FORMAT,
+    level=settings.LOGGER_LEVEL)
 
 if settings.DEVELOPMENT_MODE:
     import os
