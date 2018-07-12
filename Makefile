@@ -40,8 +40,8 @@ start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub_nlp start; \
-		else pipenv run python -m tornado.autoreload -m bothub_nlp.cli.start; fi
+		then python -m bothub_nlp.server; \
+		else pipenv run python -m tornado.autoreload -m bothub_nlp.server; fi
 
 
 # Utils

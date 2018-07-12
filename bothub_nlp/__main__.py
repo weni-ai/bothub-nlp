@@ -1,17 +1,14 @@
-if __name__ == '__main__':
-    import plac
-    import sys
-    from .cli.start import start
+import plac
+import sys
 
-    commands = {
-        'start': start,
-    }
+commands = {
+}
 
-    if len(sys.argv) == 1:
-        print('Available commands: {}'.format(', '.join(commands)))
+if len(sys.argv) == 1:
+    print('Available commands: {}'.format(', '.join(commands)))
+else:
+    command = sys.argv.pop(1)
+    if command in commands:
+        plac.call(commands[command], sys.argv[1:])
     else:
-        command = sys.argv.pop(1)
-        if command in commands:
-            plac.call(commands[command], sys.argv[1:])
-        else:
-            print('Unknown command: {}'.format(command))
+        print('Unknown command: {}'.format(command))

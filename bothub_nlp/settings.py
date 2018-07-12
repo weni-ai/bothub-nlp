@@ -7,6 +7,8 @@ from bothub.utils import cast_supported_languages
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+DEVELOPMENT_MODE = config('DEVELOPMENT_MODE', default=DEBUG, cast=bool)
+
 SUPPORTED_LANGUAGES = config(
     'SUPPORTED_LANGUAGES',
     default='en|pt',

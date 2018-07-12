@@ -13,6 +13,9 @@ logger = logging.getLogger('bothub NLP server')
 logger.setLevel(settings.LOGGER_LEVEL)
 
 
+app = None
+
+
 def make_app():
     return Application([
         url('/', ParseHandler),
@@ -20,3 +23,19 @@ def make_app():
         url('/train/', TrainHandler),
         url('/info/', InfoHandler),
     ])
+
+
+def load_app():
+    global app
+    app = make_app()
+    app.listen(settings.PORT)
+
+
+def start():
+    import tornado.ioloop
+
+    load_app()
+
+    logger.info('Starting server in {} port'.format(settings.PORT))
+
+    tornado.ioloop.IOLoop.current().start()
