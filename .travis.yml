@@ -14,8 +14,7 @@ env:
     - SEND_EMAILS=false
 before_script:
   - django-admin migrate
-  - python -m spacy download en
-  - python -m spacy download pt
+  - python download_spacy_models.py
 script:
   - flake8
   - travis_wait coverage run -m unittest
