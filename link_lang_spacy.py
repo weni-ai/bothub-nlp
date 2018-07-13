@@ -14,13 +14,18 @@ from spacy.compat import symlink_to
     lang_path=plac.Annotation(help='Language path'))
 def link_lang_spacy(lang, lang_path):
     origin_path = os.path.join(get_package_path('spacy'), 'lang', lang)
-    symlink_to(
-        Path(origin_path),
-        os.path.abspath(lang_path))
     try:
-        importlib.import_module('spacy.lang.{}'.format(lang))
+        symlink_to(
+            Path(origin_path),
+            os.path.abspath(lang_path))
+        try:
+            importlib.import_module('spacy.lang.{}'.format(lang))
+            print('link created')
+        except Exception as e:
+            print('link not created')
+            raise e
     except Exception as e:
-        print('link not created')
+        print('error to create link to {} from {}'.format(lang, lang_path))
         raise e
 
 
