@@ -8,6 +8,7 @@ import plac
 from decouple import config
 from spacy.cli import download
 from spacy.cli import link
+from spacy.util import get_package_path
 from bothub.utils import cast_supported_languages
 
 
@@ -53,7 +54,8 @@ def download_spacy_models(languages=None, debug=False):
             logger.debug('downloading {}'.format(value))
             download(value)
             logger.debug('linking: {} to {}'.format(value, lang))
-            link(value, lang, force=True)
+            package_path = get_package_path(value)
+            link(value, lang, force=True, model_path=package_path)
         else:
             logger.debug('downloading {}'.format(value))
             download(value)
