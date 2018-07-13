@@ -42,6 +42,12 @@ download_supported_languages:
 		then python download_spacy_models.py; \
 		else pipenv run python download_spacy_models.py; fi
 
+import_ilha_spacy_langs:
+	@make check_environment
+	@if [[ ${IS_PRODUCTION} = true ]]; \
+		then ./import_ilha_spacy_langs.sh; \
+		else pipenv run ./import_ilha_spacy_langs.sh; fi
+
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false

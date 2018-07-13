@@ -16,6 +16,7 @@ Use ```make``` commands to ```check_environment```, ```install_requirements```, 
 | make test | Run unit tests and show coverage report
 | make migrate | Update DB shema, apply migrations
 | make download_supported_languages | Download and link all supported languages
+| make import_ilha_spacy_langs | Import languages from Ilhasoft spaCy repository
 | make start | Start web server
 
 ## Production
