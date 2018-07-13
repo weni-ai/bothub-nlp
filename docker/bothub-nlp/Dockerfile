@@ -20,6 +20,9 @@ RUN make check_environment
 
 COPY . .
 
+ARG DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD
+RUN if [[ ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD} ]]; then python download_spacy_models.py ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}; fi
+
 RUN chmod +x ./docker/bothub-nlp/entrypoint.sh
 EXPOSE 2657
 ENTRYPOINT $WORKDIR/docker/bothub-nlp/entrypoint.sh
