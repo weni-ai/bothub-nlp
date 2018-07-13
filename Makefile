@@ -39,8 +39,8 @@ migrate:
 download_supported_languages:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python -m bothub_nlp.cli download_supported_languages; \
-		else pipenv run python -m bothub_nlp.cli download_supported_languages; fi
+		then python download_spacy_models.py; \
+		else pipenv run python download_spacy_models.py; fi
 
 start:
 	@make check_environment

@@ -1,3 +1,3 @@
 #!/bin/sh
-make download_supported_languages
+if [[ ${DOWNLOADED_LANGUAGES} != ${SUPPORTED_LANGUAGES} ]]; then make download_supported_languages; fi
 make start
