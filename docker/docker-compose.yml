@@ -46,7 +46,7 @@ services:
       context: ./scipy
       dockerfile: Dockerfile
   bothub-nlp:
-    image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${TAG:-latest}
+    image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${TAG:-latest}${DOCKER_IMAGE_FLAVOR:-}
     build:
       context: ..
       dockerfile: docker/bothub-nlp/Dockerfile
