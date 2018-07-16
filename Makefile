@@ -28,7 +28,7 @@ test:
 	@make development_mode_guard
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@SUPPORTED_LANGUAGES="en|pt" pipenv run coverage run -m unittest && pipenv run coverage report -m
+	@SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest && pipenv run coverage report -m
 
 migrate:
 	@make check_environment
