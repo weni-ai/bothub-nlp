@@ -11,10 +11,10 @@ help:
 	@exit 0
 
 check_environment:
-	@if [[ ${CHECK_ENVIRONMENT} = true ]]; then make _check_environment; fi
+	@if [ ${CHECK_ENVIRONMENT} = true ]; then make _check_environment; fi
 
 install_requirements:
-	@if [[ ${IS_PRODUCTION} = true ]]; \
+	@if [ ${IS_PRODUCTION} = true ]; \
 		then make install_production_requirements; \
 		else make install_development_requirements; fi
 
@@ -32,26 +32,26 @@ test:
 
 migrate:
 	@make check_environment
-	@if [[ ${IS_PRODUCTION} = true ]]; \
+	@if [ ${IS_PRODUCTION} = true ]; \
 		then DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" django-admin migrate; \
 		else DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate; fi
 
 download_supported_languages:
 	@make check_environment
-	@if [[ ${IS_PRODUCTION} = true ]]; \
+	@if [ ${IS_PRODUCTION} = true ]; \
 		then python scripts/download_spacy_models.py; \
 		else pipenv run python scripts/download_spacy_models.py; fi
 
 import_ilha_spacy_langs:
 	@make check_environment
-	@if [[ ${IS_PRODUCTION} = true ]]; \
+	@if [ ${IS_PRODUCTION} = true ]; \
 		then ./scripts/import_ilha_spacy_langs.sh; \
 		else pipenv run ./scripts/import_ilha_spacy_langs.sh; fi
 
 start:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
-	@if [[ ${IS_PRODUCTION} = true ]]; \
+	@if [ ${IS_PRODUCTION} = true ]; \
 		then python -m bothub_nlp.server; \
 		else pipenv run python -m tornado.autoreload -m bothub_nlp.server; fi
 
@@ -82,8 +82,8 @@ install_production_requirements:
 	@echo "${SUCCESS}✔${NC} Requirements installed"
 
 development_mode_guard:
-	@if [[ ${IS_PRODUCTION} = true ]]; then echo "${DANGER}Just run this command in development mode${NC}"; fi
-	@if [[ ${IS_PRODUCTION} = true ]]; then exit 1; fi
+	@if [ ${IS_PRODUCTION} = true ]; then echo "${DANGER}Just run this command in development mode${NC}"; fi
+	@if [ ${IS_PRODUCTION} = true ]; then exit 1; fi
 
 
 # Checkers
@@ -91,6 +91,6 @@ development_mode_guard:
 _check_environment:
 	@type pipenv &> /dev/null || (echo "${DANGER}☓${NC} Install pipenv to continue..." && exit 1)
 	@echo "${SUCCESS}✔${NC} pipenv installed"
-	@if [[ ! -f "${ENVIRONMENT_VARS_FILE}" && ${IS_PRODUCTION} = false ]]; then make create_environment_vars_file; fi
+	@if [ ! -f "${ENVIRONMENT_VARS_FILE}" ] && [ ${IS_PRODUCTION} = false ]; then make create_environment_vars_file; fi
 	@make install_requirements
 	@echo "${SUCCESS}✔${NC} Environment checked"
