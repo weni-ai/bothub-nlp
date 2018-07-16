@@ -39,14 +39,14 @@ migrate:
 download_supported_languages:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then python download_spacy_models.py; \
-		else pipenv run python download_spacy_models.py; fi
+		then python scripts/download_spacy_models.py; \
+		else pipenv run python scripts/download_spacy_models.py; fi
 
 import_ilha_spacy_langs:
 	@make check_environment
 	@if [[ ${IS_PRODUCTION} = true ]]; \
-		then ./import_ilha_spacy_langs.sh; \
-		else pipenv run ./import_ilha_spacy_langs.sh; fi
+		then ./scripts/import_ilha_spacy_langs.sh; \
+		else pipenv run ./scripts/import_ilha_spacy_langs.sh; fi
 
 start:
 	@make check_environment

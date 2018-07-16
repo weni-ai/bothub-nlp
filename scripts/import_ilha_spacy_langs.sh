@@ -7,4 +7,4 @@ else
     cd ./ilha_spacy && git pull origin develop && cd ..
 fi
 
-python link_lang_spacy.py pt_br ./ilha_spacy/spacy/lang/pt_br/ || :
+python scripts/link_lang_spacy.py pt_br ./ilha_spacy/spacy/lang/pt_br/ || :
