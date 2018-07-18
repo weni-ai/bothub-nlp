@@ -47,7 +47,8 @@ def download_spacy_models(languages=None, debug=False):
             logger.debug(' '.join(cmd))
             if subprocess.call(cmd, env=os.environ.copy()) is 0:
                 logger.debug('linking: {} to {}'.format(model_name, lang))
-                link(model_name, lang, force=True)
+                package_path = get_package_path(model_name)
+                link(model_name, lang, force=True, model_path=package_path)
             else:
                 raise Exception('Error to download {}'.format(lang))
         elif lang is not value:
