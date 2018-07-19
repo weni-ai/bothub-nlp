@@ -27,8 +27,9 @@ lint:
 test:
 	@make development_mode_guard
 	@make check_environment
-	@make migrate CHECK_ENVIRONMENT=false
-	@SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest && pipenv run coverage report -m
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate;
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest
+	@PIPENV_DONT_LOAD_ENV=1 pipenv run coverage report -m
 
 migrate:
 	@make check_environment
