@@ -11,7 +11,7 @@ from .handlers.info import InfoHandler
 
 app = None
 
-logger = logging.getLogger('bothub.server')
+logger = logging.getLogger('bothub_nlp.server')
 
 
 def make_app():
