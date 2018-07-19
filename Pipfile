@@ -12,6 +12,7 @@ sklearn-crfsuite = "*"
 scipy = "==1.1.0"
 numpy = "==1.14.5"
 bothub = {editable = true, git = "https://github.com/Ilhasoft/bothub-engine"}
+plac = "*"
 
 [dev-packages]
 "flake8" = "*"

@@ -1,3 +1,5 @@
+import spacy
+
 from tempfile import mkdtemp
 
 from rasa_nlu.config import RasaNLUModelConfig
@@ -9,11 +11,20 @@ from .persistor import BothubPersistor
 def get_rasa_nlu_config_from_update(update):
     return RasaNLUModelConfig({
         'language': update.language,
-        'pipeline': 'spacy_sklearn',
+        'pipeline': [
+            {'name': 'bothub_nlp.core.pipeline_components.spacy_nlp.' +
+                     'SpacyNLP'},
+            {'name': 'tokenizer_spacy'},
+            {'name': 'intent_featurizer_spacy'},
+            {'name': 'intent_entity_featurizer_regex'},
+            {'name': 'ner_crf'},
+            {'name': 'ner_synonyms'},
+            {'name': 'intent_classifier_sklearn'},
+        ],
     })
 
 
-class UpdateInterpreters(object):
+class UpdateInterpreters:
     interpreters = {}
 
     def get(self, update):
@@ -28,3 +39,14 @@ class UpdateInterpreters(object):
             model_directory)
         self.interpreters[update.id] = Interpreter.load(model_directory)
         return self.get(update)
+
+
+class SpacyNLPLanguageManager:
+    nlps = {}
+
+    def get(self, lang):
+        if lang not in self.nlps:
+            from . import logger
+            logger.info(f'loading {lang} spacy lang model...')
+            self.nlps[lang] = spacy.load(lang, parser=False)
+        return self.nlps[lang]
