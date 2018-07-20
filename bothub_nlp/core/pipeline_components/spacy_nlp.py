@@ -9,7 +9,6 @@ class SpacyNLP(RasaNLUSpacyNLP):
     @classmethod
     def create(cls, cfg):
         component_conf = cfg.for_component(cls.name, cls.defaults)
-        spacy_model_name = component_conf.get('model')
 
         spacy_model_name = cfg.language
         component_conf['model'] = spacy_model_name
