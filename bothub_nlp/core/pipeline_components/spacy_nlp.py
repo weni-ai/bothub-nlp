@@ -11,9 +11,8 @@ class SpacyNLP(RasaNLUSpacyNLP):
         component_conf = cfg.for_component(cls.name, cls.defaults)
         spacy_model_name = component_conf.get('model')
 
-        if not spacy_model_name:
-            spacy_model_name = cfg.language
-            component_conf['model'] = cfg.language
+        spacy_model_name = cfg.language
+        component_conf['model'] = spacy_model_name
 
         nlp = spacy_nlp_languages.get(spacy_model_name)
         cls.ensure_proper_language_model(nlp)
