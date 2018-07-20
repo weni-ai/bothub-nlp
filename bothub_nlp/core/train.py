@@ -2,6 +2,7 @@ from tempfile import mkdtemp
 
 from rasa_nlu.model import Trainer
 from rasa_nlu.training_data import Message, TrainingData
+from rasa_nlu.components import ComponentBuilder
 
 from .utils import get_rasa_nlu_config_from_update
 from .persistor import BothubPersistor
@@ -9,7 +10,6 @@ from .persistor import BothubPersistor
 
 def train_update(update, by):
     update.start_training(by)
-    update = update
 
     examples = [
         Message.build(
@@ -21,7 +21,9 @@ def train_update(update, by):
         for example in update.examples]
 
     rasa_nlu_config = get_rasa_nlu_config_from_update(update)
-    trainer = Trainer(rasa_nlu_config)
+    trainer = Trainer(
+        rasa_nlu_config,
+        ComponentBuilder(use_cache=False))
     training_data = TrainingData(training_examples=examples)
     trainer.train(training_data)
     persistor = BothubPersistor(update)
