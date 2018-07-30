@@ -1,5 +1,6 @@
 import json
 
+from urllib.parse import urlencode
 from tornado.testing import AsyncHTTPTestCase
 from django.test import TestCase
 from rest_framework import status
@@ -83,6 +84,38 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
         self.assertIn(
             'answer',
             content_data.keys())
+
+    def test_valid_request_method_get(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        train_update(self.repository.current_update(), self.user)
+
+        text = 'hi, my name is Douglas'
+
+        query_string = urlencode({
+            'text': text,
+        })
+        url = '/parse/?{}'.format(query_string)
+        response = self.fetch(
+            url,
+            method='GET',
+            headers={
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
+        )
+
+        self.assertEqual(
+            response.code,
+            status.HTTP_200_OK)
+
+        content_data = json.loads(response.body)
+
+        self.assertIn(
+            'text',
+            content_data.keys())
+        self.assertEqual(
+            content_data.get('text'),
+            text)
 
     def test_bot_not_trained(self):
         text = 'hi, my name is Douglas'
