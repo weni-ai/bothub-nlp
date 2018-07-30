@@ -4,6 +4,7 @@ from tempfile import mkdtemp
 
 from rasa_nlu.config import RasaNLUModelConfig
 from rasa_nlu.model import Interpreter
+from rasa_nlu.components import ComponentBuilder
 
 from .persistor import BothubPersistor
 
@@ -37,7 +38,9 @@ class UpdateInterpreters:
             str(update.repository.uuid),
             str(update.id),
             model_directory)
-        self.interpreters[update.id] = Interpreter.load(model_directory)
+        self.interpreters[update.id] = Interpreter.load(
+            model_directory,
+            ComponentBuilder(use_cache=False))
         return self.get(update)
 
 
