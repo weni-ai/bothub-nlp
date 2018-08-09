@@ -89,6 +89,7 @@ def train_update(update, by):
     trainer.train(training_data)
     persistor = BothubPersistor(update)
     path_temp = mkdtemp()
+    print(path_temp)
     trainer.persist(
         path_temp,
         persistor=persistor,
