@@ -32,3 +32,10 @@ class SpacyNLP(RasaNLUSpacyNLP):
         nlp = spacy_nlp_languages.get(model_name)
         cls.ensure_proper_language_model(nlp)
         return cls(component_meta, nlp)
+
+    def train(self, training_data, config, **kwargs):
+        for example in training_data.training_examples:
+            example.set('spacy_doc', self.doc_for_text(example.text))
+        if training_data.label_training_examples:
+            for example in training_data.label_training_examples:
+                example.set('spacy_doc', self.doc_for_text(example.text))
