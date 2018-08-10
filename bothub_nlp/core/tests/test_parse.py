@@ -53,11 +53,5 @@ class ParseWithLabelsTestCase(TestCase):
         response = parse_text(self.update, example.get('text'))
 
         entities = response.get('entities')
-        print('entities', len(entities))
-        for entity in entities:
-            print(entity.get('value'), entity.get('entity'))
-
         labels_as_entity = response.get('labels_as_entity', [])
-        print('labels_as_entity', len(labels_as_entity))
-        for label_as_entity in labels_as_entity:
-            print(label_as_entity.get('value'), label_as_entity.get('entity'))
+        self.assertEqual(len(entities), len(labels_as_entity))
