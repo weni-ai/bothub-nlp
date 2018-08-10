@@ -88,10 +88,8 @@ def train_update(update, by):
         training_examples=examples)
     trainer.train(training_data)
     persistor = BothubPersistor(update)
-    path_temp = mkdtemp()
-    print(path_temp)
     trainer.persist(
-        path_temp,
+        mkdtemp(),
         persistor=persistor,
         project_name=str(update.repository.uuid),
         fixed_model_name=str(update.id))
