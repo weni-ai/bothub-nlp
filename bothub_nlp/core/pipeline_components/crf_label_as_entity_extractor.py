@@ -7,11 +7,9 @@ CRF_MODEL_FILE_NAME = 'crf_model_labels.pkl'
 
 class CRFLabelAsEntityExtractor(CRFEntityExtractor):
     name = 'bothub_nlp.core.pipeline_components.' \
-    'crf_label_as_entity_extractor.CRFLabelAsEntityExtractor'
+        'crf_label_as_entity_extractor.CRFLabelAsEntityExtractor'
 
     provides = ['labels_as_entity']
-
-    # requires = ['spacy_doc', 'tokens']
 
     @classmethod
     def load(cls, model_dir=None, model_metadata=None, cached_component=None,

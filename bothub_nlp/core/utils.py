@@ -23,11 +23,9 @@ def get_rasa_nlu_config_from_update(update):
             {'name': 'ner_crf'},
             {'name': 'ner_synonyms'},
             {'name': 'intent_classifier_sklearn'},
-            {
-                'name': 'bothub_nlp.core.pipeline_components.' +
-                         'crf_label_as_entity_extractor.' +
-                         'CRFLabelAsEntityExtractor',
-            },
+            {'name': 'bothub_nlp.core.pipeline_components.' +
+                     'crf_label_as_entity_extractor.' +
+                     'CRFLabelAsEntityExtractor'},
         ],
     })
 
