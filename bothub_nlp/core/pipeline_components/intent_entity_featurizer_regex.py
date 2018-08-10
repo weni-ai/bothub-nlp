@@ -28,7 +28,7 @@ class RegexFeaturizer(RasaRegexFeaturizer):
         for example in training_data.training_examples:
             updated = self._text_features_with_regex(example)
             example.set('text_features', updated)
-        # if training_data.label_training_examples:
-        #     for example in training_data.label_training_examples:
-        #         updated = self._text_features_with_regex(example)
-        #         example.set('text_features', updated)
+        if training_data.label_training_examples:
+            for example in training_data.label_training_examples:
+                updated = self._text_features_with_regex(example)
+                example.set('text_features', updated)

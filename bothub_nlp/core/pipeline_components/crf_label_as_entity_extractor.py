@@ -7,11 +7,11 @@ CRF_MODEL_FILE_NAME = 'crf_model_labels.pkl'
 
 class CRFLabelAsEntityExtractor(CRFEntityExtractor):
     name = 'bothub_nlp.core.pipeline_components.' \
-            'crf_label_as_entity_extractor.CRFLabelAsEntityExtractor'
+    'crf_label_as_entity_extractor.CRFLabelAsEntityExtractor'
 
     provides = ['labels_as_entity']
 
-    requires = ['spacy_doc', 'tokens']
+    # requires = ['spacy_doc', 'tokens']
 
     @classmethod
     def load(cls, model_dir=None, model_metadata=None, cached_component=None,
@@ -30,6 +30,7 @@ class CRFLabelAsEntityExtractor(CRFEntityExtractor):
         self.component_config = config.for_component(self.name, self.defaults)
         self._validate_configuration()
         if training_data.label_training_examples:
+            self._check_spacy_doc(training_data.training_examples[0])
             filtered_entity_examples = self.filter_trainable_entities(
                     training_data.label_training_examples)
             dataset = self._create_dataset(filtered_entity_examples)
@@ -37,12 +38,9 @@ class CRFLabelAsEntityExtractor(CRFEntityExtractor):
 
     def persist(self, model_dir):
         from sklearn.externals import joblib
-
         if self.ent_tagger:
             model_file_name = os.path.join(model_dir, CRF_MODEL_FILE_NAME)
-
             joblib.dump(self.ent_tagger, model_file_name)
-
         return {'classifier_file': CRF_MODEL_FILE_NAME}
 
     def process(self, message, **kwargs):

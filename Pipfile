@@ -5,13 +5,13 @@ name = "pypi"
 
 [packages]
 tornado = "*"
-spacy = "*"
-rasa-nlu = "*"
+spacy = "==2.0.12"
+rasa-nlu = "==0.13.1"
 scikit-learn = "*"
 sklearn-crfsuite = "*"
 scipy = "==1.1.0"
 numpy = "==1.14.5"
-bothub = {editable = true, git = "https://github.com/Ilhasoft/bothub-engine"}
+bothub = {ref = "feature/entity-label", git = "https://github.com/Ilhasoft/bothub-engine", editable = true}
 plac = "*"
 
 [dev-packages]
