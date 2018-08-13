@@ -69,109 +69,61 @@ EXAMPLES_MOCKUP = [
 
 EXAMPLES_WITH_LABEL_MOCKUP = [
     {
-        'text': 'I love my dog, my puppy is awesome',
+        'text': 'I love cat',
         'intent': '',
         'entities': [
             {
-                'start': 10,
-                'end': 13,
-                'entity': 'dog',
-                'label': 'animal',
-            },
-            {
-                'start': 27,
-                'end': 34,
-                'entity': 'dog',
-                'label': 'animal',
-            },
-            {
-                'start': 0,
-                'end': 1,
-                'entity': 'i',
-                'label': 'person',
-            }
-        ],
-    },
-    {
-        'text': 'We love dogs!',
-        'intent': '',
-        'entities': [
-            {
-                'start': 8,
-                'end': 12,
-                'entity': 'dog',
-                'label': 'animal',
-            },
-            {
-                'start': 0,
-                'end': 2,
-                'entity': 'we',
-                'label': 'person',
-            }
-        ],
-    },
-    {
-        'text': 'We have a cat, cats are beautiful',
-        'intent': '',
-        'entities': [
-            {
-                'start': 10,
-                'end': 13,
+                'start': 7,
+                'end': 10,
                 'entity': 'cat',
                 'label': 'animal',
             },
-            {
-                'start': 15,
-                'end': 19,
-                'entity': 'cat',
-                'label': 'animal',
-            },
-            {
-                'start': 0,
-                'end': 2,
-                'entity': 'we',
-                'label': 'person',
-            }
         ],
     },
     {
-        'text': 'I love my cat',
+        'text': 'I love dog',
         'intent': '',
         'entities': [
             {
-                'start': 10,
+                'start': 7,
+                'end': 10,
+                'entity': 'dog',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'I love turtle',
+        'intent': '',
+        'entities': [
+            {
+                'start': 7,
                 'end': 13,
-                'entity': 'cat',
+                'entity': 'turtle',
                 'label': 'animal',
             },
-            {
-                'start': 0,
-                'end': 1,
-                'entity': 'i',
-                'label': 'person',
-            }
-        ]
-    },
-    {
-        'text': 'I love my aunt',
-        'intent': '',
-        'entities': [
-            {
-                'start': 10,
-                'end': 14,
-                'entity': 'aunt',
-                'label': 'person',
-            },
-            {
-                'start': 0,
-                'end': 1,
-                'entity': 'i',
-                'label': 'person',
-            }
         ],
     },
     {
-        'text': 'My aunt love cats',
+        'text': 'My dad love cat',
+        'intent': '',
+        'entities': [
+            {
+                'start': 3,
+                'end': 6,
+                'entity': 'dad',
+                'label': 'person',
+            },
+            {
+                'start': 12,
+                'end': 15,
+                'entity': 'cat',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'My aunt love cat',
         'intent': '',
         'entities': [
             {
@@ -182,10 +134,28 @@ EXAMPLES_WITH_LABEL_MOCKUP = [
             },
             {
                 'start': 13,
-                'end': 17,
+                'end': 16,
                 'entity': 'cat',
                 'label': 'animal',
-            }
+            },
+        ],
+    },
+    {
+        'text': 'My sister love dog',
+        'intent': '',
+        'entities': [
+            {
+                'start': 3,
+                'end': 9,
+                'entity': 'sister',
+                'label': 'person',
+            },
+            {
+                'start': 15,
+                'end': 18,
+                'entity': 'dog',
+                'label': 'animal',
+            },
         ],
     },
 ]

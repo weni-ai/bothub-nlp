@@ -54,9 +54,10 @@ class ParseHandler(ApiHandler):
                 field='language')
 
         answer = parse_text(update, text)
-
-        self.finish({
+        answer.update({
             'text': text,
+            'update_id': update.id,
             'language': language,
-            'answer': answer,
         })
+
+        self.finish(answer)

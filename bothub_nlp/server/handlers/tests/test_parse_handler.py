@@ -82,7 +82,7 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             content_data.keys())
 
         self.assertIn(
-            'answer',
+            'update_id',
             content_data.keys())
 
     def test_valid_request_method_get(self):
