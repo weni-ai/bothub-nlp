@@ -1,14 +1,9 @@
-import pprint
-
 from functools import reduce
 from collections import OrderedDict
 
 from bothub.common.models import RepositoryEntity
 
 from . import updateInterpreters
-
-
-pp = pprint.PrettyPrinter(indent=4)
 
 
 def order_by_confidence(l):
