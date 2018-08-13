@@ -79,9 +79,9 @@ class BothubInterpreter(Interpreter):
 class UpdateInterpreters:
     interpreters = {}
 
-    def get(self, update):
+    def get(self, update, use_cache=True):
         interpreter = self.interpreters.get(update.id)
-        if interpreter:
+        if interpreter and use_cache:
             return interpreter
         persistor = BothubPersistor(update)
         model_directory = mkdtemp()

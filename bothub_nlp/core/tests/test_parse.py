@@ -27,8 +27,10 @@ class ParseTestCase(TestCase):
 
     def test_parse(self):
         example = EXAMPLES_MOCKUP[0]
-        response = parse_text(self.update, example.get('text'))
-
+        response = parse_text(
+            self.update,
+            example.get('text'),
+            use_cache=False)
         self.assertEqual(
             response.get('intent', {}).get('name'),
             example.get('intent'))
@@ -49,9 +51,24 @@ class ParseWithLabelsTestCase(TestCase):
         train_update(self.update, self.user)
 
     def test_parse(self):
-        example = EXAMPLES_WITH_LABEL_MOCKUP[0]
-        response = parse_text(self.update, example.get('text'))
+        response = parse_text(
+            self.update,
+            'I love cat',
+            use_cache=False)
+        self.assertListEqual(
+            response.get('entities_list'),
+            ['cat'])
+        self.assertIsNone(
+            response.get('entities').get('animal')[0].get('self'))
 
-        entities = response.get('entities')
-        labels_as_entity = response.get('labels_as_entity', [])
-        self.assertEqual(len(entities), len(labels_as_entity))
+    def test_parse_label_self(self):
+        response = parse_text(
+            self.update,
+            'My aunt love elephant',
+            use_cache=False)
+        self.assertListEqual(
+            response.get('entities_list'),
+            ['aunt'])
+        animal_label = response.get('entities').get('animal')
+        self.assertEqual(len(animal_label), 1)
+        self.assertEqual(animal_label[0].get('entity'), 'animal')
