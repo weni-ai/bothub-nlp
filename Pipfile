@@ -11,7 +11,7 @@ scikit-learn = "*"
 sklearn-crfsuite = "*"
 scipy = "==1.1.0"
 numpy = "==1.14.5"
-bothub = {ref = "1.15.0b", git = "https://github.com/Ilhasoft/bothub-engine"}
+bothub = {editable = true, ref = "1.15.0b", git = "https://github.com/Ilhasoft/bothub-engine"}
 plac = "==0.9.6"
 
 [dev-packages]
