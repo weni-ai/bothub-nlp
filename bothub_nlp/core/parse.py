@@ -25,8 +25,6 @@ def minimal_entity(entity, self_flag=False):
         'value': entity.get('value'),
         'entity': entity.get('entity'),
         'confidence': entity.get('confidence'),
-        'start': entity.get('start'),
-        'end': entity.get('end'),
     }
 
     if self_flag:
