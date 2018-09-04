@@ -26,6 +26,9 @@ NEXT_LANGS = {
     languages.LANGUAGE_PT: [
         languages.LANGUAGE_PT_BR,
     ],
+    'pt-br': [
+        languages.LANGUAGE_PT_BR,
+    ],
     'br': [
         languages.LANGUAGE_PT_BR,
     ],
