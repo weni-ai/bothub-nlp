@@ -85,6 +85,39 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             'update_id',
             content_data.keys())
 
+    def test_valid_request_with_next_lang(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        train_update(self.repository.current_update(), self.user)
+
+        text = 'hi, my name is Douglas'
+
+        response = self.fetch(
+            '/parse/',
+            method='POST',
+            body=json.dumps({
+                'text': text,
+                'language': 'english'
+            }),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
+        )
+
+        self.assertEqual(
+            response.code,
+            status.HTTP_200_OK)
+
+        content_data = json.loads(response.body)
+
+        self.assertIn(
+            'language',
+            content_data.keys())
+        self.assertEqual(
+            content_data.get('language'),
+            languages.LANGUAGE_EN)
+
     def test_valid_request_method_get(self):
         fill_examples(EXAMPLES_MOCKUP, self.repository)
         train_update(self.repository.current_update(), self.user)
