@@ -21,10 +21,6 @@ class ParseHandler(ApiHandler):
             self.set_header('Content-Type', 'text/plain')
             self.finish('OK')
 
-        repository_authorization = self.repository_authorization()
-        if not repository_authorization:
-            raise AuthorizationIsRequired()
-
         self._parse(text, language, rasa_format)
 
     @asynchronous
@@ -41,15 +37,37 @@ class ParseHandler(ApiHandler):
         self._parse(text, language, rasa_format)
 
     def _parse(self, text, language, rasa_format=False):
-        print(text, language, rasa_format)
-        if language and language not in settings.SUPPORTED_LANGUAGES.keys():
+        from .. import logger
+        from .. import NEXT_LANGS
+
+        if language and (
+            language not in settings.SUPPORTED_LANGUAGES.keys() and
+            language not in NEXT_LANGS.keys()
+        ):
             raise ValidationError(
                 'Language \'{}\' not supported by now.'.format(language),
                 field='language')
 
         repository_authorization = self.repository_authorization()
+        if not repository_authorization:
+            raise AuthorizationIsRequired()
+
+        logger.info(
+            'parse request',
+            repository_authorization,
+            text,
+            language,
+            rasa_format)
+
         repository = repository_authorization.repository
         update = repository.last_trained_update(language)
+
+        if not update:
+            next_languages = NEXT_LANGS.get(language, [])
+            for next_language in next_languages:
+                update = repository.last_trained_update(next_language)
+                if update:
+                    break
 
         if not update:
             raise ValidationError(
@@ -60,7 +78,7 @@ class ParseHandler(ApiHandler):
         answer.update({
             'text': text,
             'update_id': update.id,
-            'language': language,
+            'language': update.language,
         })
 
         self.finish(answer)
