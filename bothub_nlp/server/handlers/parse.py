@@ -15,16 +15,13 @@ class ParseHandler(ApiHandler):
     def get(self):
         text = self.get_argument('text', default=None)
         language = self.get_argument('language', default=None)
+        rasa_format = self.get_argument('rasa_format', default=False)
 
         if not text and not language:
             self.set_header('Content-Type', 'text/plain')
             self.finish('OK')
 
-        repository_authorization = self.repository_authorization()
-        if not repository_authorization:
-            raise AuthorizationIsRequired()
-
-        self._parse(text, language)
+        self._parse(text, language, rasa_format)
 
     @asynchronous
     @coroutine
@@ -32,31 +29,56 @@ class ParseHandler(ApiHandler):
     def post(self):
         text = self.get_argument('text', default=None)
         language = self.get_argument('language', default=None)
+        rasa_format = self.get_argument('rasa_format', default=False)
 
         if not text:
             raise ValidationError('text field is required', field='text')
 
-        self._parse(text, language)
+        self._parse(text, language, rasa_format)
 
-    def _parse(self, text, language):
-        if language and language not in settings.SUPPORTED_LANGUAGES.keys():
+    def _parse(self, text, language, rasa_format=False):
+        from .. import logger
+        from .. import NEXT_LANGS
+
+        if language and (
+            language not in settings.SUPPORTED_LANGUAGES.keys() and
+            language not in NEXT_LANGS.keys()
+        ):
             raise ValidationError(
                 'Language \'{}\' not supported by now.'.format(language),
                 field='language')
 
         repository_authorization = self.repository_authorization()
+        if not repository_authorization:
+            raise AuthorizationIsRequired()
+
+        logger.info(
+            'parse request',
+            repository_authorization,
+            text,
+            language,
+            rasa_format)
+
         repository = repository_authorization.repository
         update = repository.last_trained_update(language)
+
+        if not update:
+            next_languages = NEXT_LANGS.get(language, [])
+            for next_language in next_languages:
+                update = repository.last_trained_update(next_language)
+                if update:
+                    break
 
         if not update:
             raise ValidationError(
                 'This repository has never been trained',
                 field='language')
 
-        answer = parse_text(update, text)
-
-        self.finish({
+        answer = parse_text(update, text, rasa_format=rasa_format)
+        answer.update({
             'text': text,
-            'language': language,
-            'answer': answer,
+            'update_id': update.id,
+            'language': update.language,
         })
+
+        self.finish(answer)

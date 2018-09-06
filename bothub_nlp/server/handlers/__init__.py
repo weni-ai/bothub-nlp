@@ -35,7 +35,6 @@ class ApiHandler(RequestHandler):
         return super().get_argument(arg, default)
 
     def write_error(self, status_code, exc_info):
-        print(status_code, exc_info)
         r = {}
         if exc_info:
             error_class, error, traceback_instance = exc_info

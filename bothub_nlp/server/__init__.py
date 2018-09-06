@@ -3,6 +3,8 @@ import tornado.ioloop
 
 from tornado.web import Application, url
 
+from bothub.common import languages
+
 from .. import settings
 from .handlers.parse import ParseHandler
 from .handlers.train import TrainHandler
@@ -12,6 +14,25 @@ from .handlers.info import InfoHandler
 app = None
 
 logger = logging.getLogger('bothub_nlp.server')
+
+NEXT_LANGS = {
+    'english': [
+        languages.LANGUAGE_EN,
+    ],
+    'portuguese': [
+        languages.LANGUAGE_PT,
+        languages.LANGUAGE_PT_BR,
+    ],
+    languages.LANGUAGE_PT: [
+        languages.LANGUAGE_PT_BR,
+    ],
+    'pt-br': [
+        languages.LANGUAGE_PT_BR,
+    ],
+    'br': [
+        languages.LANGUAGE_PT_BR,
+    ],
+}
 
 
 def make_app():

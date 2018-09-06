@@ -82,8 +82,41 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
             content_data.keys())
 
         self.assertIn(
-            'answer',
+            'update_id',
             content_data.keys())
+
+    def test_valid_request_with_next_lang(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        train_update(self.repository.current_update(), self.user)
+
+        text = 'hi, my name is Douglas'
+
+        response = self.fetch(
+            '/parse/',
+            method='POST',
+            body=json.dumps({
+                'text': text,
+                'language': 'english'
+            }),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
+        )
+
+        self.assertEqual(
+            response.code,
+            status.HTTP_200_OK)
+
+        content_data = json.loads(response.body)
+
+        self.assertIn(
+            'language',
+            content_data.keys())
+        self.assertEqual(
+            content_data.get('language'),
+            languages.LANGUAGE_EN)
 
     def test_valid_request_method_get(self):
         fill_examples(EXAMPLES_MOCKUP, self.repository)
@@ -116,6 +149,55 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
         self.assertEqual(
             content_data.get('text'),
             text)
+
+    def test_valid_request_rasa_format(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        train_update(self.repository.current_update(), self.user)
+
+        text = 'hi, my name is Douglas'
+
+        response = self.fetch(
+            '/parse/',
+            method='POST',
+            body=json.dumps({
+                'text': text,
+                'rasa_format': True,
+            }),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(
+                    self.authorization.uuid),
+            },
+        )
+
+        self.assertEqual(
+            response.code,
+            status.HTTP_200_OK)
+
+        content_data = json.loads(response.body)
+
+        self.assertIn(
+            'text',
+            content_data.keys())
+        self.assertEqual(
+            content_data.get('text'),
+            text)
+
+        self.assertIn(
+            'language',
+            content_data.keys())
+
+        self.assertIn(
+            'update_id',
+            content_data.keys())
+
+        self.assertIn(
+            'entities',
+            content_data.keys())
+
+        self.assertIn(
+            'labels_as_entity',
+            content_data.keys())
 
     def test_bot_not_trained(self):
         text = 'hi, my name is Douglas'

@@ -67,6 +67,100 @@ EXAMPLES_MOCKUP = [
 ]
 
 
+EXAMPLES_WITH_LABEL_MOCKUP = [
+    {
+        'text': 'I love cat',
+        'intent': '',
+        'entities': [
+            {
+                'start': 7,
+                'end': 10,
+                'entity': 'cat',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'I love dog',
+        'intent': '',
+        'entities': [
+            {
+                'start': 7,
+                'end': 10,
+                'entity': 'dog',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'I love turtle',
+        'intent': '',
+        'entities': [
+            {
+                'start': 7,
+                'end': 13,
+                'entity': 'turtle',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'My dad love cat',
+        'intent': '',
+        'entities': [
+            {
+                'start': 3,
+                'end': 6,
+                'entity': 'dad',
+                'label': 'person',
+            },
+            {
+                'start': 12,
+                'end': 15,
+                'entity': 'cat',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'My aunt love cat',
+        'intent': '',
+        'entities': [
+            {
+                'start': 3,
+                'end': 7,
+                'entity': 'aunt',
+                'label': 'person',
+            },
+            {
+                'start': 13,
+                'end': 16,
+                'entity': 'cat',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'My sister love dog',
+        'intent': '',
+        'entities': [
+            {
+                'start': 3,
+                'end': 9,
+                'entity': 'sister',
+                'label': 'person',
+            },
+            {
+                'start': 15,
+                'end': 18,
+                'entity': 'dog',
+                'label': 'animal',
+            },
+        ],
+    },
+]
+
+
 def fill_examples(examples_mockup, repository, language=None):
     for example_mockup in examples_mockup:
         example = RepositoryExample.objects.create(
@@ -75,8 +169,12 @@ def fill_examples(examples_mockup, repository, language=None):
             text=example_mockup.get('text'),
             intent=example_mockup.get('intent'))
         for entity_mockup in example_mockup.get('entities', []):
-            RepositoryExampleEntity.objects.create(
+            example_entity = RepositoryExampleEntity.objects.create(
                 repository_example=example,
                 start=entity_mockup.get('start'),
                 end=entity_mockup.get('end'),
                 entity=entity_mockup.get('entity'))
+            entity_label = entity_mockup.get('label')
+            if entity_label:
+                example_entity.entity.set_label(entity_label)
+                example_entity.entity.save()
