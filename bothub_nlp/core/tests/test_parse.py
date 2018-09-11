@@ -103,6 +103,8 @@ class TestFormatParseOutput(TestCase):
             ],
             'labels_as_entity': [],
         })
-        print(out)
         self.assertIn('animal', out.get('labels_list'))
         self.assertIn('cat', out.get('entities_list'))
+        self.assertEqual(
+            len(out.get('entities').get('animal')),
+            1)
