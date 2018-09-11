@@ -13,13 +13,6 @@ def order_by_confidence(l):
         reverse=True)
 
 
-def entities_values(l):
-    return list(set([
-        x.get('entity')
-        for x in l
-    ]))
-
-
 def minimal_entity(entity, self_flag=False):
     out = {
         'value': entity.get('value'),
@@ -50,13 +43,7 @@ def entities_position_match(a, b):
     return True
 
 
-def parse_text(update, text, rasa_format=False, use_cache=True):
-    interpreter = updateInterpreters.get(update, use_cache=use_cache)
-    r = interpreter.parse(text)
-
-    if rasa_format:
-        return r
-
+def format_parse_output(update, r):
     intent = r.get('intent', None)
     intent_ranking = r.get('intent_ranking')
     labels_as_entity = order_by_confidence(r.get('labels_as_entity'))
@@ -65,9 +52,7 @@ def parse_text(update, text, rasa_format=False, use_cache=True):
     entities = reduce(
         reduce_label_in_entities_base,
         labels_as_entity,
-        {
-            'other': [],
-        })
+        {})
     for entity in reversed(extracted_entities):
         added = False
         repository_entity = RepositoryEntity.objects.get(
@@ -75,20 +60,41 @@ def parse_text(update, text, rasa_format=False, use_cache=True):
             value=entity.get('entity'))
         label_value = repository_entity.label.value \
             if repository_entity.label else 'other'
-        current_label_items = list(entities.get(label_value))
+        current_label_items = list(entities.get(label_value, []))
         for i, label_item in enumerate(current_label_items):
             if entities_position_match(entity, label_item):
                 entities[label_value][i] = minimal_entity(entity)
                 added = True
                 break
         if not added:
+            if not entities.get(label_value):
+                entities[label_value] = []
             entities[label_value].insert(0, minimal_entity(entity))
 
     out = OrderedDict([
         ('intent', intent),
         ('intent_ranking', intent_ranking),
-        ('labels_list', entities_values(labels_as_entity)),
-        ('entities_list', entities_values(extracted_entities)),
+        (
+            'labels_list',
+            list(entities.keys()),
+        ),
+        (
+            'entities_list',
+            list(set([
+                x.get('entity')
+                for x in extracted_entities
+            ])),
+        ),
         ('entities', entities),
     ])
     return out
+
+
+def parse_text(update, text, rasa_format=False, use_cache=True):
+    interpreter = updateInterpreters.get(update, use_cache=use_cache)
+    r = interpreter.parse(text)
+
+    if rasa_format:
+        return r
+
+    return format_parse_output(update, r)

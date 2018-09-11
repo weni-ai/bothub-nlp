@@ -6,6 +6,7 @@ from bothub.common import languages
 
 from ..train import train_update
 from ..parse import parse_text
+from ..parse import format_parse_output
 from ...tests.utils import fill_examples
 from ...tests.utils import EXAMPLES_MOCKUP
 from ...tests.utils import EXAMPLES_WITH_LABEL_MOCKUP
@@ -72,3 +73,36 @@ class ParseWithLabelsTestCase(TestCase):
         animal_label = response.get('entities').get('animal')
         self.assertEqual(len(animal_label), 1)
         self.assertEqual(animal_label[0].get('entity'), 'animal')
+
+
+class TestFormatParseOutput(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            email='fake@user.com',
+            nickname='fake')
+        self.repository = Repository.objects.create(
+            owner=self.user,
+            slug='test',
+            name='Testing',
+            language=languages.LANGUAGE_EN)
+        fill_examples(EXAMPLES_WITH_LABEL_MOCKUP, self.repository)
+        self.update = self.repository.current_update()
+
+    def test_label_out(self):
+        out = format_parse_output(self.update, {
+            'intent': None,
+            'intent_ranking': [],
+            'entities': [
+                {
+                    'start': 0,
+                    'end': 1,
+                    'entity': 'cat',
+                    'value': 'cat',
+                    'confidence': .9,
+                }
+            ],
+            'labels_as_entity': [],
+        })
+        print(out)
+        self.assertIn('animal', out.get('labels_list'))
+        self.assertIn('cat', out.get('entities_list'))
