@@ -2,7 +2,7 @@ import logging
 import tornado.ioloop
 
 from tornado.web import Application, url
-
+from raven.contrib.tornado import AsyncSentryClient
 from bothub.common import languages
 
 from .. import settings
@@ -47,6 +47,8 @@ def make_app():
 def load_app():
     global app
     app = make_app()
+    if settings.SENTRY_CLIENT:
+        app.sentry_client = AsyncSentryClient(settings.SENTRY_CLIENT)
     app.listen(settings.PORT)
 
 
