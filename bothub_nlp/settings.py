@@ -26,4 +26,4 @@ LOGGER_LEVEL = config(
     default=logging.DEBUG,
     cast=int)
 
-SENTRY_CLIENT = config('SENTRY_CLIENT', default=None)
+SENTRY_CLIENT = config('NLP_SENTRY_CLIENT', default=None)
