@@ -37,6 +37,8 @@ class TrainHandler(ApiHandler):
                     'status': TRAIN_STATUS_TRAINED,
                 }
             except Exception as e:  # pragma: no cover
+                from .. import logger
+                logger.error(e)  # pragma: no cover
                 languages_report[language] = {  # pragma: no cover
                     'status': TRAIN_STATUS_FAILED,
                     'error': str(e),
