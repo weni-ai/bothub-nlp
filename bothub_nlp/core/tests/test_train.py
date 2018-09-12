@@ -45,3 +45,38 @@ class TrainTestCase(TestCase):
 
         self.assertIsNotNone(update.training_started_at)
         self.assertIsNotNone(update.trained_at)
+
+    def test_train_mixed(self):
+        fill_examples([
+            {
+                'text': 'I love cat',
+                'intent': '',
+                'entities': [
+                    {
+                        'start': 7,
+                        'end': 10,
+                        'entity': 'cat',
+                        'label': 'animal',
+                    },
+                ],
+            },
+            {
+                'text': 'I love dog and cat',
+                'intent': '',
+                'entities': [
+                    {
+                        'start': 7,
+                        'end': 10,
+                        'entity': 'dog',
+                    },
+                    {
+                        'start': 15,
+                        'end': 18,
+                        'entity': 'cat',
+                        'label': 'animal',
+                    },
+                ],
+            },
+        ], self.repository)
+        update = self.repository.current_update()
+        train_update(update, self.user)
