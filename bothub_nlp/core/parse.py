@@ -1,4 +1,3 @@
-from functools import reduce
 from collections import OrderedDict
 
 from bothub.common.models import RepositoryEntity
@@ -26,16 +25,7 @@ def minimal_entity(entity, self_flag=False):
     return out
 
 
-def reduce_label_in_entities_base(current, label_as_entity):
-    current.update({
-        label_as_entity.get('entity'): [minimal_entity(
-            label_as_entity,
-            self_flag=True)],
-    })
-    return current
-
-
-def entities_position_match(a, b):
+def position_match(a, b):
     if a.get('start') is not b.get('start'):
         return False
     if a.get('end') is not b.get('end'):
@@ -46,37 +36,46 @@ def entities_position_match(a, b):
 def format_parse_output(update, r):
     intent = r.get('intent', None)
     intent_ranking = r.get('intent_ranking')
-    labels_as_entity = order_by_confidence(r.get('labels_as_entity'))
-    extracted_entities = order_by_confidence(r.get('entities'))
+    labels_as_entity = r.get('labels_as_entity')
+    extracted_entities = r.get('entities')
 
-    entities = reduce(
-        reduce_label_in_entities_base,
-        labels_as_entity,
-        {})
-    for entity in reversed(extracted_entities):
-        added = False
-        repository_entity = RepositoryEntity.objects.get(
-            repository=update.repository,
-            value=entity.get('entity'))
-        label_value = repository_entity.label.value \
-            if repository_entity.label else 'other'
-        current_label_items = list(entities.get(label_value, []))
-        for i, label_item in enumerate(current_label_items):
-            if entities_position_match(entity, label_item):
-                entities[label_value][i] = minimal_entity(entity)
-                added = True
+    entities = labels_as_entity
+
+    for entity in extracted_entities:
+        replaced = False
+        for i, label in enumerate(labels_as_entity):
+            if position_match(entity, label):
+                entities[i] = entity
+                replaced = True
                 break
-        if not added:
-            if not entities.get(label_value):
-                entities[label_value] = []
-            entities[label_value].insert(0, minimal_entity(entity))
+        if not replaced:
+            entities.append(entity)
+
+    entities_dict = {}
+
+    for entity in reversed(order_by_confidence(entities)):
+        label_value = 'other'
+        is_label = entity.get('label_as_entity', False)
+        if is_label:
+            label_value = entity.get('entity')
+        else:
+            repository_entity = RepositoryEntity.objects.get(
+                repository=update.repository,
+                value=entity.get('entity'))
+            if repository_entity.label:
+                label_value = repository_entity.label.value
+
+        if not entities_dict.get(label_value):
+            entities_dict[label_value] = []
+
+        entities_dict[label_value].append(minimal_entity(entity, is_label))
 
     out = OrderedDict([
         ('intent', intent),
         ('intent_ranking', intent_ranking),
         (
             'labels_list',
-            list(entities.keys()),
+            list(entities_dict.keys()),
         ),
         (
             'entities_list',
@@ -85,7 +84,7 @@ def format_parse_output(update, r):
                 for x in extracted_entities
             ])),
         ),
-        ('entities', entities),
+        ('entities', entities_dict),
     ])
     return out
 
