@@ -34,5 +34,6 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 | SUPPORTED_LANGUAGES | ```string``` | In development mode: ```en|pt``` | Set supported languages. Separe languages using ```|```. You can set location follow the format: [LANGUAGE_CODE]:[LANGUAGE_LOCATION].
 | LOGGER_FORMAT | ```string``` | ```%(asctime)s - %(name)s - %(levelname)s - %(message)s``` | Logger format.
 | LOGGER_LEVEL | ```int``` | DEBUG = ```10`` | Logger level, use logging (Python Package) pattern.
+| NLP_SENTRY_CLIENT | ```string``` | empty | Sentry Client URL
 
 Check another valid environment variables in [Bothub repository](https://github.com/Ilhasoft/bothub-engine).
