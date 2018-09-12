@@ -3,13 +3,14 @@ import traceback
 
 from tornado.web import RequestHandler
 from rest_framework import status
+from raven.contrib.tornado import SentryMixin
 from bothub.common.models import RepositoryAuthorization
 
 from ... import settings
 from ..utils import ApiError, ValidationError
 
 
-class ApiHandler(RequestHandler):
+class ApiHandler(SentryMixin, RequestHandler):
     content_type = 'application/json'
 
     def set_default_headers(self):

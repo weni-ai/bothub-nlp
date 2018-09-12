@@ -1,5 +1,6 @@
 from tornado.web import asynchronous
 from tornado.gen import coroutine
+from tornado.gen import Task
 
 from . import ApiHandler
 from ..utils import authorization_required
@@ -36,10 +37,13 @@ class TrainHandler(ApiHandler):
                 languages_report[language] = {
                     'status': TRAIN_STATUS_TRAINED,
                 }
-            except Exception as e:  # pragma: no cover
+            except Exception as e:
                 from .. import logger
-                logger.exception(e)  # pragma: no cover
-                languages_report[language] = {  # pragma: no cover
+                logger.exception(e)
+
+                yield Task(self.captureException, exc_info=True)
+
+                languages_report[language] = {
                     'status': TRAIN_STATUS_FAILED,
                     'error': str(e),
                 }
