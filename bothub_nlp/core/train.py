@@ -62,8 +62,8 @@ def train_update(update, by):
             text=example.get_text(update.language),
             intent=example.intent,
             entities=[
-                entity.rasa_nlu_data
-                for entity in example.get_entities(update.language)])
+                example_entity.rasa_nlu_data
+                for example_entity in example.get_entities(update.language)])
         for example in update.examples]
 
     label_examples_query = update.examples \
@@ -75,8 +75,10 @@ def train_update(update, by):
         Message.build(
             text=example.get_text(update.language),
             entities=[
-                entity.get_rasa_nlu_data(label_as_entity=True)
-                for entity in example.get_entities(update.language)])
+                example_entity.get_rasa_nlu_data(label_as_entity=True)
+                for example_entity in filter(
+                    lambda ee: ee.entity.label,
+                    example.get_entities(update.language))])
         for example in label_examples_query]
 
     rasa_nlu_config = get_rasa_nlu_config_from_update(update)
