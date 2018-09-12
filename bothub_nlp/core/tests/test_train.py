@@ -4,7 +4,6 @@ from ..train import train_update
 
 from bothub.authentication.models import User
 from bothub.common.models import Repository
-from bothub.common.models import RepositoryExampleEntity
 from bothub.common import languages
 
 from ...tests.utils import fill_examples
