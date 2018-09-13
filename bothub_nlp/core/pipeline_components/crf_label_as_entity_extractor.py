@@ -47,3 +47,8 @@ class CRFLabelAsEntityExtractor(CRFEntityExtractor):
             'labels_as_entity',
             message.get('labels_as_entity', []) + extracted,
             add_to_output=True)
+
+    def _create_entity_dict(self, tokens, start, end, entity, confidence):
+        d = super()._create_entity_dict(tokens, start, end, entity, confidence)
+        d.update({'label_as_entity': True})
+        return d

@@ -95,11 +95,11 @@ class TestFormatParseOutput(TestCase):
             'entities': [
                 {
                     'start': 0,
-                    'end': 1,
+                    'end': 3,
                     'entity': 'cat',
                     'value': 'cat',
                     'confidence': .9,
-                }
+                },
             ],
             'labels_as_entity': [],
         })
@@ -107,4 +107,32 @@ class TestFormatParseOutput(TestCase):
         self.assertIn('cat', out.get('entities_list'))
         self.assertEqual(
             len(out.get('entities').get('animal')),
+            1)
+
+    def test_entity_priority(self):
+        out = format_parse_output(self.update, {
+            'intent': None,
+            'intent_ranking': [],
+            'entities': [
+                {
+                    'start': 0,
+                    'end': 3,
+                    'entity': 'cat',
+                    'value': 'cat',
+                    'confidence': .9,
+                },
+            ],
+            'labels_as_entity': [
+                {
+                    'start': 0,
+                    'end': 3,
+                    'entity': 'animal',
+                    'value': 'cat',
+                    'confidence': .9,
+                    'label_as_entity': True,
+                },
+            ],
+        })
+        self.assertEqual(
+            len(out.get('entities')),
             1)
