@@ -13,6 +13,7 @@ RUN pip install pipenv psycopg2-binary
 
 COPY Pipfile .
 COPY Pipfile.lock .
+COPY Makefile .
 
 RUN make check_environment
 
