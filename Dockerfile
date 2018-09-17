@@ -27,5 +27,5 @@ ENV DOWNLOADED_LANGUAGES ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}
 
 RUN make import_ilha_spacy_langs CHECK_ENVIRONMENT=false
 
-RUN chmod +x ./docker/bothub-nlp/entrypoint.sh
-ENTRYPOINT $WORKDIR/docker/bothub-nlp/entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT $WORKDIR/entrypoint.sh
