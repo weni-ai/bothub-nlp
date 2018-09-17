@@ -1,10 +1,13 @@
 #!/bin/sh
 
-if [[ ! -d "./ilha_spacy" ]]
+if [ ! -d "./spacy-langs" ]
 then
-    git clone --branch develop --depth 1 --single-branch https://github.com/Ilhasoft/spaCy.git ./ilha_spacy
+    git clone --branch master --depth 1 --single-branch \
+        https://github.com/Ilhasoft/spacy-lang-models \
+        ./spacy-langs
 else
-    cd ./ilha_spacy && git pull origin develop && cd ..
+    cd ./spacy-langs && git pull origin master && cd ..
 fi
 
-python scripts/link_lang_spacy.py pt_br ./ilha_spacy/spacy/lang/pt_br/ || :
+python scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ || :
+python scripts/link_lang_spacy.py mn ./spacy-langs/mn/ || :
