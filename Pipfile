@@ -14,6 +14,7 @@ numpy = "==1.14.5"
 bothub = {editable = true, ref = "1.15.3", git = "https://github.com/Ilhasoft/bothub-engine"}
 plac = "==0.9.6"
 raven = "*"
+pytz = "==2018.5"
 
 [dev-packages]
 "flake8" = "*"
