@@ -74,7 +74,7 @@ create_environment_vars_file:
 
 install_development_requirements:
 	@echo "${INFO}Installing development requirements...${NC}"
-	@pipenv install --dev &> /dev/null
+	@pipenv install --dev
 	@echo "${SUCCESS}✔${NC} Development requirements installed"
 
 install_production_requirements:
@@ -90,7 +90,7 @@ development_mode_guard:
 # Checkers
 
 _check_environment:
-	@type pipenv &> /dev/null || (echo "${DANGER}☓${NC} Install pipenv to continue..." && exit 1)
+	@type pipenv || (echo "${DANGER}☓${NC} Install pipenv to continue..." && exit 1)
 	@echo "${SUCCESS}✔${NC} pipenv installed"
 	@if [ ! -f "${ENVIRONMENT_VARS_FILE}" ] && [ ${IS_PRODUCTION} = false ]; then make create_environment_vars_file; fi
 	@make install_requirements

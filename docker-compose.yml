@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  scipy:
+    image: ilha/scipy:python3.6-alpine3.7
+    build:
+      context: .
+      dockerfile: scipy.Dockerfile
+  bothub-nlp:
+    image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${DOCKER_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD: ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}
+    ports:
+      - 2657:2657
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-SK}
+      - DEBUG=${DEBUG:-true}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE}
+      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
+      - TIME_ZONE=${TIME_ZONE:-UTC}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT:-25}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-webmaster@localhost}
+      - SERVER_EMAIL=${SERVER_EMAIL:-root@localhost}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - EMAIL_USE_SSL=${EMAIL_USE_SSL:-false}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
+      - ADMINS=${ADMINS}
+      - CSRF_COOKIE_DOMAIN=${CSRF_COOKIE_DOMAIN}
+      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-false}
+      - BOTHUB_WEBAPP_BASE_URL=${BOTHUB_WEBAPP_BASE_URL:-http://localhost/}
+      - BOTHUB_NLP_BASE_URL=${BOTHUB_NLP_BASE_URL:-http://bothub-nlp:2657/}
+      - CHECK_ACCESSIBLE_API_URL=${CHECK_ACCESSIBLE_API_URL}
+      - SEND_EMAILS=${SEND_EMAILS:-true}
+      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
+      - LOGGER_FORMAT=${LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
+      - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
