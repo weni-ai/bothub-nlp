@@ -51,7 +51,7 @@ def download_spacy_models(languages=None, debug=False):
                 link(model_name, lang, force=True, model_path=package_path)
             else:
                 raise Exception('Error to download {}'.format(lang))
-        elif lang is not value:
+        elif lang != value:
             logger.debug('downloading {}'.format(value))
             download(value)
             logger.debug('linking: {} to {}'.format(value, lang))
