@@ -40,3 +40,4 @@ services:
       - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
       - LOGGER_FORMAT=${LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
       - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
+      - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
