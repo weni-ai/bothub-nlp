@@ -105,4 +105,5 @@ def train_update(update, by):
         except Exception as e:
             raise e
         finally:
-            pl.getvalue()
+            update.training_logging = pl.getvalue()
+            update.save(update_fields=['training_logging'])
