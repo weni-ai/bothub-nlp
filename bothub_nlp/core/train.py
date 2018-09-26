@@ -11,6 +11,7 @@ from django.db import models
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
 from .persistor import BothubPersistor
+from . import logger
 
 
 class BothubWriter(TrainingDataWriter):
@@ -103,7 +104,8 @@ def train_update(update, by):
                 project_name=str(update.repository.uuid),
                 fixed_model_name=str(update.id))
         except Exception as e:
+            logger.exception(e)
             raise e
         finally:
-            update.training_logging = pl.getvalue()
-            update.save(update_fields=['training_logging'])
+            update.training_log = pl.getvalue()
+            update.save(update_fields=['training_log'])
