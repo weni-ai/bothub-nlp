@@ -126,6 +126,7 @@ class PokeLogging:
     def __enter__(self):
         self.cxt = contextvars.ContextVar(self.__class__.__name__)
         self.cxt.set(self)
+        logging.captureWarnings(True)
         self.logger = logging.getLogger()
         self.logger.setLevel(self.loggingLevel)
         self.stream = io.StringIO()
