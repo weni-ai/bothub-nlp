@@ -9,7 +9,9 @@ from rasa_nlu.utils import json_to_string
 from django.db import models
 
 from .utils import get_rasa_nlu_config_from_update
+from .utils import PokeLogging
 from .persistor import BothubPersistor
+from . import logger
 
 
 class BothubWriter(TrainingDataWriter):
@@ -55,43 +57,55 @@ class BothubTrainingData(TrainingData):
 
 
 def train_update(update, by):
-    update.start_training(by)
+    with PokeLogging() as pl:
+        try:
+            update.start_training(by)
 
-    examples = [
-        Message.build(
-            text=example.get_text(update.language),
-            intent=example.intent,
-            entities=[
-                example_entity.rasa_nlu_data
-                for example_entity in example.get_entities(update.language)])
-        for example in update.examples]
+            examples = [
+                Message.build(
+                    text=example.get_text(update.language),
+                    intent=example.intent,
+                    entities=[
+                        example_entity.rasa_nlu_data
+                        for example_entity in example.get_entities(
+                            update.language)])
+                for example in update.examples]
 
-    label_examples_query = update.examples \
-        .filter(entities__entity__label__isnull=False) \
-        .annotate(entities_count=models.Count('entities')) \
-        .filter(entities_count__gt=0)
+            label_examples_query = update.examples \
+                .filter(entities__entity__label__isnull=False) \
+                .annotate(entities_count=models.Count('entities')) \
+                .filter(entities_count__gt=0)
 
-    label_examples = [
-        Message.build(
-            text=example.get_text(update.language),
-            entities=[
-                example_entity.get_rasa_nlu_data(label_as_entity=True)
-                for example_entity in filter(
-                    lambda ee: ee.entity.label,
-                    example.get_entities(update.language))])
-        for example in label_examples_query]
+            label_examples = [
+                Message.build(
+                    text=example.get_text(update.language),
+                    entities=[
+                        example_entity.get_rasa_nlu_data(
+                            label_as_entity=True)
+                        for example_entity in filter(
+                            lambda ee: ee.entity.label,
+                            example.get_entities(update.language))])
+                for example in label_examples_query]
 
-    rasa_nlu_config = get_rasa_nlu_config_from_update(update)
-    trainer = Trainer(
-        rasa_nlu_config,
-        ComponentBuilder(use_cache=False))
-    training_data = BothubTrainingData(
-        label_training_examples=label_examples,
-        training_examples=examples)
-    trainer.train(training_data)
-    persistor = BothubPersistor(update)
-    trainer.persist(
-        mkdtemp(),
-        persistor=persistor,
-        project_name=str(update.repository.uuid),
-        fixed_model_name=str(update.id))
+            rasa_nlu_config = get_rasa_nlu_config_from_update(update)
+            trainer = Trainer(
+                rasa_nlu_config,
+                ComponentBuilder(use_cache=False))
+            training_data = BothubTrainingData(
+                label_training_examples=label_examples,
+                training_examples=examples)
+
+            trainer.train(training_data)
+
+            persistor = BothubPersistor(update)
+            trainer.persist(
+                mkdtemp(),
+                persistor=persistor,
+                project_name=str(update.repository.uuid),
+                fixed_model_name=str(update.id))
+        except Exception as e:
+            logger.exception(e)
+            raise e
+        finally:
+            update.training_log = pl.getvalue()
+            update.save(update_fields=['training_log'])
