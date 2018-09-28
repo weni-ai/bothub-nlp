@@ -18,12 +18,12 @@ def get_rasa_nlu_config_from_update(update):
                      'SpacyNLP'},
             {'name': 'bothub_nlp.core.pipeline_components.tokenizer_spacy.' +
                      'SpacyTokenizer'},
-            {'name': 'intent_featurizer_spacy'},
             {'name': 'bothub_nlp.core.pipeline_components.' +
                      'intent_entity_featurizer_regex.RegexFeaturizer'},
             {'name': 'ner_crf'},
             {'name': 'ner_synonyms'},
-            {'name': 'intent_classifier_sklearn'},
+            {'name': 'intent_featurizer_count_vectors'},
+            {'name': 'intent_classifier_tensorflow_embedding'},
             {'name': 'bothub_nlp.core.pipeline_components.' +
                      'crf_label_as_entity_extractor.' +
                      'CRFLabelAsEntityExtractor'},
