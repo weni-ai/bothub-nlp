@@ -57,10 +57,9 @@ class BothubTrainingData(TrainingData):
 
 
 def train_update(update, by):
+    update.start_training(by)
     with PokeLogging() as pl:
         try:
-            update.start_training(by)
-
             examples = [
                 Message.build(
                     text=example.get_text(update.language),
@@ -105,6 +104,7 @@ def train_update(update, by):
                 fixed_model_name=str(update.id))
         except Exception as e:
             logger.exception(e)
+            update.train_fail()
             raise e
         finally:
             update.training_log = pl.getvalue()
