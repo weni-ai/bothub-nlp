@@ -38,7 +38,11 @@ def get_rasa_nlu_config_from_update(update):
         pipeline.append({'name': 'intent_featurizer_count_vectors'})
 
     # intent classifier
-    pipeline.append({'name': 'intent_classifier_tensorflow_embedding'})
+    pipeline.append({
+        'name': 'intent_classifier_tensorflow_embedding',
+        'similarity_type': 'inner' if update.use_competing_intents else
+                           'cosine'
+    })
 
     # entity extractor
     pipeline.append({'name': 'ner_crf'})
