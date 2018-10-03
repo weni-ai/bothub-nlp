@@ -41,7 +41,8 @@ class TrainHandler(ApiHandler):
                 from .. import logger
                 logger.exception(e)
 
-                yield Task(self.captureException, exc_info=True)
+                if settings.SENTRY_CLIENT:
+                    yield Task(self.captureException, exc_info=True)
 
                 languages_report[language] = {
                     'status': TRAIN_STATUS_FAILED,
