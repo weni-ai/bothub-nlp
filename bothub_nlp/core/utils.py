@@ -14,23 +14,47 @@ from .persistor import BothubPersistor
 
 
 def get_rasa_nlu_config_from_update(update):
+    pipeline = []
+    use_spacy_tokenizer = True  # TODO: future, check if has lang spacy model
+    use_spacy_featurizer = update.use_language_model_featurizer
+    use_spacy = use_spacy_tokenizer or use_spacy_featurizer
+
+    # load spacy
+    if use_spacy:
+        pipeline.append({'name': 'bothub_nlp.core.pipeline_components.' +
+                                 'spacy_nlp.SpacyNLP'})
+
+    # tokenizer
+    if use_spacy_tokenizer:
+        pipeline.append({'name': 'bothub_nlp.core.pipeline_components.' +
+                                 'tokenizer_spacy.SpacyTokenizer'})
+    else:
+        pipeline.append({'name': 'tokenizer_whitespace'})
+
+    # featurizer
+    if use_spacy_featurizer:
+        pipeline.append({'name': 'intent_featurizer_spacy'})
+    else:
+        pipeline.append({'name': 'intent_featurizer_count_vectors'})
+
+    # intent classifier
+    pipeline.append({
+        'name': 'intent_classifier_tensorflow_embedding',
+        'similarity_type': 'inner' if update.use_competing_intents else
+                           'cosine'
+    })
+
+    # entity extractor
+    pipeline.append({'name': 'ner_crf'})
+
+    # label extractor
+    pipeline.append({'name': 'bothub_nlp.core.pipeline_components.' +
+                             'crf_label_as_entity_extractor.' +
+                             'CRFLabelAsEntityExtractor'})
+
     return RasaNLUModelConfig({
         'language': update.language,
-        'pipeline': [
-            {'name': 'bothub_nlp.core.pipeline_components.spacy_nlp.' +
-                     'SpacyNLP'},
-            {'name': 'bothub_nlp.core.pipeline_components.tokenizer_spacy.' +
-                     'SpacyTokenizer'},
-            {'name': 'intent_featurizer_spacy'},
-            {'name': 'bothub_nlp.core.pipeline_components.' +
-                     'intent_entity_featurizer_regex.RegexFeaturizer'},
-            {'name': 'ner_crf'},
-            {'name': 'ner_synonyms'},
-            {'name': 'intent_classifier_sklearn'},
-            {'name': 'bothub_nlp.core.pipeline_components.' +
-                     'crf_label_as_entity_extractor.' +
-                     'CRFLabelAsEntityExtractor'},
-        ],
+        'pipeline': pipeline,
     })
 
 
