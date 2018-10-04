@@ -79,7 +79,7 @@ install_development_requirements:
 
 install_production_requirements:
 	@echo "${INFO}Installing production requirements...${NC}"
-	@pipenv install --system
+	@pipenv install --system -v
 	@echo "${SUCCESS}✔${NC} Requirements installed"
 
 development_mode_guard:
