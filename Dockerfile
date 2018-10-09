@@ -6,8 +6,6 @@ ENV PORT 2657
 
 WORKDIR $WORKDIR
 
-RUN pip install numpy==1.15.2
-RUN pip install scipy==1.1.0
 RUN pip install pipenv
 RUN pip install psycopg2-binary
 

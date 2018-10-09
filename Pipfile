@@ -4,23 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+bothub-engine = {editable = true, ref = "1.16.0b1", git = "https://github.com/Ilhasoft/bothub-engine"}
 tornado = "==5.1.1"
+contextvars = "==2.3"
+raven = "==6.9.0"
 spacy = "==2.0.12"
 rasa-nlu = "==0.13.1"
-scikit-learn = "==0.19.2"
-sklearn-crfsuite = "==0.3.6"
-scipy = "==1.1.0"
-numpy = "==1.15.2"
-plac = "==0.9.6"
-raven = "==6.9.0"
-pytz = "==2018.5"
-contextvars = "==2.3"
-bothub-engine = {editable = true, ref = "1.16.0b1", git = "https://github.com/Ilhasoft/bothub-engine"}
 tensorflow = "==1.11.0"
+scikit-learn = "==0.20.0"
+sklearn-crfsuite = "==0.3.6"
+plac = "==0.9.6"
 
 [dev-packages]
-"flake8" = "*"
 coverage = "*"
+"flake8" = "*"
 
 [requires]
 python_version = "3.6"
