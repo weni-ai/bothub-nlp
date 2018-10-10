@@ -7,6 +7,7 @@ from bothub.common import languages
 from ..train import train_update
 from ..parse import parse_text
 from ..parse import format_parse_output
+from ..parse import position_match
 from ...tests.utils import fill_examples
 from ...tests.utils import EXAMPLES_MOCKUP
 from ...tests.utils import EXAMPLES_WITH_LABEL_MOCKUP
@@ -136,3 +137,57 @@ class TestFormatParseOutput(TestCase):
         self.assertEqual(
             len(out.get('entities')),
             1)
+
+
+class PositionMatchTestCase(TestCase):
+    def test_match(self):
+        r = position_match(
+            {
+                'start': 0,
+                'end': 4,
+            },
+            {
+                'start': 0,
+                'end': 4,
+            }
+        )
+        self.assertTrue(r)
+
+    def test_diff_start(self):
+        r = position_match(
+            {
+                'start': 0,
+                'end': 4,
+            },
+            {
+                'start': 1,
+                'end': 4,
+            }
+        )
+        self.assertFalse(r)
+
+    def test_diff_end(self):
+        r = position_match(
+            {
+                'start': 0,
+                'end': 4,
+            },
+            {
+                'start': 0,
+                'end': 3,
+            }
+        )
+        self.assertFalse(r)
+
+    def test_diff_twice(self):
+        r = position_match(
+            {
+                'start': 1,
+                'end': 4,
+            },
+            {
+                'start': 2,
+                'end': 3,
+            }
+        )
+        self.assertFalse(r)

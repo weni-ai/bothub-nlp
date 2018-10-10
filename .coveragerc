@@ -8,6 +8,8 @@ omit =
     *env*,
     *__main__*,
     bothub_nlp/cli/*.py
+    bothub_nlp/core/pipeline_components/intent_entity_featurizer_regex.py
+    setup.py
 
 [report]
 fail_under = 90
