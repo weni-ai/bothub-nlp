@@ -37,7 +37,6 @@ class ParseHandler(ApiHandler):
         self._parse(text, language, rasa_format)
 
     def _parse(self, text, language, rasa_format=False):
-        from .. import logger
         from .. import NEXT_LANGS
 
         if language and (
@@ -51,13 +50,6 @@ class ParseHandler(ApiHandler):
         repository_authorization = self.repository_authorization()
         if not repository_authorization:
             raise AuthorizationIsRequired()
-
-        logger.info(
-            'parse request',
-            repository_authorization,
-            text,
-            language,
-            rasa_format)
 
         repository = repository_authorization.repository
         update = repository.last_trained_update(language)

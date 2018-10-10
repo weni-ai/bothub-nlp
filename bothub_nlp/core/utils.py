@@ -1,3 +1,6 @@
+import contextvars
+import logging
+import io
 import spacy
 
 from tempfile import mkdtemp
@@ -11,23 +14,47 @@ from .persistor import BothubPersistor
 
 
 def get_rasa_nlu_config_from_update(update):
+    pipeline = []
+    use_spacy_tokenizer = True  # TODO: future, check if has lang spacy model
+    use_spacy_featurizer = update.use_language_model_featurizer
+    use_spacy = use_spacy_tokenizer or use_spacy_featurizer
+
+    # load spacy
+    if use_spacy:
+        pipeline.append({'name': 'bothub_nlp.core.pipeline_components.' +
+                                 'spacy_nlp.SpacyNLP'})
+
+    # tokenizer
+    if use_spacy_tokenizer:
+        pipeline.append({'name': 'bothub_nlp.core.pipeline_components.' +
+                                 'tokenizer_spacy.SpacyTokenizer'})
+    else:
+        pipeline.append({'name': 'tokenizer_whitespace'})
+
+    # featurizer
+    if use_spacy_featurizer:
+        pipeline.append({'name': 'intent_featurizer_spacy'})
+    else:
+        pipeline.append({'name': 'intent_featurizer_count_vectors'})
+
+    # intent classifier
+    pipeline.append({
+        'name': 'intent_classifier_tensorflow_embedding',
+        'similarity_type': 'inner' if update.use_competing_intents else
+                           'cosine'
+    })
+
+    # entity extractor
+    pipeline.append({'name': 'ner_crf'})
+
+    # label extractor
+    pipeline.append({'name': 'bothub_nlp.core.pipeline_components.' +
+                             'crf_label_as_entity_extractor.' +
+                             'CRFLabelAsEntityExtractor'})
+
     return RasaNLUModelConfig({
         'language': update.language,
-        'pipeline': [
-            {'name': 'bothub_nlp.core.pipeline_components.spacy_nlp.' +
-                     'SpacyNLP'},
-            {'name': 'bothub_nlp.core.pipeline_components.tokenizer_spacy.' +
-                     'SpacyTokenizer'},
-            {'name': 'intent_featurizer_spacy'},
-            {'name': 'bothub_nlp.core.pipeline_components.' +
-                     'intent_entity_featurizer_regex.RegexFeaturizer'},
-            {'name': 'ner_crf'},
-            {'name': 'ner_synonyms'},
-            {'name': 'intent_classifier_sklearn'},
-            {'name': 'bothub_nlp.core.pipeline_components.' +
-                     'crf_label_as_entity_extractor.' +
-                     'CRFLabelAsEntityExtractor'},
-        ],
+        'pipeline': pipeline,
     })
 
 
@@ -104,3 +131,36 @@ class SpacyNLPLanguageManager:
             logger.info(f'loading {lang} spacy lang model...')
             self.nlps[lang] = spacy.load(lang, parser=False)
         return self.nlps[lang]
+
+
+class PokeLoggingHandler(logging.StreamHandler):
+    def __init__(self, pl, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pl = pl
+
+    def emit(self, record):
+        if self.pl.cxt.get(default=None) is self.pl:
+            super().emit(record)
+
+
+class PokeLogging:
+    def __init__(self, loggingLevel=logging.DEBUG):
+        self.loggingLevel = loggingLevel
+
+    def __enter__(self):
+        self.cxt = contextvars.ContextVar(self.__class__.__name__)
+        self.cxt.set(self)
+        logging.captureWarnings(True)
+        self.logger = logging.getLogger()
+        self.logger.setLevel(self.loggingLevel)
+        self.stream = io.StringIO()
+        self.handler = PokeLoggingHandler(self, self.stream)
+        self.formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self.handler.setLevel(self.loggingLevel)
+        self.handler.setFormatter(self.formatter)
+        self.logger.addHandler(self.handler)
+        return self.stream
+
+    def __exit__(self, *args):
+        self.logger.removeHandler(self.logger)

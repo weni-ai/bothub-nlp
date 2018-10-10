@@ -1,11 +1,6 @@
-version: '3.3'
+version: '3'
 
 services:
-  scipy:
-    image: ilha/scipy:python3.6-alpine3.7
-    build:
-      context: .
-      dockerfile: scipy.Dockerfile
   bothub-nlp:
     image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${DOCKER_IMAGE_TAG:-latest}
     build:
