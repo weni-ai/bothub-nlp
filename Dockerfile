@@ -6,8 +6,7 @@ ENV PORT 2657
 
 WORKDIR $WORKDIR
 
-RUN pip install pipenv
-RUN pip install psycopg2-binary
+RUN pip install pipenv psycopg2-binary
 
 COPY Pipfile .
 COPY Pipfile.lock .
