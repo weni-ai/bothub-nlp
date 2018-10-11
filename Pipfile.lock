@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "003b62e4394860ef5ffaf373c6e9a0a9d68017e0afd00ebe62ee50afeb1cb61e"
+            "sha256": "2e14125dc6ffccfc15369a2aea2cc8c4bb954b489541952d5bbfcef734fcbe8b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -46,21 +46,21 @@
         "bothub-engine": {
             "editable": true,
             "git": "https://github.com/Ilhasoft/bothub-engine",
-            "ref": "9fcec5df97b03c8516d7c25aabc9d17b05a3b814"
+            "ref": "e6afaf6f72af86795dfaa1361bbb1da974f01d31"
         },
         "boto3": {
             "hashes": [
-                "sha256:b9664b5e11dc5d3e2b546609f2c86e457ac1b4b596fee18322fa3667ce730f88",
-                "sha256:b9e5a9c4c70d06a7aca9270ea4b4f69577c9107a891ab6de279565284c335eb1"
+                "sha256:606c82cb388dbf92a988d01e77157f566356e69d0e696232ccce19677cca0723",
+                "sha256:f6b9dd8ab398bd563ca43de7f758dd5facbca82e0db8a0dca99d636b36878d6e"
             ],
-            "version": "==1.9.19"
+            "version": "==1.9.21"
         },
         "botocore": {
             "hashes": [
-                "sha256:0f0a2a74a9dc1d53531f559477f329ad087f3b378fc9cf02e67017e475854f8d",
-                "sha256:bc2fa51e05afb944f4f684c7d52a0db165898985d46b2fcb55fb842028fcc7a6"
+                "sha256:a0bbd991212d5dd8355b21c4bc26fd83f02c7ba5817433ce9c2826b808df655c",
+                "sha256:a8b68eda5040dae0e795bb939cbc26cce4cf7ec59ace0a9ad0f7212baefa26a8"
             ],
-            "version": "==1.12.19"
+            "version": "==1.12.21"
         },
         "certifi": {
             "hashes": [
@@ -78,10 +78,10 @@
         },
         "cloudpickle": {
             "hashes": [
-                "sha256:2bff291af542a8121e8d0d7d156447894f253ec8a51def86292727cd0b241ab0",
-                "sha256:ccb49a4139e2a86f0c6194ebcf6e69b2410f60bdac5c702dbcf553c3a5c129d8"
+                "sha256:f169a8523a40eb0a3452e1878aac31da6759409fbafa51dd50d89d4a6b42bcf1",
+                "sha256:fac8deaad55cd9e6cc11bb1d61c66da730f3f602ea8433698ef10ce664e520ec"
             ],
-            "version": "==0.6.0"
+            "version": "==0.6.1"
         },
         "coloredlogs": {
             "hashes": [
