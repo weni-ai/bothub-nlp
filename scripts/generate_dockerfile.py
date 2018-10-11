@@ -3,6 +3,7 @@ import sys
 import plac
 from tempfile import NamedTemporaryFile
 
+
 @plac.annotations(languages=plac.Annotation(help='Languages to download'))
 def generate_dockerfile(languages=None):
     dockerfile = NamedTemporaryFile(prefix='Dockerfile', delete=False)
@@ -20,13 +21,17 @@ def generate_dockerfile(languages=None):
     dockerfile.write(b'ARG DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD\n')
     if languages:
         for language in languages.split('|'):
-            line = 'RUN python scripts/download_spacy_models.py {}\n'.format(language)
+            line = 'RUN python scripts/download_spacy_models.py {}\n'.format(
+                language)
             dockerfile.write(bytes(line, 'utf8'))
-    dockerfile.write(b'ENV DOWNLOADED_LANGUAGES ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}\n')
-    dockerfile.write(b'RUN make -s import_ilha_spacy_langs CHECK_ENVIRONMENT=false\n')
+    dockerfile.write(b'ENV DOWNLOADED_LANGUAGES ' +
+                     b'${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}\n')
+    dockerfile.write(b'RUN make -s import_ilha_spacy_langs '
+                     b'CHECK_ENVIRONMENT=false\n')
     dockerfile.write(b'RUN chmod +x ./entrypoint.sh\n')
     dockerfile.write(b'ENTRYPOINT $WORKDIR/entrypoint.sh\n')
     print(dockerfile.name)
+
 
 if __name__ == '__main__':
     plac.call(generate_dockerfile, sys.argv[1:])
