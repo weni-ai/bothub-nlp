@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
       args:
         DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD: ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}
+    depends_on:
+      - celery-broker
     ports:
       - 2657:2657
     environment:
