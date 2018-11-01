@@ -6,7 +6,7 @@ from ..utils import ValidationError
 from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
 from ... import settings
-from ...core.parse import parse_text
+from ...core.celery.tasks import parse_text
 
 
 class ParseHandler(ApiHandler):
@@ -66,7 +66,12 @@ class ParseHandler(ApiHandler):
                 'This repository has never been trained',
                 field='language')
 
-        answer = parse_text(update, text, rasa_format=rasa_format)
+        answer_task = parse_text.delay(
+            update.id,
+            text,
+            rasa_format=rasa_format)
+        answer_task.wait()
+        answer = answer_task.result
         answer.update({
             'text': text,
             'update_id': update.id,

@@ -27,3 +27,10 @@ LOGGER_LEVEL = config(
     cast=int)
 
 SENTRY_CLIENT = config('NLP_SENTRY_CLIENT', default=None)
+
+CELERY_BROKER_URL = config(
+    'CELERY_BROKER_URL',
+    default='redis://localhost:6379/0')
+CELERY_BACKEND_URL = config(
+    'CELERY_BACKEND_URL',
+    default=CELERY_BROKER_URL)

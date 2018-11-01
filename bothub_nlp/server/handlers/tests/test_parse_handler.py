@@ -10,6 +10,7 @@ from bothub.common.models import RepositoryAuthorization
 from bothub.common import languages
 
 from ....core.train import train_update
+from ....core.celery import celery_app
 
 from ....tests.utils import fill_examples
 from ....tests.utils import EXAMPLES_MOCKUP
@@ -18,6 +19,8 @@ from ....tests.utils import EXAMPLES_MOCKUP
 class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
     def setUp(self):
         super().setUp()
+
+        celery_app.conf.update(CELERY_ALWAYS_EAGER=True)
 
         self.user = User.objects.create(
             email='fake@user.com',
