@@ -26,4 +26,5 @@ ENV DOWNLOADED_LANGUAGES ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}
 RUN make -s import_ilha_spacy_langs CHECK_ENVIRONMENT=false
 
 RUN chmod +x ./entrypoint.sh
+RUN chmod +x ./celery-worker-entrypoint.sh
 ENTRYPOINT $WORKDIR/entrypoint.sh
