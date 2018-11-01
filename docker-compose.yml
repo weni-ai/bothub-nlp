@@ -37,6 +37,7 @@ services:
       - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
       - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://celery-broker:6379/0}
+      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://celery-broker:6379/0}
   celery-broker:
     image: redis:${REDIS_IMAGE_TAG:-latest}
     ports:
