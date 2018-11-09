@@ -1,6 +1,6 @@
-from . import celery_app
-from ..parse import parse_text as parse_text_core
 from bothub.common.models import RepositoryUpdate
+from .app import celery_app
+from ..parse import parse_text as parse_text_core
 
 
 @celery_app.task
