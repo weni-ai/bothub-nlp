@@ -2,6 +2,7 @@ import logging
 import tornado.ioloop
 
 from tornado.web import Application, url
+from tornado.httpserver import HTTPServer
 from raven.contrib.tornado import AsyncSentryClient
 from bothub.common import languages
 
@@ -47,10 +48,16 @@ def make_app():
 def load_app():
     global app
     app = make_app()
+
     if settings.SENTRY_CLIENT:
         app.sentry_client = AsyncSentryClient(settings.SENTRY_CLIENT)
-    app.listen(settings.PORT)
 
+    if settings.DEVELOPMENT_MODE:
+        app.listen(settings.PORT)
+    else:
+        server = HTTPServer(app)
+        server.listen(settings.PORT)
+        server.start(0)
 
 def start():
     load_app()

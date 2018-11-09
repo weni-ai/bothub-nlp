@@ -1,5 +1,5 @@
-from tornado.web import asynchronous
-from tornado.gen import coroutine
+import tornado.web
+from tornado import gen
 
 from . import ApiHandler
 from ..utils import ValidationError
@@ -12,8 +12,8 @@ from ...core.celery.actions import ACTION_PARSE
 
 
 class ParseHandler(ApiHandler):
-    @asynchronous
-    @coroutine
+    @tornado.web.asynchronous
+    @gen.engine
     def get(self):
         text = self.get_argument('text', default=None)
         language = self.get_argument('language', default=None)
@@ -25,8 +25,8 @@ class ParseHandler(ApiHandler):
 
         self._parse(text, language, rasa_format)
 
-    @asynchronous
-    @coroutine
+    @tornado.web.asynchronous
+    @gen.engine
     @authorization_required
     def post(self):
         text = self.get_argument('text', default=None)
