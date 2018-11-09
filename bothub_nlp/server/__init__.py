@@ -59,6 +59,7 @@ def load_app():
         server.listen(settings.PORT)
         server.start(0)
 
+
 def start():
     load_app()
 
