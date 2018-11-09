@@ -2,12 +2,12 @@ version: '3'
 
 services:
   bothub-nlp:
-    image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${DOCKER_IMAGE_TAG:-latest}
+    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD: ${DOWNLOAD_LANGUAGES_ON_DOCKER_IMAGE_BUILD}
+        DOWNLOAD_LANGUAGES_MODELS: ${DOWNLOAD_LANGUAGES_MODELS:-}
     depends_on:
       - redis
     ports:
@@ -15,6 +15,7 @@ services:
     environment:
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
       - DEFAULT_DATABASE=${DEFAULT_DATABASE}
       - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
@@ -40,14 +41,20 @@ services:
       - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
       - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
-  celery-worker:
-    image: ${DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${DOCKER_IMAGE_TAG:-latest}
+  worker:
+    image: ${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-worker}:${BOTHUB_NLP_WORKER_DOCKER_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOWNLOAD_LANGUAGES_MODELS: ${DOWNLOAD_LANGUAGES_MODELS:-}
     entrypoint: /home/app/celery-worker-entrypoint.sh
     depends_on:
-      - bothub-nlp
+      - redis
     environment:
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
       - DEFAULT_DATABASE=${DEFAULT_DATABASE}
       - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
