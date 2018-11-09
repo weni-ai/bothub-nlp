@@ -64,8 +64,8 @@ start_celery_worker:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@if [ ${IS_PRODUCTION} = true ]; \
-		then celery worker -A bothub_nlp.core.celery -l INFO; \
-		else pipenv run celery worker -A bothub_nlp.core.celery -l INFO; \
+		then celery worker -A bothub_nlp.core.celery -c 1 -l INFO; \
+		else pipenv run celery worker -A bothub_nlp.core.celery -c 1 -l INFO; \
 	fi
 
 
