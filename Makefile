@@ -24,12 +24,17 @@ lint:
 	@PIPENV_DONT_LOAD_ENV=1 pipenv run flake8
 	@echo "${SUCCESS}✔${NC} The code is following the PEP8"
 
+ifeq (test,$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
+
 test:
 	@make development_mode_guard
 	@make check_environment
-	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate;
-	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest
-	@PIPENV_DONT_LOAD_ENV=1 pipenv run coverage report -m
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest $(RUN_ARGS)
+	@if [ ! $(RUN_ARGS) ]; then PIPENV_DONT_LOAD_ENV=1 pipenv run coverage report -m; fi;
 
 migrate:
 	@make check_environment
@@ -60,8 +65,8 @@ start_celery_worker:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@if [ ${IS_PRODUCTION} = true ]; \
-		then celery -A bothub_nlp.core.celery.tasks worker --loglevel=info; \
-		else pipenv run celery -A bothub_nlp.core.celery.tasks worker --loglevel=info; \
+		then celery worker -A bothub_nlp.core.celery -l INFO; \
+		else pipenv run celery worker -A bothub_nlp.core.celery -l INFO; \
 	fi
 
 
