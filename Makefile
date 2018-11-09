@@ -60,12 +60,17 @@ start:
 		then python -m bothub_nlp.server; \
 		else pipenv run python -m tornado.autoreload -m bothub_nlp.server; fi
 
+ifeq (start_celery_worker,$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
+
 start_celery_worker:
 	@make check_environment
 	@make migrate CHECK_ENVIRONMENT=false
 	@if [ ${IS_PRODUCTION} = true ]; \
-		then celery worker -A bothub_nlp.core.celery -c 1 -l INFO; \
-		else pipenv run celery worker -A bothub_nlp.core.celery -c 1 -l INFO; \
+		then celery worker -A bothub_nlp.core.celery -c 1 -l INFO $(RUN_ARGS); \
+		else pipenv run celery worker -A bothub_nlp.core.celery -c 1 -l INFO $(RUN_ARGS); \
 	fi
 
 
