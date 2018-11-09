@@ -20,7 +20,7 @@ class ParseHandlerTestCase(AsyncHTTPTestCase, TestCase):
     def setUp(self):
         super().setUp()
 
-        celery_app.conf.update(CELERY_ALWAYS_EAGER=True)
+        celery_app.conf.update(task_always_eager=True)
 
         self.user = User.objects.create(
             email='fake@user.com',
