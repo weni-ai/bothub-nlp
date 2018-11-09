@@ -7,6 +7,8 @@ from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
 from ... import settings
 from ...core.celery.tasks import parse_text
+from ...core.celery.actions import queue_name
+from ...core.celery.actions import ACTION_PARSE
 
 
 class ParseHandler(ApiHandler):
@@ -66,11 +68,17 @@ class ParseHandler(ApiHandler):
                 'This repository has never been trained',
                 field='language')
 
-        answer_task = parse_text.delay(
-            update.id,
-            text,
-            rasa_format=rasa_format)
+        answer_task = parse_text.apply_async(
+            args=[
+                update.id,
+                text,
+            ],
+            kwargs={
+                'rasa_format': rasa_format,
+            },
+            queue=queue_name(ACTION_PARSE, update.language))
         answer_task.wait()
+
         answer = answer_task.result
         answer.update({
             'text': text,
