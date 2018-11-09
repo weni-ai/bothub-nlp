@@ -5,7 +5,8 @@ from tornado.gen import Task
 from . import ApiHandler
 from ..utils import authorization_required
 from ... import settings
-from ...core.train import train_update
+from ...core.celery.tasks import train_update
+from ...core.celery.actions import ACTION_TRAIN, queue_name
 
 
 TRAIN_STATUS_TRAINED = 'trained'
@@ -33,7 +34,14 @@ class TrainHandler(ApiHandler):
                 continue
 
             try:
-                train_update(current_update, repository_authorization.user)
+                # train_update(current_update, repository_authorization.user)
+                train_task = train_update.apply_async(
+                    args=[
+                        current_update.id,
+                        repository_authorization.user.id,
+                    ],
+                    queue=queue_name(ACTION_TRAIN, current_update.language))
+                train_task.wait()
                 languages_report[language] = {
                     'status': TRAIN_STATUS_TRAINED,
                 }
