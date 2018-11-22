@@ -19,6 +19,8 @@ setup(
         'scikit-learn==0.20.0',
         'sklearn-crfsuite==0.3.6',
         'plac==0.9.6',
+        'celery==4.2.1',
+        'redis==2.10.6',
     ],
     python_requires='>=3.6',
 )
