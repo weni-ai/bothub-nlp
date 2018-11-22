@@ -7,7 +7,7 @@ setup(
     description='Bothub NLP service',
     packages=find_packages(),
     install_requires=[
-        'bothub-engine==1.16.0',
+        '-e git+https://github.com/Ilhasoft/bothub-engine@1.16.0#egg=bothub-engine',
         'tornado==5.1.1',
         'contextvars==2.3',
         'raven==6.9.0',
