@@ -41,6 +41,9 @@ services:
       - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
       - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
+      - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
+      - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
+      - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   worker:
     image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
     entrypoint: /home/app/celery-worker-entrypoint.sh
@@ -75,6 +78,9 @@ services:
       - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
       - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
+      - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
+      - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
+      - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   redis:
     image: redis:${REDIS_IMAGE_TAG:-latest}
     ports:
