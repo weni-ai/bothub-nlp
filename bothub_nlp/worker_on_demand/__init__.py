@@ -1,6 +1,6 @@
 import docker
 
-from time import sleep
+from time import sleep, time
 from decouple import config
 from .. import settings
 from celery_worker_on_demand import CeleryWorkerOnDemand
@@ -85,6 +85,29 @@ class MyUpWorker(UpWorker):
 
 class MyAgent(Agent):
     def flag_down(self, queue):
+        if queue.size > 0:
+            return False
+        if not queue.has_worker:
+            return False
+        service = running_services.get(self.queue.name)
+        if not service:
+            return False
+        last_interaction = 0
+        for worker in queue.workers:
+            last_interaction = sorted(
+                [
+                    last_interaction,
+                    worker.last_task_received_at,
+                    worker.last_task_started_at,
+                    worker.last_task_succeeded_at,
+                ],
+                reverse=True,
+            )[0]
+        if last_interaction == 0:
+            return False
+        last_interaction_diff = time() - last_interaction
+        if last_interaction_diff > 10 * 60:
+            return True
         return False
 
 
