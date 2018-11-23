@@ -34,3 +34,16 @@ CELERY_BROKER_URL = config(
 CELERY_BACKEND_URL = config(
     'CELERY_BACKEND_URL',
     default=CELERY_BROKER_URL)
+
+BOTHUB_NLP_WORKER_ON_DEMAND_PORT = config(
+    'BOTHUB_NLP_WORKER_ON_DEMAND_PORT',
+    default=2658,
+)
+BOTHUB_NLP_DOCKER_CLIENT_BASE_URL = config(
+    'BOTHUB_NLP_DOCKER_CLIENT_BASE_URL',
+    default='unix://var/run/docker.sock',
+)
+BOTHUB_NLP_DOCKER_IMAGE_NAME = config(
+    'BOTHUB_NLP_DOCKER_IMAGE_NAME',
+    default='ilha/bothub-nlp',
+)
