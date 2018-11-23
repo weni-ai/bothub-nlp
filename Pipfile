@@ -16,10 +16,13 @@ sklearn-crfsuite = "==0.3.6"
 plac = "==0.9.6"
 celery = "==4.2.1"
 redis = "==2.10.6"
+celery-worker-on-demand = {editable = true, git = "https://github.com/Ilhasoft/celery-worker-on-demand"}
+docker = "*"
 
 [dev-packages]
 coverage = "*"
 "flake8" = "*"
+"psycopg2-binary" = "*"
 
 [requires]
 python_version = "3.6"
