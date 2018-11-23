@@ -44,6 +44,43 @@ services:
       - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
       - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
       - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
+  worker-on-demand:
+    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
+    entrypoint: /home/app/worker-on-demand-entrypoint.sh
+    depends_on:
+      - redis
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-SK}
+      - DEBUG=${DEBUG:-true}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE}
+      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
+      - TIME_ZONE=${TIME_ZONE:-UTC}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT:-25}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-webmaster@localhost}
+      - SERVER_EMAIL=${SERVER_EMAIL:-root@localhost}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - EMAIL_USE_SSL=${EMAIL_USE_SSL:-false}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
+      - ADMINS=${ADMINS}
+      - CSRF_COOKIE_DOMAIN=${CSRF_COOKIE_DOMAIN}
+      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-false}
+      - BOTHUB_WEBAPP_BASE_URL=${BOTHUB_WEBAPP_BASE_URL:-http://localhost/}
+      - BOTHUB_NLP_BASE_URL=${BOTHUB_NLP_BASE_URL:-http://bothub-nlp:2657/}
+      - CHECK_ACCESSIBLE_API_URL=${CHECK_ACCESSIBLE_API_URL}
+      - SEND_EMAILS=${SEND_EMAILS:-true}
+      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
+      - LOGGER_FORMAT=${LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
+      - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
+      - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
+      - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
+      - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
+      - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   worker:
     image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
     entrypoint: /home/app/celery-worker-entrypoint.sh
