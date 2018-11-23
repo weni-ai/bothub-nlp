@@ -6,6 +6,7 @@ from .. import settings
 from celery_worker_on_demand import CeleryWorkerOnDemand
 from celery_worker_on_demand import Agent
 from celery_worker_on_demand import UpWorker
+from celery_worker_on_demand import DownWorker
 
 
 LABEL_KEY = 'bothub-nlp-wod.name'
@@ -83,6 +84,14 @@ class MyUpWorker(UpWorker):
             sleep(1)
 
 
+class MyDownWorker(DownWorker):
+    def run(self):
+        services_lookup()
+        service = running_services.get(self.queue.name)
+        service.remove()
+        running_services[self.queue.name] = None
+
+
 class MyAgent(Agent):
     def flag_down(self, queue):
         if queue.size > 0:
@@ -114,3 +123,4 @@ class MyAgent(Agent):
 class MyDemand(CeleryWorkerOnDemand):
     Agent = MyAgent
     UpWorker = MyUpWorker
+    DownWorker = MyDownWorker
