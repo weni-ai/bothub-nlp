@@ -34,9 +34,12 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 | PORT | `int` | `2657` | Port to run web server.
 | SUPPORTED_LANGUAGES | `string` | In development mode: `en|pt` | Set supported languages. Separe languages using `|`. You can set location follow the format: [LANGUAGE_CODE]:[LANGUAGE_LOCATION].
 | LOGGER_FORMAT | `string` | `%(asctime)s - %(name)s - %(levelname)s - %(message)s` | Logger format.
-| LOGGER_LEVEL | `int` | DEBUG = `10`` | Logger level, use logging (Python Package) pattern.
+| LOGGER_LEVEL | `int` | DEBUG = `10` | Logger level, use logging (Python Package) pattern.
 | NLP_SENTRY_CLIENT | `string` | empty | Sentry Client URL
 | CELERY_BROKER_URL | `string` | `redis://localhost:6379/0` | Celery Broker URL
 | CELERY_BACKEND_URL | `string` | The `CELERY_BROKER_URL` value | Celery Backend URL
+| BOTHUB_NLP_WORKER_ON_DEMAND_PORT | `number` | `2658` | Port to expose Celery Worker on Demand API service.
+| BOTHUB_NLP_DOCKER_CLIENT_BASE_URL | `string` | `unix://var/run/docker.sock` | Docker client API endpoint.
+| BOTHUB_NLP_DOCKER_IMAGE_NAME | `string` | `ilha/bothub-nlp` | Bothub NLP image name.
 
 Check another valid environment variables in [Bothub repository](https://github.com/Ilhasoft/bothub-engine).
