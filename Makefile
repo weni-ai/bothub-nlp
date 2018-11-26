@@ -96,7 +96,7 @@ install_development_requirements:
 
 install_production_requirements:
 	@echo "${INFO}Installing production requirements...${NC}"
-	@pipenv install --system -v
+	@pipenv install --system --deploy -v
 	@echo "${SUCCESS}✔${NC} Requirements installed"
 
 development_mode_guard:
@@ -109,6 +109,8 @@ development_mode_guard:
 _check_environment:
 	@type pipenv || (echo "${DANGER}☓${NC} Install pipenv to continue..." && exit 1)
 	@echo "${SUCCESS}✔${NC} pipenv installed"
-	@if [ ! -f "${ENVIRONMENT_VARS_FILE}" ] && [ ${IS_PRODUCTION} = false ]; then make create_environment_vars_file; fi
+	@if [ ! -f "${ENVIRONMENT_VARS_FILE}" ] && [ ${IS_PRODUCTION} = false ]; \
+		then make create_environment_vars_file; \
+	fi
 	@make install_requirements
 	@echo "${SUCCESS}✔${NC} Environment checked"

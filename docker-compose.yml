@@ -46,7 +46,7 @@ services:
       - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   worker-on-demand:
     image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
-    entrypoint: /home/app/worker-on-demand-entrypoint.sh
+    entrypoint: ./worker-on-demand-entrypoint.sh
     depends_on:
       - redis
     environment:
@@ -83,7 +83,7 @@ services:
       - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   worker:
     image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
-    entrypoint: /home/app/celery-worker-entrypoint.sh
+    entrypoint: ./celery-worker-entrypoint.sh
     depends_on:
       - redis
     environment:
