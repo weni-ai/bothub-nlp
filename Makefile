@@ -32,7 +32,7 @@ test:
 	@make development_mode_guard
 	@make check_environment
 	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate
-	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest $(RUN_ARGS)
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false ASYNC_TEST_TIMEOUT=30 pipenv run coverage run -m unittest $(RUN_ARGS)
 	@if [ ! $(RUN_ARGS) ]; then PIPENV_DONT_LOAD_ENV=1 pipenv run coverage report -m; fi;
 
 migrate:
