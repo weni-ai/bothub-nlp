@@ -13,7 +13,10 @@ from spacy.compat import symlink_to
     lang=plac.Annotation(help='Language code'),
     lang_path=plac.Annotation(help='Language path'))
 def link_lang_spacy(lang, lang_path):
-    origin_path = os.path.join(get_package_path('spacy'), 'lang', lang)
+    origin_path = os.path.join(
+        str(get_package_path('spacy').resolve()),
+        'lang',
+        lang)
     try:
         symlink_to(
             Path(origin_path),
