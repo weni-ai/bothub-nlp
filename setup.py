@@ -7,8 +7,8 @@ setup(
     description='Bothub NLP service',
     packages=find_packages(),
     dependency_links=[
-        'git+https://github.com/Ilhasoft/bothub-engine@1.16.0#egg=bothub-eng' +
-        'ine',
+        'git+https://github.com/Ilhasoft/bothub-engine@1.17.0b#egg=bothub-en' +
+        'gine',
     ],
     install_requires=[
         'tornado==5.1.1',
@@ -23,5 +23,5 @@ setup(
         'celery==4.2.1',
         'redis==2.10.6',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.4',
 )
