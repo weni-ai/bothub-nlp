@@ -6,4 +6,4 @@ RUN if [ ${DOWNLOAD_LANGUAGES_MODELS} ]; \
     fi
 ENV DOWNLOADED_LANGUAGES_MODELS ${DOWNLOAD_LANGUAGES_MODELS}
 
-ENTRYPOINT ./worker-entrypoint.sh
+ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp.core.celery", "-c", "1", "-l", "INFO", "-E" ]

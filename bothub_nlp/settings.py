@@ -47,3 +47,11 @@ BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME = config(
     'BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME',
     default='ilha/bothub-nlp',
 )
+BOTHUB_NLP_WORKER_DOWN_TIME = config(
+    'BOTHUB_NLP_WORKER_DOWN_TIME',
+    cast=int,
+    default=10,
+)
+BOTHUB_NLP_WORKER_NETWORK = config(
+    'BOTHUB_NLP_WORKER_NETWORK',
+    default='bothub-nlp')

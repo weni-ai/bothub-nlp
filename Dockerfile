@@ -33,6 +33,6 @@ COPY . .
 
 RUN make -s import_ilha_spacy_langs CHECK_ENVIRONMENT=false
 
-RUN chmod +x ./entrypoint.sh ./worker-entrypoint.sh ./worker-on-demand-entrypoint.sh
+RUN chmod +x ./entrypoint.sh ./worker-on-demand-entrypoint.sh
 
 ENTRYPOINT $WORKDIR/entrypoint.sh

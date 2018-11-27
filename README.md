@@ -41,5 +41,7 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 | BOTHUB_NLP_WORKER_ON_DEMAND_PORT | `number` | `2658` | Port to expose Celery Worker on Demand API service.
 | BOTHUB_NLP_DOCKER_CLIENT_BASE_URL | `string` | `unix://var/run/docker.sock` | Docker client API endpoint.
 | BOTHUB_NLP_DOCKER_IMAGE_NAME | `string` | `ilha/bothub-nlp` | Bothub NLP image name.
+| BOTHUB_NLP_WORKER_DOWN_TIME | `int` | `10` | Down worker after [x] minutes without interaction.
+| BOTHUB_NLP_WORKER_NETWORK | `string` | `bothub-nlp` | Docker network to connect worker service.
 
 Check another valid environment variables in [Bothub repository](https://github.com/Ilhasoft/bothub-engine).
