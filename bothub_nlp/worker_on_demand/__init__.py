@@ -102,9 +102,7 @@ class MyUpWorker(UpWorker):
                 labels={
                     LABEL_KEY: self.queue.name,
                 },
-                networks=[
-                    settings.BOTHUB_NLP_WORKER_NETWORK,
-                ],
+                networks=settings.BOTHUB_NLP_WORKER_NETWORKS,
             )
         while not self.queue.has_worker:
             sleep(1)

@@ -52,6 +52,7 @@ BOTHUB_NLP_WORKER_DOWN_TIME = config(
     cast=int,
     default=10,
 )
-BOTHUB_NLP_WORKER_NETWORK = config(
-    'BOTHUB_NLP_WORKER_NETWORK',
+BOTHUB_NLP_WORKER_NETWORKS = config(
+    'BOTHUB_NLP_WORKER_NETWORKS',
+    cast=lambda v: [s.strip() for s in v.split(',')],
     default='bothub-nlp')
