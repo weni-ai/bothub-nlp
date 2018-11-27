@@ -33,11 +33,6 @@ COPY . .
 
 RUN make -s import_ilha_spacy_langs CHECK_ENVIRONMENT=false
 
-ARG DOWNLOAD_LANGUAGES_MODELS
-RUN if [ ${DOWNLOAD_LANGUAGES_MODELS} ]; \
-        then python scripts/download_spacy_models.py ${DOWNLOAD_LANGUAGES_MODELS}; \
-    fi
-ENV DOWNLOADED_LANGUAGES_MODELS ${DOWNLOAD_LANGUAGES_MODELS}
+RUN chmod +x ./entrypoint.sh ./worker-entrypoint.sh ./worker-on-demand-entrypoint.sh
 
-RUN chmod +x ./entrypoint.sh ./celery-worker-entrypoint.sh ./worker-on-demand-entrypoint.sh
 ENTRYPOINT $WORKDIR/entrypoint.sh

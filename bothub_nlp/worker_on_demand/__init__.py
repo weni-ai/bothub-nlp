@@ -43,7 +43,7 @@ ENV_LIST = [
         'CELERY_BACKEND_URL',
         'BOTHUB_NLP_WORKER_ON_DEMAND_PORT',
         'BOTHUB_NLP_DOCKER_CLIENT_BASE_URL',
-        'BOTHUB_NLP_DOCKER_IMAGE_NAME',
+        'BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME',
     ]
 ]
 
@@ -70,7 +70,8 @@ class MyUpWorker(UpWorker):
         if not service:
             queue_language = self.queue.name.split(':')[1]
             docker_client.services.create(
-                f'{settings.BOTHUB_NLP_DOCKER_IMAGE_NAME}:{queue_language}',
+                f'{settings.BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME}:' +
+                f'{queue_language}',
                 [
                     '-Q',
                     self.queue.name,

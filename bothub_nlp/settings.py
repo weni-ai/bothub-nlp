@@ -43,7 +43,7 @@ BOTHUB_NLP_DOCKER_CLIENT_BASE_URL = config(
     'BOTHUB_NLP_DOCKER_CLIENT_BASE_URL',
     default='unix://var/run/docker.sock',
 )
-BOTHUB_NLP_DOCKER_IMAGE_NAME = config(
-    'BOTHUB_NLP_DOCKER_IMAGE_NAME',
+BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME = config(
+    'BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME',
     default='ilha/bothub-nlp',
 )

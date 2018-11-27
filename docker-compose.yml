@@ -6,8 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        DOWNLOAD_LANGUAGES_MODELS: ${DOWNLOAD_LANGUAGES_MODELS:-}
     depends_on:
       - redis
     ports:
@@ -43,7 +41,7 @@ services:
       - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
       - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
       - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
-      - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
+      - BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME=${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   worker-on-demand:
     image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
     entrypoint: ./worker-on-demand-entrypoint.sh
@@ -80,10 +78,14 @@ services:
       - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
       - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
       - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
-      - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
+      - BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME=${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   worker:
-    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
-    entrypoint: ./celery-worker-entrypoint.sh
+    image: ${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_WORKER_DOCKER_IMAGE_TAG:-worker}
+    build:
+      context: .
+      dockerfile: worker.Dockerfile
+      args:
+        DOWNLOAD_LANGUAGES_MODELS: ${DOWNLOAD_LANGUAGES_MODELS:-}
     depends_on:
       - redis
     environment:
@@ -117,7 +119,7 @@ services:
       - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
       - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
       - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
-      - BOTHUB_NLP_DOCKER_IMAGE_NAME=${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
+      - BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME=${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
   redis:
     image: redis:${REDIS_IMAGE_TAG:-latest}
     ports:
