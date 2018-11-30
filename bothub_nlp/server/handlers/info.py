@@ -1,7 +1,7 @@
 from tornado.web import asynchronous
 from tornado.gen import coroutine
 
-from bothub.api.serializers.repository import RepositorySerializer
+from bothub.api.v1.serializers.repository import RepositorySerializer
 
 from . import ApiHandler
 from ..utils import authorization_required
