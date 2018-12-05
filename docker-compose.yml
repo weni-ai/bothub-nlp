@@ -45,7 +45,7 @@ services:
       - BOTHUB_NLP_WORKER_DOWN_TIME=${BOTHUB_NLP_WORKER_DOWN_TIME:-10}
       - BOTHUB_NLP_WORKER_NETWORKS=${BOTHUB_NLP_WORKER_NETWORKS:-bothub-nlp}
   worker-on-demand:
-    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
+    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_WOD_DOCKER_IMAGE_TAG:-worker-on-demand}
     entrypoint: ./worker-on-demand-entrypoint.sh
     depends_on:
       - redis
