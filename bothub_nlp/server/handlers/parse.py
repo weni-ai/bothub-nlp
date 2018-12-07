@@ -1,17 +1,19 @@
-from tornado.web import asynchronous
-from tornado.gen import coroutine
+import tornado.web
+from tornado import gen
 
 from . import ApiHandler
 from ..utils import ValidationError
 from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
 from ... import settings
-from ...core.parse import parse_text
+from ...core.celery.tasks import parse_text
+from ...core.celery.actions import queue_name
+from ...core.celery.actions import ACTION_PARSE
 
 
 class ParseHandler(ApiHandler):
-    @asynchronous
-    @coroutine
+    @tornado.web.asynchronous
+    @gen.engine
     def get(self):
         text = self.get_argument('text', default=None)
         language = self.get_argument('language', default=None)
@@ -23,8 +25,8 @@ class ParseHandler(ApiHandler):
 
         self._parse(text, language, rasa_format)
 
-    @asynchronous
-    @coroutine
+    @tornado.web.asynchronous
+    @gen.engine
     @authorization_required
     def post(self):
         text = self.get_argument('text', default=None)
@@ -66,7 +68,18 @@ class ParseHandler(ApiHandler):
                 'This repository has never been trained',
                 field='language')
 
-        answer = parse_text(update, text, rasa_format=rasa_format)
+        answer_task = parse_text.apply_async(
+            args=[
+                update.id,
+                text,
+            ],
+            kwargs={
+                'rasa_format': rasa_format,
+            },
+            queue=queue_name(ACTION_PARSE, update.language))
+        answer_task.wait()
+
+        answer = answer_task.result
         answer.update({
             'text': text,
             'update_id': update.id,
