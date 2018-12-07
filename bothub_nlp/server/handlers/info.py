@@ -1,7 +1,7 @@
 import tornado.web
 from tornado import gen
 
-from bothub.api.v2.repository.serializers import ShortRepositorySerializer
+from bothub.api.v1.serializers.repository import RepositorySerializer
 
 from . import ApiHandler
 from ..utils import authorization_required

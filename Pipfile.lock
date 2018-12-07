@@ -601,6 +601,7 @@
                 "sha256:f8a57cbda46a94ed0db55b73e6ab0c15e78b4ede8690fa491a0e55128d552bb0",
                 "sha256:fcea97a352416afcbccd7af9625159d80704a25c519c251c734527329bb20d0e"
             ],
+            "index": "pypi",
             "version": "==0.5.6"
         },
         "msgpack-numpy": {
