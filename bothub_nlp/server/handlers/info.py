@@ -14,5 +14,5 @@ class InfoHandler(ApiHandler):
     def get(self):
         repository_authorization = self.repository_authorization()
         repository = repository_authorization.repository
-        serializer = ShortRepositorySerializer(repository)
+        serializer = RepositorySerializer(repository)
         self.finish(serializer.data)
