@@ -6,7 +6,10 @@ from .. import settings
 from . import MyDemand
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    format='%(levelname)-8s -- %(asctime)-15s --- %(name)s - %(message)s',
+    level=logging.INFO,
+)
 MyDemand(
     celery_app,
     api_server_address=(
