@@ -1,5 +1,6 @@
 import logging
 import tornado.ioloop
+import multiprocessing
 
 from tornado.web import Application, url
 from tornado.httpserver import HTTPServer
@@ -57,7 +58,8 @@ def load_app():
     else:
         server = HTTPServer(app)
         server.listen(settings.PORT)
-        server.start(0)
+        cpu_count = multiprocessing.cpu_count()
+        server.start(cpu_count * 2 if cpu_count > 4 else 8)
 
 
 def start():
