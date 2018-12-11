@@ -1,5 +1,5 @@
-from tornado.web import asynchronous
-from tornado.gen import coroutine
+import tornado.web
+from tornado import gen
 
 from bothub.api.v1.serializers.repository import RepositorySerializer
 
@@ -8,8 +8,8 @@ from ..utils import authorization_required
 
 
 class InfoHandler(ApiHandler):
-    @asynchronous
-    @coroutine
+    @tornado.web.asynchronous
+    @gen.engine
     @authorization_required
     def get(self):
         repository_authorization = self.repository_authorization()

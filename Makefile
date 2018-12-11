@@ -20,16 +20,20 @@ install_requirements:
 
 lint:
 	@make development_mode_guard
-	@make check_environment
 	@PIPENV_DONT_LOAD_ENV=1 pipenv run flake8
 	@echo "${SUCCESS}✔${NC} The code is following the PEP8"
+
+ifeq (test,$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
 
 test:
 	@make development_mode_guard
 	@make check_environment
-	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate;
-	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false pipenv run coverage run -m unittest
-	@PIPENV_DONT_LOAD_ENV=1 pipenv run coverage report -m
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE}" pipenv run django-admin migrate
+	@PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false ASYNC_TEST_TIMEOUT=30 pipenv run coverage run -m unittest $(RUN_ARGS)
+	@if [ ! $(RUN_ARGS) ]; then PIPENV_DONT_LOAD_ENV=1 pipenv run coverage report -m; fi;
 
 migrate:
 	@make check_environment
@@ -56,6 +60,19 @@ start:
 		then python -m bothub_nlp.server; \
 		else pipenv run python -m tornado.autoreload -m bothub_nlp.server; fi
 
+ifeq (start_celery_worker,$(firstword $(MAKECMDGOALS)))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
+
+start_celery_worker:
+	@make check_environment
+	@make migrate CHECK_ENVIRONMENT=false
+	@if [ ${IS_PRODUCTION} = true ]; \
+		then celery worker -A bothub_nlp.core.celery -c 1 -l INFO $(RUN_ARGS); \
+		else pipenv run celery worker -A bothub_nlp.core.celery -c 1 -l INFO $(RUN_ARGS); \
+	fi
+
 
 # Utils
 
@@ -79,7 +96,7 @@ install_development_requirements:
 
 install_production_requirements:
 	@echo "${INFO}Installing production requirements...${NC}"
-	@pipenv install --system -v
+	@pipenv install --system --deploy -v
 	@echo "${SUCCESS}✔${NC} Requirements installed"
 
 development_mode_guard:
@@ -92,6 +109,8 @@ development_mode_guard:
 _check_environment:
 	@type pipenv || (echo "${DANGER}☓${NC} Install pipenv to continue..." && exit 1)
 	@echo "${SUCCESS}✔${NC} pipenv installed"
-	@if [ ! -f "${ENVIRONMENT_VARS_FILE}" ] && [ ${IS_PRODUCTION} = false ]; then make create_environment_vars_file; fi
+	@if [ ! -f "${ENVIRONMENT_VARS_FILE}" ] && [ ${IS_PRODUCTION} = false ]; \
+		then make create_environment_vars_file; \
+	fi
 	@make install_requirements
 	@echo "${SUCCESS}✔${NC} Environment checked"

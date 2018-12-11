@@ -1,7 +1,9 @@
 import logging
 import tornado.ioloop
+import multiprocessing
 
 from tornado.web import Application, url
+from tornado.httpserver import HTTPServer
 from raven.contrib.tornado import AsyncSentryClient
 from bothub.common import languages
 
@@ -47,9 +49,17 @@ def make_app():
 def load_app():
     global app
     app = make_app()
+
     if settings.SENTRY_CLIENT:
         app.sentry_client = AsyncSentryClient(settings.SENTRY_CLIENT)
-    app.listen(settings.PORT)
+
+    if settings.DEVELOPMENT_MODE:
+        app.listen(settings.PORT)
+    else:
+        server = HTTPServer(app)
+        server.listen(settings.PORT)
+        cpu_count = multiprocessing.cpu_count()
+        server.start(cpu_count * 2 if cpu_count > 4 else 8)
 
 
 def start():
