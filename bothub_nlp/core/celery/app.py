@@ -12,13 +12,13 @@ celery_app = Celery(
     backend=settings.CELERY_BACKEND_URL,
     broker=settings.CELERY_BROKER_URL)
 
-queues_name = [
+queues_name = set([
     queue_name(ACTION_PARSE, lang)
     for lang in settings.SUPPORTED_LANGUAGES.keys()
 ] + [
     queue_name(ACTION_TRAIN, lang)
     for lang in settings.SUPPORTED_LANGUAGES.keys()
-]
+])
 celery_app.conf.task_queues = [
     Queue(queue)
     for queue in queues_name
