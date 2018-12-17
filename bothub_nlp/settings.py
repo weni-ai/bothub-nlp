@@ -60,3 +60,7 @@ BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE = config(
     'BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE',
     cast=bool,
     default=True)
+BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER = config(
+    'BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER',
+    cast=bool,
+    default=True)
