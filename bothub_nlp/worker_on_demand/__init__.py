@@ -76,7 +76,8 @@ class MyUpWorker(UpWorker):
         services_lookup()
         service = running_services.get(self.queue.name)
         if not service:
-            queue_language = self.queue.name.split(':')[1]
+            queue_language = self.queue.name.split(':')[1] \
+                if ':' in self.queue.name else self.queue.name
             docker_client.services.create(
                 f'{settings.BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME}:' +
                 f'{queue_language}',
