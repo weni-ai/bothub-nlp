@@ -45,6 +45,10 @@ ENV_LIST = [
         'BOTHUB_NLP_WORKER_ON_DEMAND_PORT',
         'BOTHUB_NLP_DOCKER_CLIENT_BASE_URL',
         'BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME',
+        'BOTHUB_NLP_WORKER_DOWN_TIME',
+        'BOTHUB_NLP_WORKER_NETWORKS',
+        'BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE',
+        'BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER',
     ]
 ]
 
@@ -76,7 +80,11 @@ class MyUpWorker(UpWorker):
         services_lookup()
         service = running_services.get(self.queue.name)
         if not service:
-            queue_language = self.queue.name.split(':')[1]
+            queue_language = self.queue.name.split(':')[1] \
+                if ':' in self.queue.name else self.queue.name
+            constraints = []
+            if settings.BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER:
+                constraints.append('node.role == worker')
             docker_client.services.create(
                 f'{settings.BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME}:' +
                 f'{queue_language}',
@@ -103,6 +111,7 @@ class MyUpWorker(UpWorker):
                     LABEL_KEY: self.queue.name,
                 },
                 networks=settings.BOTHUB_NLP_WORKER_NETWORKS,
+                constraints=constraints,
             )
         while not self.queue.has_worker:
             sleep(1)
