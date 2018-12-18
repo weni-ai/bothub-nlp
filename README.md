@@ -43,5 +43,7 @@ Docker images available in [Bothub NLP's Docker Hub repository](https://hub.dock
 | BOTHUB_NLP_DOCKER_IMAGE_NAME | `string` | `ilha/bothub-nlp` | Bothub NLP image name.
 | BOTHUB_NLP_WORKER_DOWN_TIME | `int` | `10` | Down worker after [x] minutes without interaction.
 | BOTHUB_NLP_WORKER_NETWORKS | `string` | `bothub-nlp` | Docker networks should be separated per `,` to connect worker service.
+| BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE | `boolean` | `true` | Agroup language celery queue, if `true` there will be only one queue per language.
+| BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER | `boolean` | `true` | Block WOD up containers in swarm manager.
 
 Check another valid environment variables in [Bothub repository](https://github.com/Ilhasoft/bothub-engine).

@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 
 setup(
     name='bothub-nlp',
-    version='1.2.1',
+    version='1.3.0',
     description='Bothub NLP service',
     packages=find_packages(),
     dependency_links=[
         'git+https://github.com/Ilhasoft/bothub-engine@1.17.0#egg=bothub-en' +
         'gine',
-        'git+https://github.com/Ilhasoft/celery-worker-on-demand@0.1.1#egg=' +
+        'git+https://github.com/Ilhasoft/celery-worker-on-demand@0.1.2#egg=' +
         'celery-worker-on-demand',
     ],
     install_requires=[
