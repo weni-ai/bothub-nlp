@@ -56,3 +56,11 @@ BOTHUB_NLP_WORKER_NETWORKS = config(
     'BOTHUB_NLP_WORKER_NETWORKS',
     cast=lambda v: [s.strip() for s in v.split(',')],
     default='bothub-nlp')
+BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE = config(
+    'BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE',
+    cast=bool,
+    default=True)
+BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER = config(
+    'BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER',
+    cast=bool,
+    default=True)

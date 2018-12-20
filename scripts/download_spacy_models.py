@@ -42,6 +42,7 @@ def download_spacy_models(languages=None, debug=False):
                 'pip',
                 'install',
                 '--no-deps',
+                '--no-cache-dir',
                 pip_package,
             ]
             logger.debug(' '.join(cmd))

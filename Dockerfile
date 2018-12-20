@@ -17,6 +17,7 @@ FROM base
 ENV PATH="/usr/local/lib/python3.6/site-packages/bin:${PATH}"
 ENV WORKDIR /root
 ENV IS_PRODUCTION true
+ENV DEVELOPMENT_MODE false
 ENV PORT 2657
 
 WORKDIR $WORKDIR
