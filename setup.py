@@ -9,7 +9,7 @@ setup(
     dependency_links=[
         'git+https://github.com/Ilhasoft/bothub-engine@1.17.0#egg=bothub-en' +
         'gine',
-        'git+https://github.com/Ilhasoft/celery-worker-on-demand@0.1.2#egg=' +
+        'git+https://github.com/Ilhasoft/celery-worker-on-demand@0.1.3#egg=' +
         'celery-worker-on-demand',
     ],
     install_requires=[
