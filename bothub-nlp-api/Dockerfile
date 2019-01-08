@@ -11,11 +11,11 @@ COPY bothub-nlp-api/Pipfile .
 COPY bothub-nlp-api/Pipfile.lock .
 
 RUN apk update \
-    && apk --virtual .build-dependencies add \
+    && apk add --virtual .build-dependencies --no-cache \
         alpine-sdk \
         git \
         python3-dev \
-    && apk add postgresql-dev \
+    && apk add --no-cache postgresql-dev \
     && pip install pipenv psycopg2-binary \
     && pipenv install --system --deploy \
     && apk del .build-dependencies \
