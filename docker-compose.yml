@@ -1,140 +1,33 @@
-version: '3'
+# Attention:
+# Use this docker-compose to:
+# - Up development environment: docker-compose up
+# - Build docker images: docker-compose build
+
+version: '3.6'
 
 services:
-  bothub-nlp:
-    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
+  bothub-nlp-api:
+    image: ilha/bothub-nlp-api:${BOTHUB_NLP_API_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: bothub-nlp-api/Dockerfile
     depends_on:
-      - redis
-    ports:
-      - 2657:2657
+      - bothub-nlp-celery-redis
     environment:
+      # bothub-engine env vars
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
-      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE}
-      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
-      - TIME_ZONE=${TIME_ZONE:-UTC}
-      - EMAIL_HOST=${EMAIL_HOST}
-      - EMAIL_PORT=${EMAIL_PORT:-25}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-webmaster@localhost}
-      - SERVER_EMAIL=${SERVER_EMAIL:-root@localhost}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
-      - EMAIL_USE_SSL=${EMAIL_USE_SSL:-false}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
-      - ADMINS=${ADMINS}
-      - CSRF_COOKIE_DOMAIN=${CSRF_COOKIE_DOMAIN}
-      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-false}
-      - BOTHUB_WEBAPP_BASE_URL=${BOTHUB_WEBAPP_BASE_URL:-http://localhost/}
-      - BOTHUB_NLP_BASE_URL=${BOTHUB_NLP_BASE_URL:-http://bothub-nlp:2657/}
-      - CHECK_ACCESSIBLE_API_URL=${CHECK_ACCESSIBLE_API_URL}
-      - SEND_EMAILS=${SEND_EMAILS:-true}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@localhost:5432/postgres}
+      # bothub-nlp env vars
+      - BOTHUB_NLP_DEBUG=${BOTHUB_NLP_DEBUG:-true}
+      - BOTHUB_NLP_DEVELOPMENT_MODE=${BOTHUB_NLP_DEVELOPMENT_MODE:-false}
+      - BOTHUB_NLP_SENTRY_CLIENT=${BOTHUB_NLP_SENTRY_CLIENT}
       - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
-      - LOGGER_FORMAT=${LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
-      - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
-      - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
-      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
-      - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
-      - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
-      - BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME=${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
-      - BOTHUB_NLP_WORKER_DOWN_TIME=${BOTHUB_NLP_WORKER_DOWN_TIME:-10}
-      - BOTHUB_NLP_WORKER_NETWORKS=${BOTHUB_NLP_WORKER_NETWORKS:-bothub-nlp}
-      - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE:-true}
-      - BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER=${BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER:-true}
-  worker-on-demand:
-    image: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_WOD_DOCKER_IMAGE_TAG:-worker-on-demand}
-    entrypoint: ./worker-on-demand-entrypoint.sh
-    depends_on:
-      - redis
-    environment:
-      - SECRET_KEY=${SECRET_KEY:-SK}
-      - DEBUG=${DEBUG:-true}
-      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE}
-      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
-      - TIME_ZONE=${TIME_ZONE:-UTC}
-      - EMAIL_HOST=${EMAIL_HOST}
-      - EMAIL_PORT=${EMAIL_PORT:-25}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-webmaster@localhost}
-      - SERVER_EMAIL=${SERVER_EMAIL:-root@localhost}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
-      - EMAIL_USE_SSL=${EMAIL_USE_SSL:-false}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
-      - ADMINS=${ADMINS}
-      - CSRF_COOKIE_DOMAIN=${CSRF_COOKIE_DOMAIN}
-      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-false}
-      - BOTHUB_WEBAPP_BASE_URL=${BOTHUB_WEBAPP_BASE_URL:-http://localhost/}
-      - BOTHUB_NLP_BASE_URL=${BOTHUB_NLP_BASE_URL:-http://bothub-nlp:2657/}
-      - CHECK_ACCESSIBLE_API_URL=${CHECK_ACCESSIBLE_API_URL}
-      - SEND_EMAILS=${SEND_EMAILS:-true}
-      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
-      - LOGGER_FORMAT=${LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
-      - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
-      - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
-      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
-      - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
-      - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
-      - BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME=${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
-      - BOTHUB_NLP_WORKER_DOWN_TIME=${BOTHUB_NLP_WORKER_DOWN_TIME:-10}
-      - BOTHUB_NLP_WORKER_NETWORKS=${BOTHUB_NLP_WORKER_NETWORKS:-bothub-nlp}
-      - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE:-true}
-      - BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER=${BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER:-true}
-  worker:
-    image: ${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}:${BOTHUB_NLP_WORKER_DOCKER_IMAGE_TAG:-worker}
-    build:
-      context: .
-      dockerfile: worker.Dockerfile
-      args:
-        BOTHUB_NLP_DOCKER_IMAGE_NAME: ${BOTHUB_NLP_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
-        BOTHUB_NLP_DOCKER_IMAGE_TAG: ${BOTHUB_NLP_DOCKER_IMAGE_TAG:-latest}
-        DOWNLOAD_LANGUAGES_MODELS: ${DOWNLOAD_LANGUAGES_MODELS:-}
-    depends_on:
-      - redis
-    environment:
-      - SECRET_KEY=${SECRET_KEY:-SK}
-      - DEBUG=${DEBUG:-true}
-      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE:-false}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE}
-      - LANGUAGE_CODE=${LANGUAGE_CODE:-en-us}
-      - TIME_ZONE=${TIME_ZONE:-UTC}
-      - EMAIL_HOST=${EMAIL_HOST}
-      - EMAIL_PORT=${EMAIL_PORT:-25}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-webmaster@localhost}
-      - SERVER_EMAIL=${SERVER_EMAIL:-root@localhost}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
-      - EMAIL_USE_SSL=${EMAIL_USE_SSL:-false}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
-      - ADMINS=${ADMINS}
-      - CSRF_COOKIE_DOMAIN=${CSRF_COOKIE_DOMAIN}
-      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-false}
-      - BOTHUB_WEBAPP_BASE_URL=${BOTHUB_WEBAPP_BASE_URL:-http://localhost/}
-      - BOTHUB_NLP_BASE_URL=${BOTHUB_NLP_BASE_URL:-http://bothub-nlp:2657/}
-      - CHECK_ACCESSIBLE_API_URL=${CHECK_ACCESSIBLE_API_URL}
-      - SEND_EMAILS=${SEND_EMAILS:-true}
-      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
-      - LOGGER_FORMAT=${LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
-      - LOGGER_LEVEL=${LOGGER_LEVEL:-10}
-      - NLP_SENTRY_CLIENT=${NLP_SENTRY_CLIENT}
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
-      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
-      - BOTHUB_NLP_WORKER_ON_DEMAND_PORT=${BOTHUB_NLP_WORKER_ON_DEMAND_PORT:-2658}
-      - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
-      - BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME=${BOTHUB_NLP_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp}
-      - BOTHUB_NLP_WORKER_DOWN_TIME=${BOTHUB_NLP_WORKER_DOWN_TIME:-10}
-      - BOTHUB_NLP_WORKER_NETWORKS=${BOTHUB_NLP_WORKER_NETWORKS:-bothub-nlp}
-      - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE:-true}
-      - BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER=${BOTHUB_NLP_WORKER_BLOCK_ON_SWARM_MANAGER:-true}
-  redis:
-    image: redis:${REDIS_IMAGE_TAG:-latest}
+      # bothub-nlp-celery env vars
+      - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-}
+      - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL}
+      - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE}
+  bothub-nlp-celery-redis:
+    image: redis
     ports:
       - 6379:6379

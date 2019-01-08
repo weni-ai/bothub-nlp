@@ -19,3 +19,6 @@ insert_final_newline = true
 
 [Makefile]
 indent_style = tab
+
+[{Makefile,Dockerfile,.editorconfig,README.md}]
+insert_final_newline = true
