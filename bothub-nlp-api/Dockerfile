@@ -3,14 +3,6 @@ FROM python:3.6-alpine
 ENV WORKDIR /root/app
 ENV BOTHUB_NLP_API_PORT 2657
 
-RUN apk update \
-    && apk --virtual .build-dependencies add \
-        alpine-sdk \
-        git \
-        python3-dev \
-    && apk add postgresql-dev \
-    && pip install pipenv psycopg2-binary
-
 WORKDIR $WORKDIR
 
 COPY bothub-nlp ../bothub-nlp
@@ -18,7 +10,14 @@ COPY bothub-nlp-celery ../bothub-nlp-celery
 COPY bothub-nlp-api/Pipfile .
 COPY bothub-nlp-api/Pipfile.lock .
 
-RUN pipenv install --system --deploy \
+RUN apk update \
+    && apk --virtual .build-dependencies add \
+        alpine-sdk \
+        git \
+        python3-dev \
+    && apk add postgresql-dev \
+    && pip install pipenv psycopg2-binary \
+    && pipenv install --system --deploy \
     && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
 
