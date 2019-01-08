@@ -9,13 +9,14 @@ start = "python -m tornado.autoreload -m bothub_nlp_api"
 [packages]
 tornado = "==5.1.1"
 raven = "*"
-bothub-engine = {editable = true, ref = "1.17.0", git = "https://github.com/Ilhasoft/bothub-engine"}
+bothub-engine = {editable = true, ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engine"}
 bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
 python-decouple = "*"
 bothub-nlp = {path = "./../bothub-nlp"}
 
 [dev-packages]
 redis = "*"
+"psycopg2-binary" = "*"
 
 [requires]
 python_version = "3.6"
