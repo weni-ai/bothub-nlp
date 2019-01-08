@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+start = "celery worker -A bothub_nlp_nlu_worker.celery_app"
+
+[packages]
+bothub-engine = {editable = true, ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engine"}
+bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
+bothub-nlp-nlu = {path = "./../bothub-nlp-nlu"}
+bothub-nlp = {path = "./../bothub-nlp"}
+"psycopg2-binary" = "*"
+
+[dev-packages]
+redis = "*"
+
+[requires]
+python_version = "3.6"
