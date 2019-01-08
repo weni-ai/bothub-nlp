@@ -11,6 +11,8 @@ services:
     build:
       context: .
       dockerfile: bothub-nlp-api/Dockerfile
+    ports:
+      - 2657:2657
     depends_on:
       - bothub-nlp-celery-redis
     networks:
@@ -29,6 +31,9 @@ services:
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-}
       - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL}
       - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE}
+      # env vars
+      - BOTHUB_NLP_API_LOGGER_FORMAT=${BOTHUB_NLP_API_LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
+      - BOTHUB_NLP_API_LOGGER_LEVEL=${BOTHUB_NLP_API_LOGGER_LEVEL:-10}
 
   bothub-nlp-celery-redis:
     image: redis

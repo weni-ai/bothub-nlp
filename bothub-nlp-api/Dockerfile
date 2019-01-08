@@ -1,5 +1,8 @@
 FROM python:3.6-alpine
 
+ENV WORKDIR /root/app
+ENV BOTHUB_NLP_API_PORT 2657
+
 RUN apk update \
     && apk --virtual .build-dependencies add \
         alpine-sdk \
@@ -7,8 +10,6 @@ RUN apk update \
         python3-dev \
     && apk add postgresql-dev \
     && pip install pipenv psycopg2-binary
-
-ENV WORKDIR /root/app
 
 WORKDIR $WORKDIR
 
