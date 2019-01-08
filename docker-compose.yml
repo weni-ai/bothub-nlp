@@ -13,11 +13,13 @@ services:
       dockerfile: bothub-nlp-api/Dockerfile
     depends_on:
       - bothub-nlp-celery-redis
+    networks:
+      - bothub
     environment:
       # bothub-engine env vars
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@localhost:5432/postgres}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@database:5432/postgres}
       # bothub-nlp env vars
       - BOTHUB_NLP_DEBUG=${BOTHUB_NLP_DEBUG:-true}
       - BOTHUB_NLP_DEVELOPMENT_MODE=${BOTHUB_NLP_DEVELOPMENT_MODE:-false}
@@ -27,7 +29,12 @@ services:
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-}
       - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL}
       - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE}
+
   bothub-nlp-celery-redis:
     image: redis
     ports:
       - 6379:6379
+
+networks:
+  bothub:
+    external: true

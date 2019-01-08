@@ -5,7 +5,7 @@ RUN apk update \
         alpine-sdk \
         git \
         python3-dev \
-        postgresql-dev \
+    && apk add postgresql-dev \
     && pip install pipenv psycopg2-binary
 
 ENV WORKDIR /root/app
