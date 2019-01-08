@@ -6,7 +6,7 @@ from rest_framework import status
 from raven.contrib.tornado import SentryMixin
 from bothub.common.models import RepositoryAuthorization
 
-from .. import settings
+from bothub_nlp import settings as bothub_nlp_settings
 from ..utils import ApiError, ValidationError
 
 
@@ -40,7 +40,7 @@ class ApiHandler(SentryMixin, RequestHandler):
         if exc_info:
             error_class, error, traceback_instance = exc_info
 
-            if settings.DEBUG:
+            if bothub_nlp_settings.BOTHUB_NLP_DEBUG:
                 r['traceback'] = traceback.format_exception(
                     error_class, error, traceback_instance)
 

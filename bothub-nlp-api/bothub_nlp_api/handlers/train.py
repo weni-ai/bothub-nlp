@@ -5,10 +5,10 @@ from tornado.gen import Task
 from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 from bothub_nlp_celery.app import celery_app
+from bothub_nlp import settings as bothub_nlp_settings
 
 from . import ApiHandler
 from ..utils import authorization_required
-from . import settings
 
 
 TRAIN_STATUS_TRAINED = 'trained'
@@ -26,7 +26,7 @@ class TrainHandler(ApiHandler):
 
         languages_report = {}
 
-        for language in settings.SUPPORTED_LANGUAGES.keys():
+        for language in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys():
             current_update = repository.current_update(language)
 
             if not current_update.ready_for_train:
@@ -51,7 +51,7 @@ class TrainHandler(ApiHandler):
                 from .. import logger
                 logger.exception(e)
 
-                if settings.SENTRY_CLIENT:
+                if bothub_nlp_settings.BOTHUB_NLP_SENTRY_CLIENT:
                     yield Task(self.captureException, exc_info=True)
 
                 languages_report[language] = {
@@ -60,6 +60,6 @@ class TrainHandler(ApiHandler):
                 }
 
         self.finish({
-            'SUPPORTED_LANGUAGES': list(settings.SUPPORTED_LANGUAGES.keys()),
+            'SUPPORTED_LANGUAGES': list(bothub_nlp_settings.SUPPORTED_LANGUAGES.keys()),
             'languages_report': languages_report,
         })
