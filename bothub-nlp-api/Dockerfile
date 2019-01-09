@@ -16,7 +16,7 @@ RUN apk update \
         git \
         python3-dev \
     && apk add --no-cache postgresql-dev \
-    && pip install pipenv psycopg2-binary \
+    && pip install pipenv psycopg2-binary redis \
     && pipenv install --system --deploy \
     && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
