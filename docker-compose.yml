@@ -29,12 +29,39 @@ services:
       - BOTHUB_NLP_SENTRY_CLIENT=${BOTHUB_NLP_SENTRY_CLIENT}
       - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
       # bothub-nlp-celery env vars
-      - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-}
-      - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL}
+      - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
+      - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL:-redis://bothub-nlp-celery-redis:6379/0}
       - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE}
       # env vars
       - BOTHUB_NLP_API_LOGGER_FORMAT=${BOTHUB_NLP_API_LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
       - BOTHUB_NLP_API_LOGGER_LEVEL=${BOTHUB_NLP_API_LOGGER_LEVEL:-10}
+
+  bothub-nlp-nlu-worker:
+    image: ilha/bothub-nlp-nlu-worker:${BOTHUB_NLP_NLU_DOCKER_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: bothub-nlp-nlu-worker/Dockerfile
+      args:
+        DOWNLOAD_SPACY_MODELS: ${DOWNLOAD_SPACY_MODELS_ON_DOCKER_BUILD}
+    depends_on:
+      - bothub-nlp-celery-redis
+    networks:
+      - default
+      - bothub
+    environment:
+      # bothub-engine env vars
+      - SECRET_KEY=${SECRET_KEY:-SK}
+      - DEBUG=${DEBUG:-true}
+      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@database:5432/bothub}
+      # bothub-nlp env vars
+      - BOTHUB_NLP_DEBUG=${BOTHUB_NLP_DEBUG:-true}
+      - BOTHUB_NLP_DEVELOPMENT_MODE=${BOTHUB_NLP_DEVELOPMENT_MODE:-false}
+      - BOTHUB_NLP_SENTRY_CLIENT=${BOTHUB_NLP_SENTRY_CLIENT}
+      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
+      # bothub-nlp-celery env vars
+      - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
+      - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL:-redis://bothub-nlp-celery-redis:6379/0}
+      - BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE}
 
   bothub-nlp-celery-redis:
     image: redis
