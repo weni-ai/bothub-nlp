@@ -11,7 +11,7 @@ bothub-engine = {editable = true, ref = "1.18.1", git = "https://github.com/Ilha
 bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
 bothub-nlp-nlu = {path = "./../bothub-nlp-nlu"}
 bothub-nlp = {path = "./../bothub-nlp"}
-"psycopg2-binary" = "*"
+"psycopg2-binary" = "==2.7.6.1"
 
 [dev-packages]
 redis = "*"

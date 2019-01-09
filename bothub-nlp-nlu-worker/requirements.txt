@@ -1,0 +1,25 @@
+-i https://pypi.org/simple
+-e git+https://github.com/Ilhasoft/bothub-engine@f8f53c4a84f943c156a75d4799123b84579829ca#egg=bothub-engine
+./../bothub-nlp
+./../bothub-nlp-celery
+./../bothub-nlp-nlu
+certifi==2018.11.29
+chardet==3.0.4
+coreapi==2.3.3
+coreschema==0.0.4
+dj-database-url==0.5.0
+django-cors-headers==2.4.0
+django-filter==2.0.0
+django==2.1.3
+djangorestframework==3.9.0
+idna==2.7
+itypes==1.1.0
+jinja2==2.10
+markupsafe==1.1.0
+psycopg2-binary==2.7.6.1
+python-decouple==3.1
+pytz==2018.7
+requests==2.20.1
+uritemplate==3.0.0
+urllib3==1.24.1
+whitenoise==4.1.2
