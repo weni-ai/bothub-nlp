@@ -5,6 +5,7 @@ name = "pypi"
 
 [scripts]
 start = "python -m bothub_nlp_nlu_worker_on_demand"
+lint = "flake8"
 
 [packages]
 python-decouple = "*"
@@ -16,6 +17,7 @@ bothub-engine = {ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engin
 
 [dev-packages]
 redis = "*"
+"flake8" = "*"
 
 [requires]
 python_version = "3.6"

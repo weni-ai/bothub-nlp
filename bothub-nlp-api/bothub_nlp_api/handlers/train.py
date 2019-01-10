@@ -60,6 +60,8 @@ class TrainHandler(ApiHandler):
                 }
 
         self.finish({
-            'SUPPORTED_LANGUAGES': list(bothub_nlp_settings.SUPPORTED_LANGUAGES.keys()),
+            'SUPPORTED_LANGUAGES': list(
+                bothub_nlp_settings.SUPPORTED_LANGUAGES.keys(),
+            ),
             'languages_report': languages_report,
         })

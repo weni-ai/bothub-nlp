@@ -1,8 +1,4 @@
-import logging
-
 from decouple import config
-
-from bothub.utils import cast_supported_languages
 
 
 BOTHUB_NLP_WORKER_ON_DEMAND_PORT = config(

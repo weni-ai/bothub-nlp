@@ -5,6 +5,7 @@ name = "pypi"
 
 [scripts]
 start = "python -m tornado.autoreload -m bothub_nlp_api"
+lint = "flake8"
 
 [packages]
 tornado = "==5.1.1"
@@ -17,6 +18,7 @@ bothub-nlp = {path = "./../bothub-nlp"}
 [dev-packages]
 redis = "*"
 "psycopg2-binary" = "*"
+"flake8" = "*"
 
 [requires]
 python_version = "3.6"

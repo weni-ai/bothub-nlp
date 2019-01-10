@@ -24,4 +24,3 @@ SUPPORTED_LANGUAGES = config(
     default='en|pt',
     cast=cast_supported_languages,
 )
-

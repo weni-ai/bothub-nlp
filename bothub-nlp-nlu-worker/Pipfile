@@ -5,6 +5,7 @@ name = "pypi"
 
 [scripts]
 start = "celery worker -A bothub_nlp_nlu_worker.celery_app"
+lint = "flake8"
 
 [packages]
 bothub-engine = {editable = true, ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engine"}
@@ -15,6 +16,7 @@ bothub-nlp = {path = "./../bothub-nlp"}
 
 [dev-packages]
 redis = "*"
+"flake8" = "*"
 
 [requires]
 python_version = "3.6"
