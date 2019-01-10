@@ -6,6 +6,6 @@ ACTION_TRAIN = 'train'
 
 
 def queue_name(action, language):
-    if settings.BOTHUB_NLP_AGROUP_LANGUAGE_QUEUE:
+    if settings.BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE:
         return language
     return '{}:{}'.format(action, language)
