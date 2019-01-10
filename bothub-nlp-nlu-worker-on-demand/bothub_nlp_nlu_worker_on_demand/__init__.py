@@ -83,11 +83,11 @@ class MyUpWorker(UpWorker):
             queue_language = self.queue.name.split(':')[1] \
                 if ':' in self.queue.name else self.queue.name
             constraints = []
-            if settings.BOTHUB_NLP_WORKER_ON_DEMAND_BLOCK_ON_SWARM_MANAGER:
+            if settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_RUN_IN_WORKER_NODE:
                 constraints.append('node.role == worker')
             docker_client.services.create(
-                f'{settings.BOTHUB_NLP_WORKER_ON_DEMAND_DOCKER_IMAGE_NAME}:' +
-                f'{queue_language}',
+                settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_NAME +
+                f':{queue_language}',
                 [
                     'celery',
                     'worker',
@@ -110,7 +110,7 @@ class MyUpWorker(UpWorker):
                 labels={
                     LABEL_KEY: self.queue.name,
                 },
-                networks=settings.BOTHUB_NLP_WORKER_ON_DEMAND_NETWORKS,
+                networks=settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_NETWORKS,
                 constraints=constraints,
             )
         while not self.queue.has_worker:
@@ -152,7 +152,7 @@ class MyAgent(Agent):
             return False
         last_interaction_diff = time() - last_interaction
         if last_interaction_diff > (
-            settings.BOTHUB_NLP_WORKER_ON_DEMAND_DOWN_TIME * 60
+            settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOWN_TIME * 60
         ):
             return True
         return False
