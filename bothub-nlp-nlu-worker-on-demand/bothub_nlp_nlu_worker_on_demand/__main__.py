@@ -15,6 +15,6 @@ MyDemand(
     celery_app,
     api_server_address=(
         '0.0.0.0',
-        settings.BOTHUB_NLP_WORKER_ON_DEMAND_API_PORT,
+        settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_API_PORT,
     ),
 ).run()
