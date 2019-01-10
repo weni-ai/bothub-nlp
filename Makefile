@@ -20,6 +20,12 @@ lint:
 		&& PIPENV_DONT_LOAD_ENV=1 pipenv run lint \
 		&& echo "${SUCCESS}✔${NC} bothub-nlp-nlu-worker-on-demand" || echo "${DANGER}✖${NC} bothub-nlp-nlu-worker-on-demand"
 
+test:
+	@echo "${INFO}Testing...${NC}"
+	@cd bothub-nlp-nlu \
+		&& PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="bothub.settings" pipenv run django-admin migrate \
+		&& PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false ASYNC_TEST_TIMEOUT=30 pipenv run test
+
 
 # Utils
 

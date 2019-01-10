@@ -6,9 +6,9 @@ from bothub.authentication.models import User
 from bothub.common.models import Repository
 from bothub.common import languages
 
-from ...tests.utils import fill_examples
-from ...tests.utils import EXAMPLES_MOCKUP
-from ...tests.utils import EXAMPLES_WITH_LABEL_MOCKUP
+from .utils import fill_examples
+from .utils import EXAMPLES_MOCKUP
+from .utils import EXAMPLES_WITH_LABEL_MOCKUP
 
 
 class TrainTestCase(TestCase):

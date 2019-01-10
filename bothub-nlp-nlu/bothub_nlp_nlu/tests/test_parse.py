@@ -8,9 +8,9 @@ from ..train import train_update
 from ..parse import parse_text
 from ..parse import format_parse_output
 from ..parse import position_match
-from ...tests.utils import fill_examples
-from ...tests.utils import EXAMPLES_MOCKUP
-from ...tests.utils import EXAMPLES_WITH_LABEL_MOCKUP
+from .utils import fill_examples
+from .utils import EXAMPLES_MOCKUP
+from .utils import EXAMPLES_WITH_LABEL_MOCKUP
 
 
 class ParseTestCase(TestCase):
