@@ -24,7 +24,8 @@ test:
 	@echo "${INFO}Testing...${NC}"
 	@cd bothub-nlp-nlu \
 		&& PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK DJANGO_SETTINGS_MODULE="bothub.settings" pipenv run django-admin migrate \
-		&& PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false ASYNC_TEST_TIMEOUT=30 pipenv run test
+		&& PIPENV_DONT_LOAD_ENV=1 SECRET_KEY=SK SUPPORTED_LANGUAGES="en|pt" SEND_EMAILS=false ASYNC_TEST_TIMEOUT=30 pipenv run test \
+		&& echo "${SUCCESS}✔${NC} bothub-nlp-nlu" || echo "${DANGER}✖${NC} bothub-nlp-nlu"
 
 
 # Utils
