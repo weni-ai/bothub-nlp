@@ -8,10 +8,10 @@ start = "python -m bothub_nlp_nlu_worker_on_demand"
 lint = "flake8"
 
 [packages]
-python-decouple = "*"
-celery-worker-on-demand = {ref = "0.1.3", git = "https://github.com/Ilhasoft/celery-worker-on-demand"}
+python-decouple = "==3.1"
+celery-worker-on-demand = {ref = "0.2.0", git = "https://github.com/Ilhasoft/celery-worker-on-demand"}
 bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
-docker = "*"
+docker = "==3.7.0"
 bothub-nlp = {path = "./../bothub-nlp"}
 bothub-engine = {ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engine"}
 
