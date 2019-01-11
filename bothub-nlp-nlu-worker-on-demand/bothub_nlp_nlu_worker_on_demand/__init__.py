@@ -1,12 +1,16 @@
 import docker
+import configparser
+import cgi
 
 from time import sleep, time
 from decouple import config
-from . import settings
 from celery_worker_on_demand import CeleryWorkerOnDemand
 from celery_worker_on_demand import Agent
 from celery_worker_on_demand import UpWorker
 from celery_worker_on_demand import DownWorker
+from celery_worker_on_demand import APIHandler
+
+from . import settings
 
 
 LABEL_KEY = 'bothub-nlp-wod.name'
@@ -123,6 +127,9 @@ class MyDownWorker(DownWorker):
 class MyAgent(Agent):
     def flag_down(self, queue):
         global running_services
+        ignore_list = self.cwod.config.get('worker-down', 'ignore').split(',')
+        if queue.name in ignore_list:
+            return False
         if queue.size > 0:
             return False
         if not queue.has_worker:
@@ -152,7 +159,73 @@ class MyAgent(Agent):
         return False
 
 
+class MyAPIHandler(APIHandler):
+    def post_data(self):
+        content_type = self.headers.get('content-type')
+        if not content_type:
+            return {}
+        ctype, pdict = cgi.parse_header(content_type)
+        if not ctype == 'multipart/form-data':
+            return {}
+        pdict['boundary'] = bytes(pdict.get('boundary', ''), 'utf-8')
+        parsed = cgi.parse_multipart(self.rfile, pdict)
+        return dict(
+            map(
+                lambda x: (
+                    x[0],
+                    list(
+                        map(
+                            lambda x: x.decode(),
+                            x[1],
+                        ),
+                    ) if len(x[1]) > 1 else x[1][0].decode(),
+                ),
+                parsed.items(),
+            ),
+        )
+
+    def do_POST(self):
+        if not self.has_permission():
+            return
+        post_data = self.post_data()
+        for key, value in post_data.items():
+            section, option = key.split('.', 1)
+            self.cwod.config.set(
+                section,
+                option,
+                ','.join(value) if isinstance(value, list) else value,
+            )
+        self.cwod.write_config()
+        self.do_GET()
+
+
 class MyDemand(CeleryWorkerOnDemand):
     Agent = MyAgent
     UpWorker = MyUpWorker
     DownWorker = MyDownWorker
+    APIHandler = MyAPIHandler
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config = configparser.ConfigParser()
+        self.config.read_dict({
+            'worker-down': {
+                'ignore': [],
+            },
+        })
+        self.config.read(settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE)
+
+    def write_config(self):
+        self.config.write(
+            open(
+                settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE,
+                'w+',
+            ),
+        )
+
+    def serializer(self):
+        data = super().serializer()
+        data.update({
+            'config': self.config._sections,
+        })
+        return data

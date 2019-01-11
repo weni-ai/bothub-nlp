@@ -34,3 +34,8 @@ BOTHUB_NLP_NLU_WORKER_ON_DEMAND_RUN_IN_WORKER_NODE = config(
     cast=bool,
     default=False,
 )
+
+BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE = config(
+    'BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE',
+    default='bothub-nlp-nlu-worker-on-demand.cfg',
+)
