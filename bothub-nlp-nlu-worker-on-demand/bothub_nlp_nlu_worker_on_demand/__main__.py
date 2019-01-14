@@ -17,4 +17,5 @@ MyDemand(
         '0.0.0.0',
         settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_API_PORT,
     ),
+    api_basic_authorization=settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_API_BASIC_AUTHORIZATION,  # NOQA: E501
 ).run()

@@ -12,3 +12,4 @@ This service listen Celery Queues to up and down NLU workers on demand.
 | BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOWN_TIME | `int` | `10` | Down worker after x minutes without interaction. |
 | BOTHUB_NLP_NLU_WORKER_ON_DEMAND_NETWORKS | List separated by common. | `bothub-nlp` | Networks to assign in new worker service. |
 | BOTHUB_NLP_NLU_WORKER_ON_DEMAND_RUN_IN_WORKER_NODE | `boolean` | `False` | Run service just in Workers Nodes in Docker Swarm cluster. |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_API_BASIC_AUTHORIZATION | `string` | `None` | Fill `api_basic_authorization` kwarg in [CeleryWorkerOnDemand](https://github.com/Ilhasoft/celery-worker-on-demand#class-celeryworkerondemand) constructor |
