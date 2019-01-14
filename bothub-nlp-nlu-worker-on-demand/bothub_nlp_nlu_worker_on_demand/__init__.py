@@ -84,7 +84,7 @@ class MyUpWorker(UpWorker):
             if settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_RUN_IN_WORKER_NODE:
                 constraints.append('node.role == worker')
             docker_client.services.create(
-                settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_NAME +
+                settings.BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME +
                 f':{queue_language}',
                 [
                     'celery',
