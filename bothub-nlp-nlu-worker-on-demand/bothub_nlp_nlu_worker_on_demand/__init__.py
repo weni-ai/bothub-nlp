@@ -90,7 +90,7 @@ class MyUpWorker(UpWorker):
                     'celery',
                     'worker',
                     '-A',
-                    'bothub_nlp.core.celery',
+                    'bothub_nlp_nlu_worker.celery_app',
                     '-c',
                     '1',
                     '-l',
