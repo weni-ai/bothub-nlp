@@ -7,7 +7,7 @@ version: '3.6'
 
 services:
   bothub-nlp-api:
-    image: ilha/bothub-nlp-api:${BOTHUB_NLP_API_DOCKER_IMAGE_TAG:-latest}
+    image: ${BOTHUB_NLP_API_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-api}:${BOTHUB_NLP_API_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: bothub-nlp-api/Dockerfile
@@ -37,7 +37,7 @@ services:
       - BOTHUB_NLP_API_LOGGER_LEVEL=${BOTHUB_NLP_API_LOGGER_LEVEL:-10}
 
   bothub-nlp-nlu-worker:
-    image: ilha/bothub-nlp-nlu-worker:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
+    image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-nlu-worker}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: bothub-nlp-nlu-worker/Dockerfile
@@ -64,7 +64,7 @@ services:
       - BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE:-True}
 
   bothub-nlp-nlu-worker-on-demand:
-    image: ilha/bothub-nlp-nlu-worker-on-demand:${BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_TAG:-latest}
+    image: ${BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-nlu-worker-on-demand}:${BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: bothub-nlp-nlu-worker-on-demand/Dockerfile
