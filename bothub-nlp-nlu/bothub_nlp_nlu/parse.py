@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from bothub.common.models import RepositoryEntity
 
-from . import updateInterpreters
+from . import update_interpreters
 
 
 def order_by_confidence(l):
@@ -90,7 +90,7 @@ def format_parse_output(update, r):
 
 
 def parse_text(update, text, rasa_format=False, use_cache=True):
-    interpreter = updateInterpreters.get(update, use_cache=use_cache)
+    interpreter = update_interpreters.get(update, use_cache=use_cache)
     r = interpreter.parse(text)
 
     if rasa_format:

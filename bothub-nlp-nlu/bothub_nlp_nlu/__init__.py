@@ -11,5 +11,5 @@ django.setup()
 
 logger = logging.getLogger('bothub_nlp_nlu')
 
-updateInterpreters = UpdateInterpreters()
+update_interpreters = UpdateInterpreters()
 spacy_nlp_languages = SpacyNLPLanguageManager()
