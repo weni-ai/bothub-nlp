@@ -3,8 +3,7 @@ from rasa_nlu.tokenizers.spacy_tokenizer import SpacyTokenizer \
 
 
 class SpacyTokenizer(RasaSpacyTokenizer):
-    name = 'bothub_nlp_nlu.pipeline_components.tokenizer_spacy.' \
-            'SpacyTokenizer'
+    name = 'tokenizer_spacy_with_labels'
 
     def train(self, training_data, config, **kwargs):
         for example in training_data.training_examples:

@@ -7,8 +7,7 @@ from rasa_nlu.featurizers.regex_featurizer import REGEX_FEATURIZER_FILE_NAME
 
 
 class RegexFeaturizer(RasaRegexFeaturizer):
-    name = 'bothub_nlp_nlu.pipeline_components.' \
-            'intent_entity_featurizer_regex.RegexFeaturizer'
+    name = 'intent_entity_featurizer_regex'
 
     @classmethod
     def load(cls, model_dir=None, model_metadata=None, cached_component=None,

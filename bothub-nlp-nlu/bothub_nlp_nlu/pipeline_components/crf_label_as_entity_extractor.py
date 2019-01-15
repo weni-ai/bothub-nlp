@@ -6,8 +6,7 @@ CRF_MODEL_FILE_NAME = 'crf_model_labels.pkl'
 
 
 class CRFLabelAsEntityExtractor(CRFEntityExtractor):
-    name = 'bothub_nlp_nlu.pipeline_components.' \
-        'crf_label_as_entity_extractor.CRFLabelAsEntityExtractor'
+    name = 'crf_label_as_entity_extractor'
 
     provides = ['labels_as_entity']
 
