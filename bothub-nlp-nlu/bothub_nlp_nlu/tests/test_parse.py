@@ -1,16 +1,22 @@
+import os
 from django.test import TestCase
 
 from bothub.authentication.models import User
 from bothub.common.models import Repository
 from bothub.common import languages
+from rasa_nlu.components import ComponentBuilder
 
 from ..train import train_update
 from ..parse import parse_text
 from ..parse import format_parse_output
 from ..parse import position_match
+from ..utils import BothubInterpreter
 from .utils import fill_examples
 from .utils import EXAMPLES_MOCKUP
 from .utils import EXAMPLES_WITH_LABEL_MOCKUP
+
+
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 class ParseTestCase(TestCase):
@@ -191,3 +197,15 @@ class PositionMatchTestCase(TestCase):
             }
         )
         self.assertFalse(r)
+
+
+class OldTrainsTestCase(TestCase):
+    def test_2018_12_07(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2018_12_07'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'affirmative',
+        )
