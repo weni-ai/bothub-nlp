@@ -21,13 +21,11 @@ def get_rasa_nlu_config_from_update(update):
 
     # load spacy
     if use_spacy:
-        pipeline.append({'name': 'bothub_nlp_nlu.pipeline_components.' +
-                                 'spacy_nlp.SpacyNLP'})
+        pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
 
     # tokenizer
     if use_spacy_tokenizer:
-        pipeline.append({'name': 'bothub_nlp_nlu.pipeline_components.' +
-                                 'tokenizer_spacy.SpacyTokenizer'})
+        pipeline.append({'name': 'tokenizer_spacy_with_labels'})
     else:
         pipeline.append({'name': 'tokenizer_whitespace'})
 
@@ -48,9 +46,7 @@ def get_rasa_nlu_config_from_update(update):
     pipeline.append({'name': 'ner_crf'})
 
     # label extractor
-    pipeline.append({'name': 'bothub_nlp_nlu.pipeline_components.' +
-                             'crf_label_as_entity_extractor.' +
-                             'CRFLabelAsEntityExtractor'})
+    pipeline.append({'name': 'crf_label_as_entity_extractor'})
 
     return RasaNLUModelConfig({
         'language': update.language,
@@ -164,3 +160,7 @@ class PokeLogging:
 
     def __exit__(self, *args):
         self.logger.removeHandler(self.logger)
+
+
+update_interpreters = UpdateInterpreters()
+spacy_nlp_languages = SpacyNLPLanguageManager()

@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from bothub.common.models import RepositoryEntity
 
-from . import update_interpreters
+from .utils import update_interpreters
 
 
 def order_by_confidence(l):
