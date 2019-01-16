@@ -44,6 +44,12 @@ RUN pip install --no-index --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS
 
 COPY bothub-nlp-nlu-worker .
 
+RUN git clone --branch master --depth 1 --single-branch \
+    https://github.com/Ilhasoft/spacy-lang-models \
+    spacy-langs \
+    && python3.6 scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
+    && python3.6 scripts/link_lang_spacy.py mn ./spacy-langs/mn/
+
 ARG DOWNLOAD_SPACY_MODELS
 
 RUN if [ ${DOWNLOAD_SPACY_MODELS} ]; then \
