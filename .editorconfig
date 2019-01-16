@@ -14,7 +14,7 @@ indent_size = 2
 [.flake8]
 indent_size = 2
 
-[*.{py,yml}]
+[*.{py,yml,sh}]
 insert_final_newline = true
 
 [Makefile]
