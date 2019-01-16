@@ -68,6 +68,8 @@ services:
     build:
       context: .
       dockerfile: bothub-nlp-nlu-worker-on-demand/Dockerfile
+    ports:
+      - 2658:2658
     depends_on:
       - bothub-nlp-celery-redis
     networks:
