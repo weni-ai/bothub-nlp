@@ -113,6 +113,3 @@ dmypy.json
 
 # IDEs
 .vscode/
-
-# project ignore
-spacy-langs/
