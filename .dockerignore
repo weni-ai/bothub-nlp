@@ -8,13 +8,19 @@ app/dump.rdb
 etc/
 bothub-nlp.log
 
-## File-based project format:
+# file-based project format:
 *.iws
 
-#tests
+# tests
 tests.db
 .coverage
 
+# env vars files
 .env
 settings.ini
+
+# dev
 db.sqlite3
+
+# spacy-langs
+bothub-nlp-nlu-worker/spacy-langs
