@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+start = "celery worker -A bothub_nlp_nlu_worker.celery_app"
+lint = "flake8"
+importilhaspacylangs = "sh scripts/import_ilha_spacy_langs.sh"
+
+[packages]
+bothub-engine = {editable = true, ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engine"}
+bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
+bothub-nlp-nlu = {path = "./../bothub-nlp-nlu"}
+bothub-nlp = {path = "./../bothub-nlp"}
+"psycopg2-binary" = "==2.7.6.1"
+plac = "==1.0.0"
+
+[dev-packages]
+redis = "*"
+"flake8" = "*"
+
+[requires]
+python_version = "3.6"
