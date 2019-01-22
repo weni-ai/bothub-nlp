@@ -29,7 +29,27 @@ class ParseTestCase(TestCase):
             slug='test',
             name='Testing',
             language=languages.LANGUAGE_EN)
-        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        fill_examples(
+            [
+                {
+                    'text': 'hey',
+                    'intent': 'greet',
+                },
+                {
+                    'text': 'hey there',
+                    'intent': 'greet',
+                },
+                {
+                    'text': 'bye',
+                    'intent': 'goodbye',
+                },
+                {
+                    'text': 'good bye',
+                    'intent': 'goodbye',
+                },
+            ],
+            self.repository,
+        )
         self.update = self.repository.current_update()
         train_update(self.update, self.user)
 

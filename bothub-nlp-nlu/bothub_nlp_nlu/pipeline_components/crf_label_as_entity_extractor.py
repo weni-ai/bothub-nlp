@@ -1,4 +1,5 @@
 import os
+
 from rasa_nlu.extractors.crf_entity_extractor import CRFEntityExtractor
 
 

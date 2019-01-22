@@ -1,7 +1,5 @@
 from rasa_nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
 
-from ..utils import spacy_nlp_languages
-
 
 class SpacyNLP(RasaNLUSpacyNLP):
     name = 'optimized_spacy_nlp_with_labels'
@@ -9,6 +7,7 @@ class SpacyNLP(RasaNLUSpacyNLP):
     @classmethod
     def load(cls, model_dir=None, model_metadata=None, cached_component=None,
              **kwargs):
+        from ..utils import spacy_nlp_languages
         if cached_component:
             return cached_component
         component_meta = model_metadata.for_component(cls.name)
@@ -19,6 +18,7 @@ class SpacyNLP(RasaNLUSpacyNLP):
 
     @classmethod
     def create(cls, cfg):
+        from ..utils import spacy_nlp_languages
         component_conf = cfg.for_component(cls.name, cls.defaults)
         spacy_model_name = cfg.language
         component_conf['model'] = spacy_model_name

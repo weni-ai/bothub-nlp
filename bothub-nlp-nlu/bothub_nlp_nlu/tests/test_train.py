@@ -35,7 +35,8 @@ class TrainTestCase(TestCase):
         self.assertIsNotNone(update.trained_at)
 
     def test_train_without_language_model(self):
-        self.repository.use_language_model_featurizer = False
+        self.repository.algorithm = Repository \
+            .ALGORITHM_NEURAL_NETWORK_INTERNAL
         self.repository.save()
         fill_examples(EXAMPLES_MOCKUP, self.repository)
         update = self.repository.current_update()
@@ -108,3 +109,78 @@ class TrainTestCase(TestCase):
         ], self.repository)
         update = self.repository.current_update()
         train_update(update, self.user)
+
+
+class TrainStatisticalTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            email='fake@user.com',
+            nickname='fake')
+        self.repository = Repository.objects.create(
+            owner=self.user,
+            slug='test',
+            name='Testing',
+            language=languages.LANGUAGE_EN,
+            algorithm=Repository.ALGORITHM_STATISTICAL_MODEL)
+
+    def test_train(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        update = self.repository.current_update()
+        train_update(update, self.user)
+
+        self.assertEqual(
+            update.by.id,
+            self.user.id)
+
+        self.assertIsNotNone(update.training_started_at)
+        self.assertIsNotNone(update.trained_at)
+
+
+class TrainNeuralNetworkInternalTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            email='fake@user.com',
+            nickname='fake')
+        self.repository = Repository.objects.create(
+            owner=self.user,
+            slug='test',
+            name='Testing',
+            language=languages.LANGUAGE_EN,
+            algorithm=Repository.ALGORITHM_NEURAL_NETWORK_INTERNAL)
+
+    def test_train(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        update = self.repository.current_update()
+        train_update(update, self.user)
+
+        self.assertEqual(
+            update.by.id,
+            self.user.id)
+
+        self.assertIsNotNone(update.training_started_at)
+        self.assertIsNotNone(update.trained_at)
+
+
+class TrainNeuralNetworkExternalTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            email='fake@user.com',
+            nickname='fake')
+        self.repository = Repository.objects.create(
+            owner=self.user,
+            slug='test',
+            name='Testing',
+            language=languages.LANGUAGE_EN,
+            algorithm=Repository.ALGORITHM_NEURAL_NETWORK_EXTERNAL)
+
+    def test_train(self):
+        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        update = self.repository.current_update()
+        train_update(update, self.user)
+
+        self.assertEqual(
+            update.by.id,
+            self.user.id)
+
+        self.assertIsNotNone(update.training_started_at)
+        self.assertIsNotNone(update.trained_at)
