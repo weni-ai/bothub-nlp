@@ -14,7 +14,7 @@ bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
 bothub-nlp-nlu = {path = "./../bothub-nlp-nlu"}
 bothub-nlp = {path = "./../bothub-nlp"}
 "psycopg2-binary" = "==2.7.6.1"
-plac = "==1.0.0"
+plac = "==0.9.6"
 
 [dev-packages]
 redis = "*"
