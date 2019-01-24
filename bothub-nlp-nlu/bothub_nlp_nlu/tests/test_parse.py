@@ -212,3 +212,33 @@ class OldTrainsTestCase(TestCase):
             result.get('intent', {}).get('name'),
             'affirmative',
         )
+
+    def test_2019_01_24_statistical(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2019_01_24_statistical'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'yes',
+        )
+
+    def test_2019_01_24_nn_internal(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2019_01_24_nn_internal'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'yes',
+        )
+
+    def test_2019_01_24_nn_external(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2019_01_24_nn_external'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'yes',
+        )
