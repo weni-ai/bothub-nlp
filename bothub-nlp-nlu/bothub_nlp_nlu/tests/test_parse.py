@@ -29,7 +29,10 @@ class ParseTestCase(TestCase):
             slug='test',
             name='Testing',
             language=languages.LANGUAGE_EN)
-        fill_examples(EXAMPLES_MOCKUP, self.repository)
+        fill_examples(
+            EXAMPLES_MOCKUP,
+            self.repository,
+        )
         self.update = self.repository.current_update()
         train_update(self.update, self.user)
 
@@ -208,4 +211,34 @@ class OldTrainsTestCase(TestCase):
         self.assertEqual(
             result.get('intent', {}).get('name'),
             'affirmative',
+        )
+
+    def test_2019_01_24_statistical(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2019_01_24_statistical'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'yes',
+        )
+
+    def test_2019_01_24_nn_internal(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2019_01_24_nn_internal'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'yes',
+        )
+
+    def test_2019_01_24_nn_external(self):
+        interpreter = BothubInterpreter.load(
+            os.path.join(BASE_DIR, 'old_trains', '2019_01_24_nn_external'),
+            ComponentBuilder(use_cache=False))
+        result = interpreter.parse('yes')
+        self.assertEqual(
+            result.get('intent', {}).get('name'),
+            'yes',
         )

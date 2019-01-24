@@ -1,0 +1,2 @@
+model_checkpoint_path: "/tmp/tmpbt9v2_13/40af2777-519b-4190-b751-f3cb6a3a7e5c/9/intent_classifier_tensorflow_embedding.ckpt"
+all_model_checkpoint_paths: "/tmp/tmpbt9v2_13/40af2777-519b-4190-b751-f3cb6a3a7e5c/9/intent_classifier_tensorflow_embedding.ckpt"

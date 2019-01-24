@@ -9,12 +9,12 @@ lint = "flake8"
 importilhaspacylangs = "sh scripts/import_ilha_spacy_langs.sh"
 
 [packages]
-bothub-engine = {editable = true, ref = "1.18.1", git = "https://github.com/Ilhasoft/bothub-engine"}
+bothub-engine = {ref = "1.19.0b", git = "https://github.com/Ilhasoft/bothub-engine"}
 bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
 bothub-nlp-nlu = {path = "./../bothub-nlp-nlu"}
 bothub-nlp = {path = "./../bothub-nlp"}
 "psycopg2-binary" = "==2.7.6.1"
-plac = "==1.0.0"
+plac = "==0.9.6"
 
 [dev-packages]
 redis = "*"
