@@ -28,13 +28,9 @@ def get_rasa_nlu_config_from_update(update):
         use_spacy = update.algorithm == Repository \
             .ALGORITHM_NEURAL_NETWORK_EXTERNAL
         # load spacy
-        if use_spacy:
-            pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
+        pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
         # tokenizer
-        if use_spacy:
-            pipeline.append({'name': 'tokenizer_spacy_with_labels'})
-        else:
-            pipeline.append({'name': 'tokenizer_whitespace'})
+        pipeline.append({'name': 'tokenizer_spacy_with_labels'})
         # featurizer
         if use_spacy:
             pipeline.append({'name': 'intent_featurizer_spacy'})
