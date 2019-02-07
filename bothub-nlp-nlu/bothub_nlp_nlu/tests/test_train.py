@@ -75,6 +75,19 @@ class TrainTestCase(TestCase):
         self.assertIsNotNone(update.training_started_at)
         self.assertIsNotNone(update.trained_at)
 
+    def test_train_neural_network_with_labels(self):
+        self.repository.algorithm = Repository.ALGORITHM_NEURAL_NETWORK_INTERNAL
+        fill_examples(EXAMPLES_WITH_LABEL_MOCKUP, self.repository)
+        update = self.repository.current_update()
+        train_update(update, self.user)
+
+        self.assertEqual(
+            update.by.id,
+            self.user.id)
+
+        self.assertIsNotNone(update.training_started_at)
+        self.assertIsNotNone(update.trained_at)
+
     def test_train_mixed(self):
         fill_examples([
             {
