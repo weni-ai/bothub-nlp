@@ -3,6 +3,7 @@ from . import settings
 
 ACTION_PARSE = 'parse'
 ACTION_TRAIN = 'train'
+ACTION_TEST = 'test'
 
 
 def queue_name(action, language):
