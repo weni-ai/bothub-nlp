@@ -14,6 +14,7 @@ from ..utils import BothubInterpreter
 from .utils import fill_examples
 from .utils import EXAMPLES_MOCKUP
 from .utils import EXAMPLES_WITH_LABEL_MOCKUP
+from .utils import EXAMPLES_WITH_SPACY_NER_MOCKUP
 
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -83,6 +84,47 @@ class ParseWithLabelsTestCase(TestCase):
         animal_label = response.get('entities').get('animal')
         self.assertEqual(len(animal_label), 1)
         self.assertEqual(animal_label[0].get('entity'), 'animal')
+
+
+class ParseWithSpacyNERTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            email='fake@user.com',
+            nickname='fake')
+        self.repository = Repository.objects.create(
+            owner=self.user,
+            slug='test',
+            name='Testing',
+            language=languages.LANGUAGE_PT)
+        fill_examples(EXAMPLES_WITH_SPACY_NER_MOCKUP, self.repository)
+        self.update = self.repository.current_update()
+        train_update(self.update, self.user)
+
+    def test_parse_name_entities_disabled(self):
+        response = parse_text(
+            self.update,
+            'Meu nome é João e eu gosto de gatos',
+            use_cache=False)
+        self.assertListEqual(
+            response.get('entities_list'),
+            ['cat'])
+        self.assertIsNone(
+            response.get('entities').get('animal')[0].get('self'))
+
+    def test_parse_name_entities_enabled(self):
+        self.repository.use_name_entities = True
+        self.repository.save()
+
+        self.update = self.repository.current_update()
+        train_update(self.update, self.user)
+
+        response = parse_text(
+            self.update,
+            'Meu nome é João e eu gosto de gatos',
+            use_cache=False)
+        self.assertListEqual(
+            response.get('entities_list'),
+            ['cat', 'PER'])
 
 
 class TestFormatParseOutput(TestCase):

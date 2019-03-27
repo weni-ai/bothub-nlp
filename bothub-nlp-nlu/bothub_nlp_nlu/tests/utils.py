@@ -160,6 +160,81 @@ EXAMPLES_WITH_LABEL_MOCKUP = [
     },
 ]
 
+EXAMPLES_WITH_SPACY_NER_MOCKUP = [
+    {
+        'text': 'Meu nome é John',
+        'intent': '',
+        'entities': [
+            {
+                'start': 14,
+                'end': 24,
+                'entity': 'turtle',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'Minha irmã ama cachorros',
+        'intent': '',
+        'entities': [
+            {
+                'start': 15,
+                'end': 24,
+                'entity': 'dog',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'Eu gosto de tartarugas',
+        'intent': '',
+        'entities': [
+            {
+                'start': 12,
+                'end': 22,
+                'entity': 'tartarugas',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'Meu pai ama gatos',
+        'intent': '',
+        'entities': [
+            {
+                'start': 12,
+                'end': 17,
+                'entity': 'cat',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'Minha tia ama gatos',
+        'intent': '',
+        'entities': [
+            {
+                'start': 14,
+                'end': 19,
+                'entity': 'cat',
+                'label': 'animal',
+            },
+        ],
+    },
+    {
+        'text': 'Minha irmã ama cachorros',
+        'intent': '',
+        'entities': [
+            {
+                'start': 15,
+                'end': 24,
+                'entity': 'dog',
+                'label': 'animal',
+            },
+        ],
+    },
+]
+
 
 def fill_examples(examples_mockup, repository, language=None):
     for example_mockup in examples_mockup:
