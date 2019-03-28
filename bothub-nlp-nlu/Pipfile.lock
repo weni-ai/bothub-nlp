@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b0ff1246069922f0ca707c2f0607ff7d04c90b5c9a9e64f08f79b94f594194b9"
+            "sha256": "f47ee38a5a5d4bee2ce95226587cbf8f2cc370104f808e10a0f701286a6cc312"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -52,7 +52,7 @@
         },
         "bothub-engine": {
             "git": "https://github.com/Ilhasoft/bothub-engine",
-            "ref": "f954acb06eccd0069e18fb7b8e138a6251aa49b6"
+            "ref": "9ae80e64c85ccfef220c0030f5cb09b6d1d64d93"
         },
         "boto3": {
             "hashes": [
