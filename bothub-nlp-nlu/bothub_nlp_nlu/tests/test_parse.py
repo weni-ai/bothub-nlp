@@ -126,6 +126,22 @@ class ParseWithSpacyNERTestCase(TestCase):
             response.get('entities_list'),
             ['cat', 'PER'])
 
+    def test_parse_name_entities_enabled_nn(self):
+        self.repository.use_name_entities = True
+        self.repository.algorithm = Repository.ALGORITHM_NEURAL_NETWORK_INTERNAL
+        self.repository.save()
+
+        self.update = self.repository.current_update()
+        train_update(self.update, self.user)
+
+        response = parse_text(
+            self.update,
+            'Meu nome é João e eu gosto de gatos',
+            use_cache=False)
+        self.assertListEqual(
+            response.get('entities_list'),
+            ['cat', 'PER'])
+
 
 class TestFormatParseOutput(TestCase):
     def setUp(self):
