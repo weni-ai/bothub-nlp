@@ -162,18 +162,6 @@ EXAMPLES_WITH_LABEL_MOCKUP = [
 
 EXAMPLES_WITH_SPACY_NER_MOCKUP = [
     {
-        'text': 'Meu nome é John',
-        'intent': '',
-        'entities': [
-            {
-                'start': 14,
-                'end': 24,
-                'entity': 'turtle',
-                'label': 'animal',
-            },
-        ],
-    },
-    {
         'text': 'Minha irmã ama cachorros',
         'intent': '',
         'entities': [
