@@ -1,14 +1,67 @@
-from rasa_nlu.evaluate import evaluate_intents, evaluate_entities
-from rasa_nlu.evaluate import get_intent_predictions, get_entity_predictions
-from rasa_nlu.evaluate import get_entity_extractors
+from rasa_nlu.evaluate import *
 from rasa_nlu.training_data import Message
 from django.db import models
+
+from bothub.common.models import RepositoryValidationResult
+from bothub.common.models import Evaluation
 
 from .train import BothubTrainingData
 from .utils import get_rasa_nlu_config_from_update
 from .utils import update_interpreters
 from .utils import PokeLogging
 from . import logger
+
+
+def evaluate_intents(intent_results):
+
+    intent_results = remove_empty_intent_examples(intent_results)
+
+    targets, predictions = _targets_predictions_from(intent_results)
+
+    report, precision, f1, accuracy = get_evaluation_metrics(
+        targets, predictions, output_dict=True)
+
+    predictions = [
+        {
+            "text": res.message,
+            "intent": res.target,
+            "predicted": res.prediction,
+            "confidence": res.confidence
+        } for res in intent_results
+    ]
+
+    return {
+        "predictions": predictions,
+        "report": report,
+        "precision": precision,
+        "f1_score": f1,
+        "accuracy": accuracy
+    }
+
+
+def evaluate_entities(targets, predictions, tokens, extractor):
+
+    # ???: This may generate some problems because extractor is not an array
+    aligned_predictions = align_all_entity_predictions(targets, predictions,
+                                                       tokens, extractor)
+    merged_targets = merge_labels(aligned_predictions)
+    merged_targets = substitute_labels(merged_targets, "O", "no_entity")
+
+    merged_predictions = merge_labels(aligned_predictions, extractor)
+    merged_predictions = substitute_labels(
+        merged_predictions, "O", "no_entity")
+    logger.info("Evaluation for entity extractor: {} ".format(extractor))
+
+    report, precision, f1, accuracy = get_evaluation_metrics(
+        merged_targets, merged_predictions, output_dict=True)
+
+    return {
+        "report": report,
+        "precision": precision,
+        "f1_score": f1,
+        "accuracy": accuracy
+    }
+
 
 def test_update(update, by):
     '''
@@ -80,8 +133,62 @@ def test_update(update, by):
                                                             tokens,
                                                             extractors)
 
-            # TODO: This result needs to be handled and stored.
-            return result
+            from bothub.common.models import IntentReport
+            from bothub.common.models import IntentPrediction
+
+            reports = result['intent_evaluation']['report']
+
+            intent_evaluation = Evaluation.objects.create(
+                precision=result['intent_evaluation']['precision'],
+                f1_score =result['intent_evaluation']['f1_score'],
+                accuracy=result['intent_evaluation']['accuracy']
+            )
+
+            for intent in reports.keys():
+                IntentReport.objects.create(
+                    intent=intent,
+                    evaluation=intent_evaluation,
+                    precision=reports[intent]['precision'],
+                    recall=reports[intent]['recall'],
+                    f1_score=reports[intent]['f1_score'],
+                    support=reports[intent]['support']
+                )
+
+            predictions = result['intent_evaluation']['predictions']
+
+            for prediction in predictions:
+                IntentPrediction.objects.create(
+                    evaluation=intent_evaluation,
+                    text=prediction['text'],
+                    intent=prediction['intent'],
+                    predicted=prediction['predicted'],
+                    confidence=prediction['confidence']
+                )
+
+            from bothub.common.models import EntityReport
+
+            entity_evaluation = Evaluation.objects.create(
+                precision=result['entity_evaluation']['precision'],
+                f1_score=result['entity_evaluation']['f1_score'],
+                accuracy=result['entity_evaluation']['accuracy']
+            )
+
+            reports = result['entity_evaluation']['report']
+
+            for entity in reports.keys():
+                EntityReport.objects.create(
+                    entity=RepositoryEntity.get(value=entity),
+                    evaluation=entity_evaluation,
+                    precision=reports[entity]['precision'],
+                    recall=reports[entity]['recall'],
+                    f1_score=reports[entity]['f1_score'],
+                    support=reports[entity]['support']
+                )
+
+            RepositoryValidationResult.objects.create(
+                intent_evaluation=intent_evaluation,
+                entity_evaluation=entity_evaluation
+            )
 
         except Exception as e:
             logger.exception(e)
