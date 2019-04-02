@@ -22,6 +22,9 @@ def get_rasa_nlu_config_from_update(update):
         pipeline.append({'name': 'intent_entity_featurizer_regex'})
         pipeline.append({'name': 'intent_featurizer_spacy'})
         pipeline.append({'name': 'ner_crf'})
+        # spacy named entity recognition
+        if update.use_name_entities:
+            pipeline.append({'name': 'ner_spacy'})
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
         pipeline.append({'name': 'intent_classifier_sklearn'})
     else:
@@ -44,6 +47,9 @@ def get_rasa_nlu_config_from_update(update):
         })
         # entity extractor
         pipeline.append({'name': 'ner_crf'})
+        # spacy named entity recognition
+        if update.use_name_entities:
+            pipeline.append({'name': 'ner_spacy'})
         # label extractor
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
     return RasaNLUModelConfig({

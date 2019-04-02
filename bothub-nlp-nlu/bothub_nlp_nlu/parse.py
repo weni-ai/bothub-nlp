@@ -8,7 +8,7 @@ from .utils import update_interpreters
 def order_by_confidence(l):
     return sorted(
         l,
-        key=lambda x: x.get('confidence'),
+        key=lambda x: (x.get('confidence') is not None, x.get('confidence')),
         reverse=True)
 
 
@@ -79,7 +79,7 @@ def format_parse_output(update, r):
         ),
         (
             'entities_list',
-            list(set([
+            list(OrderedDict.fromkeys([
                 x.get('entity')
                 for x in extracted_entities
             ])),

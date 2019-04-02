@@ -2,6 +2,6 @@
 ./../bothub-nlp
 ./../bothub-nlp-celery
 ./../bothub-nlp-nlu
-git+https://github.com/Ilhasoft/bothub-engine@d3aa0888415f680d7726904b19dbae8a3f1569ab#egg=bothub-engine
+git+https://github.com/Ilhasoft/bothub-engine@9ae80e64c85ccfef220c0030f5cb09b6d1d64d93#egg=bothub-engine
 plac==0.9.6
 psycopg2-binary==2.7.6.1
