@@ -2,7 +2,7 @@ import tornado.web
 from tornado import gen
 
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
-from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE
+from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp import settings as bothub_nlp_settings
 
@@ -46,7 +46,7 @@ class EvaluateHandler(ApiHandler):
 
         try:
             evaluate_task = celery_app.send_task(
-                TASK_NLU_EVALUATE,
+                TASK_NLU_EVALUATE_UPDATE,
                 args=[
                     update.id,
                     repository_authorization.user.id,
