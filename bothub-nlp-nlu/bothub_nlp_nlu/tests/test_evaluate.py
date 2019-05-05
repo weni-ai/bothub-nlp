@@ -51,6 +51,11 @@ class EvaluateTestCase(TestCase):
             text='hey',
             intent='greet')
 
+        RepositoryEvaluate.objects.create(
+            repository_update=update,
+            text='test evaluate with rasa and spacy',
+            intent='goodbye')
+
         RepositoryEvaluateEntity.objects.create(
             repository_evaluate=evalute_1,
             start=18,
