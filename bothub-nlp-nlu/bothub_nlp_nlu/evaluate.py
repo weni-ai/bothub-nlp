@@ -1,6 +1,9 @@
 import logging
 import json
+import uuid
 
+from rasa_nlu.training_data import Message
+from rasa_nlu.training_data import TrainingData
 from rasa_nlu.evaluate import (
     merge_labels,
     align_all_entity_predictions,
@@ -8,32 +11,21 @@ from rasa_nlu.evaluate import (
     get_evaluation_metrics,
     remove_empty_intent_examples,
     is_intent_classifier_present,
-    # get_predictions,
     get_entity_targets,
     get_entity_extractors,
     get_intent_targets,
-
     plot_intent_confidences,
     plot_confusion_matrix,
-
-    _targets_predictions_from,
-
-    extract_entities,
-    IntentEvaluationResult,
-    extract_intent,
-    extract_message,
-    extract_confidence,
     get_intent_predictions,
     get_entity_predictions,
-    duckling_extractors,
-    remove_duckling_entities,
-    remove_duckling_extractors,
-    # evaluate_entities,
-    log_evaluation_table,
+    _targets_predictions_from,
 )
 
-from rasa_nlu.training_data import Message
-from rasa_nlu.training_data import TrainingData
+from bothub.common.models import RepositoryEntity
+from bothub.common.models import RepositoryEvaluateResult
+from bothub.common.models import RepositoryEvaluateResultScore
+from bothub.common.models import RepositoryEvaluateResultEntity
+from bothub.common.models import RepositoryEvaluateResultIntent
 
 from .utils import update_interpreters
 
@@ -43,10 +35,6 @@ excluded_itens = ['micro avg', 'macro avg', 'weighted avg', 'no_entity']
 
 
 def collect_nlu_successes(intent_results):
-    '''
-    Log messages which result in successful predictions
-    and save them to file
-    '''
     successes = [{'text': r.message,
                   'intent': r.target,
                   'intent_prediction': {'name': r.prediction,
@@ -57,9 +45,6 @@ def collect_nlu_successes(intent_results):
 
 
 def collect_nlu_errors(intent_results):
-    '''
-    Log messages which result in wrong predictions and save them to file
-    '''
     errors = [{'text': r.message,
                'intent': r.target,
                'intent_prediction': {'name': r.prediction,
@@ -82,7 +67,6 @@ def evaluate_entities(targets,
         merged_predictions = merge_labels(aligned_predictions, extractor)
         merged_predictions = substitute_labels(
             merged_predictions, 'O', 'no_entity')
-        logger.info('Evaluation for entity extractor: {} '.format(extractor))
         report, precision, f1, accuracy = get_evaluation_metrics(
             merged_targets, merged_predictions, output_dict=True)
 
@@ -96,40 +80,15 @@ def evaluate_entities(targets,
     return result
 
 
-def evaluate_intents(intent_results,
-                     confmat_filename,
-                     intent_hist_filename):  # pragma: no cover
-    from sklearn.metrics import confusion_matrix
-    from sklearn.utils.multiclass import unique_labels
-    import matplotlib.pyplot as plt
-
-    num_examples = len(intent_results)
+def evaluate_intents(intent_results):  # pragma: no cover
     intent_results = remove_empty_intent_examples(intent_results)
-
-    logger.info('Intent Evaluation: Only considering those '
-                '{} examples that have a defined intent out '
-                'of {} examples'.format(len(intent_results), num_examples))
-
     targets, predictions = _targets_predictions_from(intent_results)
 
     report, precision, f1, accuracy = get_evaluation_metrics(
         targets, predictions, output_dict=True)
-    # log_evaluation_table(report, precision, f1, accuracy)
 
     log = collect_nlu_errors(intent_results) + \
         collect_nlu_successes(intent_results)
-
-    # cnf_matrix = confusion_matrix(targets, predictions)
-    # labels = unique_labels(targets, predictions)
-    # plot_confusion_matrix(cnf_matrix, classes=labels,
-    #                       title='Intent Confusion matrix',
-    #                       out=confmat_filename)
-    # plt.show()
-
-    # plot_intent_confidences(intent_results,
-    #                         intent_hist_filename)
-
-    # plt.show()
 
     predictions = [
         {
@@ -150,7 +109,83 @@ def evaluate_intents(intent_results,
     }
 
 
-def _entity_rasa_nlu_data(entity, evaluate):
+def plot_and_save_charts(update, intent_results):
+    import io
+    import boto3
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import confusion_matrix
+    from sklearn.utils.multiclass import unique_labels
+    from botocore.exceptions import ClientError
+    from decouple import config
+
+    aws_access_key_id = config('BOTHUB_NLP_AWS_ACCESS_KEY_ID', default='')
+    aws_secret_access_key = config(
+        'BOTHUB_NLP_AWS_SECRET_ACCESS_KEY', default='')
+    aws_bucket_name = config('BOTHUB_NLP_AWS_S3_BUCKET_NAME', default='')
+    aws_region_name = config('BOTHUB_NLP_AWS_REGION_NAME', 'us-east-1')
+
+    confmat_url = ''
+    intent_hist_url = ''
+
+    if all([aws_access_key_id, aws_secret_access_key, aws_bucket_name]):
+        confmat_filename = 'repository_{}/confmat_{}.png'.format(
+            update.id, uuid.uuid4())
+        intent_hist_filename = 'repository_{}/intent_hist_{}.png'.format(
+            update.id, uuid.uuid4())
+
+        intent_results = remove_empty_intent_examples(intent_results)
+        targets, predictions = _targets_predictions_from(intent_results)
+
+        cnf_matrix = confusion_matrix(targets, predictions)
+        labels = unique_labels(targets, predictions)
+        plot_confusion_matrix(cnf_matrix, classes=labels,
+                              title='Intent Confusion matrix')
+
+        chart = io.BytesIO()
+        fig = plt.gcf()
+        fig.set_size_inches(20, 20)
+        fig.savefig(chart, format='png')
+        chart.seek(0)
+
+        s3_client = boto3.client('s3',
+                                 aws_access_key_id=aws_access_key_id,
+                                 aws_secret_access_key=aws_secret_access_key,
+                                 region_name=aws_region_name,
+                                 )
+        try:
+            s3_client.upload_fileobj(chart, aws_bucket_name, confmat_filename,
+                                     ExtraArgs={
+                                         'ContentType': 'image/png'})
+            confmat_url = '{}/{}/{}'.format(s3_client.meta.endpoint_url,
+                                            aws_bucket_name, confmat_filename)
+        except ClientError as e:
+            logger.error(e)
+
+        plot_intent_confidences(intent_results, None)
+        chart = io.BytesIO()
+        fig = plt.gcf()
+        fig.set_size_inches(20, 20)
+        fig.savefig(chart, format='png')
+        chart.seek(0)
+
+        try:
+            s3_client.upload_fileobj(chart, aws_bucket_name,
+                                     intent_hist_filename,
+                                     ExtraArgs={
+                                         'ContentType': 'image/png'})
+            intent_hist_url = '{}/{}/{}'.format(s3_client.meta.endpoint_url,
+                                                aws_bucket_name,
+                                                intent_hist_filename)
+        except ClientError as e:
+            logger.error(e)
+
+    return {
+        'matrix_chart': confmat_url,
+        'confidence_chart': intent_hist_url,
+    }
+
+
+def entity_rasa_nlu_data(entity, evaluate):
     return {
         'start': entity.start,
         'end': entity.end,
@@ -169,7 +204,7 @@ def evaluate_update(update, by):
             text=evaluate.get_text(update.language),
             intent=evaluate.intent,
             entities=[
-                _entity_rasa_nlu_data(evaluate_entity, evaluate)
+                entity_rasa_nlu_data(evaluate_entity, evaluate)
                 for evaluate_entity in evaluate.get_entities(
                     update.language)])
         for evaluate in evaluations
@@ -186,34 +221,19 @@ def evaluate_update(update, by):
         'entity_evaluation': None
     }
 
-    confmat_filename = 'teste.png'
-    intent_hist_filename = 'teste2.png'
-
     if is_intent_classifier_present(interpreter):
         intent_targets = get_intent_targets(test_data)
         intent_results = get_intent_predictions(
             intent_targets, interpreter, test_data)
 
-        logger.info("Intent evaluation results:")
-        result['intent_evaluation'] = evaluate_intents(intent_results,
-                                                       confmat_filename,
-                                                       intent_hist_filename)
+        result['intent_evaluation'] = evaluate_intents(intent_results)
 
     if extractor:
         entity_targets = get_entity_targets(test_data)
-
-        logger.info("Entity evaluation results:")
         result['entity_evaluation'] = evaluate_entities(entity_targets,
                                                         entity_predictions,
                                                         tokens,
                                                         extractor)
-
-    # Save a new evaluate report
-    from bothub.common.models import RepositoryEntity
-    from bothub.common.models import RepositoryEvaluateResult
-    from bothub.common.models import RepositoryEvaluateResultScore
-    from bothub.common.models import RepositoryEvaluateResultEntity
-    from bothub.common.models import RepositoryEvaluateResultIntent
 
     intent_evaluation = result.get('intent_evaluation')
     entity_evaluation = result.get('entity_evaluation')
@@ -230,10 +250,13 @@ def evaluate_update(update, by):
         accuracy=entity_evaluation.get('accuracy'),
     )
 
+    charts = plot_and_save_charts(update, intent_results)
     evaluate_result = RepositoryEvaluateResult.objects.create(
         repository_update=update,
         entity_results=entities_score,
         intent_results=intents_score,
+        matrix_chart=charts.get('matrix_chart'),
+        confidence_chart=charts.get('confidence_chart'),
         log=json.dumps(intent_evaluation.get('log')),
     )
 
@@ -275,5 +298,4 @@ def evaluate_update(update, by):
                 score=entity_score,
             )
 
-    print('END EVALUATE')
     return result
