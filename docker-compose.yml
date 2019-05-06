@@ -50,6 +50,9 @@ services:
       - bothub
     environment:
       - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
+      - BOTHUB_NLP_AWS_S3_BUCKET_NAME=${BOTHUB_NLP_AWS_S3_BUCKET_NAME}
+      - BOTHUB_NLP_AWS_ACCESS_KEY_ID=${BOTHUB_NLP_AWS_ACCESS_KEY_ID}
+      - BOTHUB_NLP_AWS_SECRET_ACCESS_KEY=${BOTHUB_NLP_AWS_SECRET_ACCESS_KEY}
       # bothub-engine env vars
       - SECRET_KEY=${SECRET_KEY:-SK}
       - DEBUG=${DEBUG:-true}
