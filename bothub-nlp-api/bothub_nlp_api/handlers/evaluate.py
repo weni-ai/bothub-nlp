@@ -53,9 +53,13 @@ class EvaluateHandler(ApiHandler):
                 ],
                 queue=queue_name(ACTION_EVALUATE, update.language))
             evaluate_task.wait()
+            evaluate = evaluate_task.result
             evaluate_report = {
                 'language': language,
                 'status': EVALUATE_STATUS_EVALUATED,
+                'update_id': update.id,
+                'evaluate_id': evaluate.get('id'),
+                'evaluate_version': evaluate.get('version'),
             }
         except Exception as e:
             from .. import logger

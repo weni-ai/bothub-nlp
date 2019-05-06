@@ -298,4 +298,7 @@ def evaluate_update(update, by):
                 score=entity_score,
             )
 
-    return result
+    return {
+        'id': evaluate_result.id,
+        'version': evaluate_result.version,
+    }
