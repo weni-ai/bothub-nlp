@@ -7,7 +7,7 @@ setup(
     description='Bothub NLP Common',
     packages=find_packages(),
     dependency_links=[
-        'git+https://github.com/Ilhasoft/bothub-engine@1.19.3#egg=bothub-en' +
+        'git+https://github.com/Ilhasoft/bothub-engine@1.20.0#egg=bothub-en' +
         'gine',
     ],
     install_requires=[

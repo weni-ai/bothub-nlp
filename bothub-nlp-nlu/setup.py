@@ -7,13 +7,13 @@ setup(
     description='Bothub NLP NLU',
     packages=find_packages(),
     dependency_links=[
-        'git+https://github.com/Ilhasoft/bothub-engine@1.19.3#egg=bothub-en' +
+        'git+https://github.com/Ilhasoft/bothub-engine@1.20.0#egg=bothub-en' +
         'gine',
     ],
     install_requires=[
         'contextvars==2.3',
         'spacy==2.0.18',
-        'rasa-nlu==0.15.0',
+        'rasa-nlu==0.14.1',
         'tensorflow==1.12.0',
         'scikit-learn==0.20.2',
         'sklearn-crfsuite==0.3.6',

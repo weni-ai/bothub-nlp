@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c7f3991c29af5372f08fb5659be4983ce3c5b0ae7282248f6ebaca8a10019856"
+            "sha256": "f3bbfb3b6bc333f6f9e6225d32fb431a60853db343ad9b34b2b66346ec11584d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,7 +18,7 @@
     "default": {
         "bothub-engine": {
             "git": "https://github.com/Ilhasoft/bothub-engine",
-            "ref": "9ae80e64c85ccfef220c0030f5cb09b6d1d64d93"
+            "ref": "1.20.0"
         },
         "bothub-nlp": {
             "path": "./../bothub-nlp"
@@ -28,7 +28,7 @@
         },
         "celery-worker-on-demand": {
             "git": "https://github.com/Ilhasoft/celery-worker-on-demand",
-            "ref": "22fc1f0e0c839ecf4e7d661229101fc222bdca17"
+            "ref": "0.2.0"
         },
         "certifi": {
             "hashes": [
@@ -89,10 +89,10 @@
         },
         "urllib3": {
             "hashes": [
-                "sha256:61bf29cada3fc2fbefad4fdf059ea4bd1b4a86d2b6d15e1c7c0b582b9752fe39",
-                "sha256:de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22"
+                "sha256:2393a695cd12afedd0dcb26fe5d50d0cf248e5a66f75dbd89a3d4eb333a61af4",
+                "sha256:a637e5fae88995b256e3409dc4d52c2e2e0ba32c42a6365fee8bbd2238de3cfb"
             ],
-            "version": "==1.24.1"
+            "version": "==1.24.3"
         },
         "websocket-client": {
             "hashes": [
