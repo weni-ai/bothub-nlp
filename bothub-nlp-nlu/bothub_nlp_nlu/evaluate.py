@@ -39,7 +39,8 @@ def collect_nlu_successes(intent_results):
                   'intent': r.target,
                   'intent_prediction': {'name': r.prediction,
                                         'confidence': r.confidence,
-                                        'status': 'success'}}
+                                        },
+                  'status': 'success'}
                  for r in intent_results if r.target == r.prediction]
     return successes
 
@@ -49,7 +50,8 @@ def collect_nlu_errors(intent_results):
                'intent': r.target,
                'intent_prediction': {'name': r.prediction,
                                      'confidence': r.confidence,
-                                     'status': 'error'}}
+                                     },
+               'status': 'error'}
               for r in intent_results if r.target != r.prediction]
     return errors
 
@@ -112,6 +114,9 @@ def evaluate_intents(intent_results):  # pragma: no cover
 def plot_and_save_charts(update, intent_results):
     import io
     import boto3
+    import matplotlib as mpl
+    mpl.use('Agg')
+
     import matplotlib.pyplot as plt
     from sklearn.metrics import confusion_matrix
     from sklearn.utils.multiclass import unique_labels
@@ -144,7 +149,7 @@ def plot_and_save_charts(update, intent_results):
         chart = io.BytesIO()
         fig = plt.gcf()
         fig.set_size_inches(20, 20)
-        fig.savefig(chart, format='png')
+        fig.savefig(chart, format='png', bbox_inches='tight')
         chart.seek(0)
 
         s3_client = boto3.client('s3',
@@ -164,8 +169,8 @@ def plot_and_save_charts(update, intent_results):
         plot_intent_confidences(intent_results, None)
         chart = io.BytesIO()
         fig = plt.gcf()
-        fig.set_size_inches(20, 20)
-        fig.savefig(chart, format='png')
+        fig.set_size_inches(10, 10)
+        fig.savefig(chart, format='png', bbox_inches='tight')
         chart.seek(0)
 
         try:
@@ -269,7 +274,7 @@ def evaluate_update(update, by):
             intent_score = RepositoryEvaluateResultScore.objects.create(
                 precision=intent.get('precision'),
                 recall=intent.get('recall'),
-                f1_score=intent.get('f1_score'),
+                f1_score=intent.get('f1-score'),
                 support=intent.get('support'),
             )
 
@@ -285,7 +290,7 @@ def evaluate_update(update, by):
             entity_score = RepositoryEvaluateResultScore.objects.create(
                 precision=entity.get('precision'),
                 recall=entity.get('recall'),
-                f1_score=entity.get('f1_score'),
+                f1_score=entity.get('f1-score'),
                 support=entity.get('support'),
             )
 
