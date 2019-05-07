@@ -11,6 +11,7 @@ from . import settings
 from .handlers.parse import ParseHandler
 from .handlers.train import TrainHandler
 from .handlers.info import InfoHandler
+from .handlers.evaluate import EvaluateHandler
 
 
 app = None
@@ -24,6 +25,7 @@ def make_app():
         url('/parse/', ParseHandler),
         url('/train/', TrainHandler),
         url('/info/', InfoHandler),
+        url('/evaluate/', EvaluateHandler)
     ])
 
 
