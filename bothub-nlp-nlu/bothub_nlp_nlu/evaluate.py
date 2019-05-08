@@ -200,9 +200,7 @@ def entity_rasa_nlu_data(entity, evaluate):
 
 
 def evaluate_update(update, by):
-    evaluations = update.repository.evaluations(
-        exclude_deleted=False).filter(
-            repository_update__language=update.language)
+    evaluations = update.repository.evaluations(language=update.language)
 
     training_examples = [
         Message.build(
