@@ -267,7 +267,7 @@ def evaluate_update(update, by):
     entity_reports = entity_evaluation.get('report')
 
     for intent_key in intent_reports.keys():
-        if intent_key not in excluded_itens:
+        if intent_key and intent_key not in excluded_itens:
             intent = intent_reports.get(intent_key)
             intent_score = RepositoryEvaluateResultScore.objects.create(
                 precision=intent.get('precision'),
@@ -283,7 +283,7 @@ def evaluate_update(update, by):
             )
 
     for entity_key in entity_reports.keys():
-        if entity_key not in excluded_itens:
+        if entity_key and entity_key not in excluded_itens:
             entity = entity_reports.get(entity_key)
             entity_score = RepositoryEvaluateResultScore.objects.create(
                 precision=entity.get('precision'),
