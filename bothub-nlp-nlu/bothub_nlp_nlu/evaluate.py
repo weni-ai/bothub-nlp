@@ -9,7 +9,6 @@ from rasa_nlu.evaluate import (
     align_all_entity_predictions,
     substitute_labels,
     get_evaluation_metrics,
-    remove_empty_intent_examples,
     is_intent_classifier_present,
     get_entity_targets,
     get_entity_extractors,
@@ -31,7 +30,25 @@ from .utils import update_interpreters
 
 logger = logging.getLogger(__name__)
 
-excluded_itens = ['micro avg', 'macro avg', 'weighted avg', 'no_entity']
+excluded_itens = [
+    'micro avg',
+    'macro avg',
+    'weighted avg',
+    'no_entity',
+    'no predicted',
+]
+
+
+def remove_empty_intent_examples(intent_results):
+    filtered = []
+    for r in intent_results:
+        if r.prediction is None:
+            r = r._replace(prediction='no predicted')
+
+        if r.target != '' and r.target is not None:
+            filtered.append(r)
+
+    return filtered
 
 
 def collect_nlu_successes(intent_results):
