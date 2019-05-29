@@ -4,6 +4,7 @@ from bothub_nlp import settings as bothub_nlp_settings
 
 from .actions import ACTION_PARSE
 from .actions import ACTION_TRAIN
+from .actions import ACTION_EVALUATE
 from .actions import queue_name
 from . import settings
 
@@ -18,6 +19,9 @@ queues_name = set([
     for lang in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys()
 ] + [
     queue_name(ACTION_TRAIN, lang)
+    for lang in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys()
+] + [
+    queue_name(ACTION_EVALUATE, lang)
     for lang in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys()
 ])
 celery_app.conf.task_queues = [

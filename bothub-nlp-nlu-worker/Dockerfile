@@ -13,11 +13,14 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y ${PYTHON_BUILD_PACKAGES} git \
     && add-apt-repository ppa:fkrull/deadsnakes \
     && apt-get update \
-    && apt-get install --no-install-recommends -y python3.6 python3.6-dev \
+    && apt-get install --no-install-recommends -y python3.6 python3.6-dev python3.6-tk \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.6 get-pip.py \
     && rm get-pip.py \
-    && apt-get remove -y ${PYTHON_BUILD_PACKAGES} \
+    && apt-get remove -y ${PYTHON_BUILD_PACKAGES}
+
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+RUN apt-get install -y ttf-mscorefonts-installer \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*

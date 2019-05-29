@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "88f3f01346d2e6fc86ec853676d2946797dae5acd7286ce78709a08af4c7b4af"
+            "sha256": "eb8221facc6d6a0f32ba8549c7064f43e2231629f18f123865c1a6f22a13894b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,7 +18,7 @@
     "default": {
         "bothub-engine": {
             "git": "https://github.com/Ilhasoft/bothub-engine",
-            "ref": "d3aa0888415f680d7726904b19dbae8a3f1569ab"
+            "ref": "ae6484f9afcc6de6fc6aa74bec050dcb42596020"
         },
         "bothub-nlp": {
             "path": "./../bothub-nlp"
@@ -84,11 +84,11 @@
         },
         "flake8": {
             "hashes": [
-                "sha256:c3ba1e130c813191db95c431a18cb4d20a468e98af7a77e2181b68574481ad36",
-                "sha256:fd9ddf503110bf3d8b1d270e8c673aab29ccb3dd6abf29bae1f54e5116ab4a91"
+                "sha256:859996073f341f2670741b51ec1e67a01da142831aa1fdc6242dbf88dffbe661",
+                "sha256:a796a115208f5c03b18f332f7c11729812c8c3ded6c46319c59b53efd3819da8"
             ],
             "index": "pypi",
-            "version": "==3.7.5"
+            "version": "==3.7.7"
         },
         "mccabe": {
             "hashes": [
@@ -106,18 +106,18 @@
         },
         "pyflakes": {
             "hashes": [
-                "sha256:5e8c00e30c464c99e0b501dc160b13a14af7f27d4dffb529c556e30a159e231d",
-                "sha256:f277f9ca3e55de669fba45b7393a1449009cff5a37d1af10ebb76c52765269cd"
+                "sha256:17dbeb2e3f4d772725c777fabc446d5634d1038f234e77343108ce445ea69ce0",
+                "sha256:d976835886f8c5b31d47970ed689944a0262b5f3afa00a5a7b4dc81e5449f8a2"
             ],
-            "version": "==2.1.0"
+            "version": "==2.1.1"
         },
         "redis": {
             "hashes": [
-                "sha256:74c892041cba46078ae1ef845241548baa3bd3634f9a6f0f952f006eb1619c71",
-                "sha256:7ba8612bbfd966dea8c62322543fed0095da2834dbd5a7c124afbc617a156aa7"
+                "sha256:6946b5dca72e86103edc8033019cc3814c031232d339d5f4533b02ea85685175",
+                "sha256:8ca418d2ddca1b1a850afa1680a7d2fd1f3322739271de4b704e0d4668449273"
             ],
             "index": "pypi",
-            "version": "==3.1.0"
+            "version": "==3.2.1"
         }
     }
 }
