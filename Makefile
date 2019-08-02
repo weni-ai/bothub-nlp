@@ -28,6 +28,22 @@ test:
 		&& echo "${SUCCESS}✔${NC} bothub-nlp-nlu" || echo "${DANGER}✖${NC} bothub-nlp-nlu"
 
 
+mode_development:
+	@echo "${INFO}Mode Development...${NC}"
+	@echo "SUPPORTED_LANGUAGES=en:en_core_web_md" >> .env
+	@echo "DEFAULT_DATABASE=postgres://bothub:bothub@database:5432/bothub" >> .env
+	@docker-compose build --build-arg DOWNLOAD_SPACY_MODELS=en:en_core_web_md
+	@docker-compose up -d
+	@echo "${SUCCESS}Finish...${NC}"
+
+
+dev_update:
+	@echo "${INFO}Mode Development Update...${NC}"
+	@docker-compose build --build-arg DOWNLOAD_SPACY_MODELS=en:en_core_web_md
+	@docker-compose up -d
+	@echo "${SUCCESS}Finish...${NC}"
+
+
 # Utils
 
 ## Colors
