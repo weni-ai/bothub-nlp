@@ -28,7 +28,7 @@ class TrainHandler(ApiHandler):
 
         for language in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys():
             current_update = requests.get(
-                'http://7cfc350e.ngrok.io/v2/repository/nlp/authorization/{}/?language={}'.format(
+                'http://7cfc350e.ngrok.io/v2/repository/nlp/authorization/train/{}/?language={}'.format(
                     repository_authorization, 
                     language
                 )

@@ -1,5 +1,6 @@
 import tornado.escape
 import traceback
+import requests
 
 from tornado.web import RequestHandler
 from rest_framework import status
@@ -78,6 +79,15 @@ class ApiHandler(SentryMixin, RequestHandler):
             return False
 
         return authorization_uuid
+
+    def request_update_parse(self, repository_authorization, language):
+        update = requests.get(
+            'http://7cfc350e.ngrok.io/v2/repository/nlp/authorization/parse/{}/?language={}'.format(
+                repository_authorization, 
+                language
+            )
+        ).json()
+        return update
 
     def get(self):
         self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
