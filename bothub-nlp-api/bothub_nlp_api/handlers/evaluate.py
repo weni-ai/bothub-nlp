@@ -1,5 +1,4 @@
 import tornado.web
-import requests
 from tornado import gen
 
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
@@ -37,12 +36,7 @@ class EvaluateHandler(ApiHandler):
         if not repository_authorization:
             raise AuthorizationIsRequired()
 
-        update = requests.get(
-            'http://7cfc350e.ngrok.io/v2/repository/nlp/authorization/evaluate/{}/?language={}'.format(
-                repository_authorization, 
-                language
-            )
-        ).json()
+        update = self.request_backend_parse('evaluate', repository_authorization, language)
 
         if not update.get('update'):
             raise ValidationError(

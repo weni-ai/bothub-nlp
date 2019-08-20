@@ -1,5 +1,4 @@
 import tornado.web
-import requests
 from tornado import gen
 from tornado.gen import Task
 
@@ -27,12 +26,8 @@ class TrainHandler(ApiHandler):
         languages_report = {}
 
         for language in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys():
-            current_update = requests.get(
-                'http://7cfc350e.ngrok.io/v2/repository/nlp/authorization/train/{}/?language={}'.format(
-                    repository_authorization, 
-                    language
-                )
-            ).json()
+
+            current_update = self.request_backend_parse('train', repository_authorization, language)
 
             if not current_update.get('ready_for_train'):
                 languages_report[language] = {
