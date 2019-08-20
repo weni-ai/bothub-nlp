@@ -21,7 +21,7 @@ class TrainHandler(ApiHandler):
     @gen.engine
     @authorization_required
     def post(self):
-        repository_authorization = self.repository_authorization_new_backend()
+        repository_authorization = self.repository_authorization()
         
         languages_report = {}
 

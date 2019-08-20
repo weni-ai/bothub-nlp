@@ -5,7 +5,6 @@ import requests
 from tornado.web import RequestHandler
 from rest_framework import status
 from raven.contrib.tornado import SentryMixin
-from bothub.common.models import RepositoryAuthorization
 
 from bothub_nlp import settings as bothub_nlp_settings
 from ..utils import ApiError, ValidationError
@@ -57,20 +56,6 @@ class ApiHandler(SentryMixin, RequestHandler):
         self.finish(r)
 
     def repository_authorization(self):
-        authorization_header_value = self.request.headers.get('Authorization')
-        authorization_uuid = authorization_header_value and\
-            authorization_header_value[7:]
-
-        if not authorization_uuid:
-            return False
-
-        try:
-            return RepositoryAuthorization.objects.get(
-                uuid=authorization_uuid)
-        except RepositoryAuthorization.DoesNotExist:
-            return False
-
-    def repository_authorization_new_backend(self):
         authorization_header_value = self.request.headers.get('Authorization')
         authorization_uuid = authorization_header_value and\
             authorization_header_value[7:]

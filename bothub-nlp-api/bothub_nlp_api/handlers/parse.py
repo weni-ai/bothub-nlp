@@ -50,7 +50,7 @@ class ParseHandler(ApiHandler):
                 'Language \'{}\' not supported by now.'.format(language),
                 field='language')
 
-        repository_authorization = self.repository_authorization_new_backend()
+        repository_authorization = self.repository_authorization()
         if not repository_authorization:
             raise AuthorizationIsRequired()
       

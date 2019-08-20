@@ -1,26 +1,13 @@
+import requests
 from tornado.web import HTTPError
 from rest_framework import status
-from bothub.common import languages
 
 
-NEXT_LANGS = {
-    'english': [
-        languages.LANGUAGE_EN,
-    ],
-    'portuguese': [
-        languages.LANGUAGE_PT,
-        languages.LANGUAGE_PT_BR,
-    ],
-    languages.LANGUAGE_PT: [
-        languages.LANGUAGE_PT_BR,
-    ],
-    'pt-br': [
-        languages.LANGUAGE_PT_BR,
-    ],
-    'br': [
-        languages.LANGUAGE_PT_BR,
-    ],
-}
+NEXT_LANGS = requests.get(
+    '{}/v2/repository/nlp/authorization/langs/'.format(
+        'http://7cfc350e.ngrok.io'
+    )
+).json()
 
 
 class ApiError(HTTPError):
