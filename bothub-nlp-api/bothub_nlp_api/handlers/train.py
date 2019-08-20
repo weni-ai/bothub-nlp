@@ -1,4 +1,5 @@
 import tornado.web
+import requests
 from tornado import gen
 from tornado.gen import Task
 
@@ -21,15 +22,19 @@ class TrainHandler(ApiHandler):
     @gen.engine
     @authorization_required
     def post(self):
-        repository_authorization = self.repository_authorization()
-        repository = repository_authorization.repository
-
+        repository_authorization = self.repository_authorization_new_backend()
+        
         languages_report = {}
 
         for language in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys():
-            current_update = repository.current_update(language)
+            current_update = requests.get(
+                'http://7cfc350e.ngrok.io/v2/repository/nlp/authorization/{}/?language={}'.format(
+                    repository_authorization, 
+                    language
+                )
+            ).json()
 
-            if not current_update.ready_for_train:
+            if not current_update.get('ready_for_train'):
                 languages_report[language] = {
                     'status': TRAIN_STATUS_NOT_READY_FOR_TRAIN,
                 }
@@ -39,10 +44,10 @@ class TrainHandler(ApiHandler):
                 train_task = celery_app.send_task(
                     TASK_NLU_TRAIN_UPDATE,
                     args=[
-                        current_update.id,
-                        repository_authorization.user.id,
+                        current_update.get('current_update_id'),
+                        current_update.get('repository_authorization_user_id'),
                     ],
-                    queue=queue_name(ACTION_TRAIN, current_update.language))
+                    queue=queue_name(ACTION_TRAIN, current_update.get('language')))
                 train_task.wait()
                 languages_report[language] = {
                     'status': TRAIN_STATUS_TRAINED,

@@ -69,6 +69,16 @@ class ApiHandler(SentryMixin, RequestHandler):
         except RepositoryAuthorization.DoesNotExist:
             return False
 
+    def repository_authorization_new_backend(self):
+        authorization_header_value = self.request.headers.get('Authorization')
+        authorization_uuid = authorization_header_value and\
+            authorization_header_value[7:]
+
+        if not authorization_uuid:
+            return False
+
+        return authorization_uuid
+
     def get(self):
         self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
         self.finish()
