@@ -2,6 +2,7 @@ import logging
 import io
 import contextvars
 import spacy
+import requests
 
 from tempfile import mkdtemp
 
@@ -9,27 +10,25 @@ from rasa_nlu.config import RasaNLUModelConfig
 from rasa_nlu.model import Interpreter
 from rasa_nlu.model import Metadata
 from rasa_nlu import components
-from bothub.common.models import Repository
 
 from .persistor import BothubPersistor
 
 
 def get_rasa_nlu_config_from_update(update):
     pipeline = []
-    if update.algorithm == Repository.ALGORITHM_STATISTICAL_MODEL:
+    if update.get('algorithm') == update.get('ALGORITHM_STATISTICAL_MODEL'):
         pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
         pipeline.append({'name': 'tokenizer_spacy_with_labels'})
         pipeline.append({'name': 'intent_entity_featurizer_regex'})
         pipeline.append({'name': 'intent_featurizer_spacy'})
         pipeline.append({'name': 'ner_crf'})
         # spacy named entity recognition
-        if update.use_name_entities:
+        if update.get('use_name_entities'):
             pipeline.append({'name': 'ner_spacy'})
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
         pipeline.append({'name': 'intent_classifier_sklearn'})
     else:
-        use_spacy = update.algorithm == Repository \
-            .ALGORITHM_NEURAL_NETWORK_EXTERNAL
+        use_spacy = update.get('algorithm') == update.get('ALGORITHM_NEURAL_NETWORK_EXTERNAL')
         # load spacy
         pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
         # tokenizer
@@ -42,18 +41,18 @@ def get_rasa_nlu_config_from_update(update):
         # intent classifier
         pipeline.append({
             'name': 'intent_classifier_tensorflow_embedding',
-            'similarity_type': 'inner' if update.use_competing_intents else
+            'similarity_type': 'inner' if update.get('use_competing_intents') else
                                'cosine'
         })
         # entity extractor
         pipeline.append({'name': 'ner_crf'})
         # spacy named entity recognition
-        if update.use_name_entities:
+        if update.get('use_name_entities'):
             pipeline.append({'name': 'ner_spacy'})
         # label extractor
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
     return RasaNLUModelConfig({
-        'language': update.language,
+        'language': update.get('language'),
         'pipeline': pipeline,
     })
 
@@ -106,17 +105,30 @@ class BothubInterpreter(Interpreter):
 class UpdateInterpreters:
     interpreters = {}
 
+    def request_backend_parse(self, update_id):
+        backend = 'http://ab24300f.ngrok.io'
+        update = requests.get(
+            '{}/v2/repository/nlp/update_interpreters/{}/'.format(
+                backend,
+                update_id
+            )
+        ).json()
+        return update
+
     def get(self, update, use_cache=True):
-        interpreter = self.interpreters.get(update.id)
+
+        update_request = self.request_backend_parse(update)
+
+        interpreter = self.interpreters.get(update_request.get('update_id'))
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(update)
+        persistor = BothubPersistor(update)#####
         model_directory = mkdtemp()
         persistor.retrieve(
-            str(update.repository.uuid),
-            str(update.id),
+            str(update_request.get('repository_uuid')),
+            str(update_request.get('update_id')),
             model_directory)
-        self.interpreters[update.id] = BothubInterpreter.load(
+        self.interpreters[update_request.get('update_id')] = BothubInterpreter.load(
             model_directory,
             components.ComponentBuilder(use_cache=False))
         return self.get(update)
