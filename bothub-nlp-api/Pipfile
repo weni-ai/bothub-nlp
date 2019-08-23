@@ -10,10 +10,10 @@ lint = "flake8"
 [packages]
 tornado = "==5.1.1"
 raven = "*"
-bothub-engine = {ref = "1.21.0", git = "https://github.com/Ilhasoft/bothub-engine"}
 bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
 python-decouple = "*"
 bothub-nlp = {path = "./../bothub-nlp"}
+requests = "==2.20.1"
 
 [dev-packages]
 redis = "*"

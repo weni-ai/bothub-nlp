@@ -7,7 +7,7 @@ from rasa_nlu.training_data import Message, TrainingData
 from rasa_nlu.components import ComponentBuilder
 from rasa_nlu.training_data.formats.readerwriter import TrainingDataWriter
 from rasa_nlu.utils import json_to_string
-from django.db import models
+# from django.db import models
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging

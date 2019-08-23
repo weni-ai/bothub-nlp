@@ -3,7 +3,7 @@ import traceback
 import requests
 
 from tornado.web import RequestHandler
-from rest_framework import status
+# from rest_framework import status
 from raven.contrib.tornado import SentryMixin
 
 from bothub_nlp import settings as bothub_nlp_settings
@@ -78,13 +78,13 @@ class ApiHandler(SentryMixin, RequestHandler):
         return update
 
     def get(self):
-        self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.set_status(405)
         self.finish()
 
     def post(self):
-        self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.set_status(s405)
         self.finish()
 
     def options(self):
-        self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.set_status(405)
         self.finish()

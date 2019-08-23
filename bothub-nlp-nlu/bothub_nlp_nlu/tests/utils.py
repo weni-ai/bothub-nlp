@@ -1,5 +1,5 @@
-from bothub.common.models import RepositoryExample
-from bothub.common.models import RepositoryExampleEntity
+# from bothub.common.models import RepositoryExample
+# from bothub.common.models import RepositoryExampleEntity
 
 
 EXAMPLES_MOCKUP = [
@@ -224,20 +224,20 @@ EXAMPLES_WITH_SPACY_NER_MOCKUP = [
 ]
 
 
-def fill_examples(examples_mockup, repository, language=None):
-    for example_mockup in examples_mockup:
-        example = RepositoryExample.objects.create(
-            repository_update=repository.current_update(
-                (language or repository.language)),
-            text=example_mockup.get('text'),
-            intent=example_mockup.get('intent'))
-        for entity_mockup in example_mockup.get('entities', []):
-            example_entity = RepositoryExampleEntity.objects.create(
-                repository_example=example,
-                start=entity_mockup.get('start'),
-                end=entity_mockup.get('end'),
-                entity=entity_mockup.get('entity'))
-            entity_label = entity_mockup.get('label')
-            if entity_label:
-                example_entity.entity.set_label(entity_label)
-                example_entity.entity.save()
+# def fill_examples(examples_mockup, repository, language=None):
+#     for example_mockup in examples_mockup:
+#         example = RepositoryExample.objects.create(
+#             repository_update=repository.current_update(
+#                 (language or repository.language)),
+#             text=example_mockup.get('text'),
+#             intent=example_mockup.get('intent'))
+#         for entity_mockup in example_mockup.get('entities', []):
+#             example_entity = RepositoryExampleEntity.objects.create(
+#                 repository_example=example,
+#                 start=entity_mockup.get('start'),
+#                 end=entity_mockup.get('end'),
+#                 entity=entity_mockup.get('entity'))
+#             entity_label = entity_mockup.get('label')
+#             if entity_label:
+#                 example_entity.entity.set_label(entity_label)
+#                 example_entity.entity.save()

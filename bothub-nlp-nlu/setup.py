@@ -6,10 +6,10 @@ setup(
     version='0.2.0',
     description='Bothub NLP NLU',
     packages=find_packages(),
-    dependency_links=[
-        'git+https://github.com/Ilhasoft/bothub-engine@1.21.0#egg=bothub-en' +
-        'gine',
-    ],
+    # dependency_links=[
+    #     'git+https://github.com/Ilhasoft/bothub-engine@1.21.0#egg=bothub-en' +
+    #     'gine',
+    # ],
     install_requires=[
         'contextvars==2.3',
         'spacy==2.0.18',
@@ -20,5 +20,6 @@ setup(
         'pythainlp==1.7.2',
         'pymorphy2==0.8',
         'plac==0.9.6',
+        'requests==2.20.1',
     ],
 )

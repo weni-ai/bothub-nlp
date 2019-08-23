@@ -1,6 +1,6 @@
 import requests
 from tornado.web import HTTPError
-from rest_framework import status
+# from rest_framework import status
 
 
 NEXT_LANGS = requests.get(
@@ -20,7 +20,7 @@ class ValidationError(ApiError):
     def __init__(self, *args, field=None, status_code=None, **kwargs):
         super().__init__(
             *args,
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=400,
             **kwargs)
         self.field = field
 
@@ -30,7 +30,7 @@ class AuthorizationIsRequired(ApiError):
         super().__init__(
             'Authorization is required',
             *args,
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             **kwargs)
 
 
