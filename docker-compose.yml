@@ -35,6 +35,7 @@ services:
       # env vars
       - BOTHUB_NLP_API_LOGGER_FORMAT=${BOTHUB_NLP_API_LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
       - BOTHUB_NLP_API_LOGGER_LEVEL=${BOTHUB_NLP_API_LOGGER_LEVEL:-10}
+      - BOTHUB_ENGINE_URL=${BOTHUB_ENGINE_URL:-https://api.bothub.it}
 
   bothub-nlp-nlu-worker:
     image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-nlu-worker}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
@@ -66,6 +67,7 @@ services:
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
       - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL:-redis://bothub-nlp-celery-redis:6379/0}
       - BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE:-True}
+      - BOTHUB_ENGINE_URL=${BOTHUB_ENGINE_URL:-https://api.bothub.it}
 
   bothub-nlp-nlu-worker-on-demand:
     image: ${BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-nlu-worker-on-demand}:${BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOCKER_IMAGE_TAG:-latest}
@@ -101,6 +103,7 @@ services:
       - BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE:-True}
       # env vars
       - BOTHUB_NLP_DOCKER_CLIENT_BASE_URL=${BOTHUB_NLP_DOCKER_CLIENT_BASE_URL:-unix://var/run/docker.sock}
+      - BOTHUB_ENGINE_URL=${BOTHUB_ENGINE_URL:-https://api.bothub.it}
 
   bothub-nlp-celery-redis:
     image: redis
