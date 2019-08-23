@@ -20,6 +20,6 @@ def train_update(update_id, by_id):
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def evaluate_update(update_id, by_id):
-    update = RepositoryUpdate.objects.get(id=update_id)
-    by = User.objects.get(id=by_id)
-    return evaluate_update_core(update, by)
+    # update = RepositoryUpdate.objects.get(id=update_id)
+    # by = User.objects.get(id=by_id)
+    return evaluate_update_core(update_id, by_id)

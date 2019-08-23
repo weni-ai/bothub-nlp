@@ -1,6 +1,5 @@
+import requests
 from collections import OrderedDict
-
-from bothub.common.models import RepositoryEntity
 
 from .utils import update_interpreters
 
@@ -32,6 +31,16 @@ def position_match(a, b):
         return False
     return True
 
+def request_backend_repository_entity(update_id, entity):
+    backend = 'http://ab24300f.ngrok.io'
+    update = requests.get(
+        '{}/v2/repository/nlp/authorization/parse/repositoryentity/?update_id={}&entity={}'.format(
+            backend,
+            update_id,
+            entity
+        )
+    ).json()
+    return update
 
 def format_parse_output(update, r):
     intent = r.get('intent', None)
@@ -59,11 +68,9 @@ def format_parse_output(update, r):
         if is_label:
             label_value = entity.get('entity')
         else:
-            repository_entity = RepositoryEntity.objects.get(
-                repository=update.repository,
-                value=entity.get('entity'))
-            if repository_entity.label:
-                label_value = repository_entity.label.value
+            repository_entity = request_backend_repository_entity(update, entity.get('entity'))
+            if repository_entity.get('label'):
+                label_value = repository_entity.get('label_value')
 
         if not entities_dict.get(label_value):
             entities_dict[label_value] = []
