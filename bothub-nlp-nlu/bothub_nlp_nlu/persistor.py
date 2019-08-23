@@ -16,7 +16,7 @@ class BothubPersistor(Persistor):
             self.send_training_backend(self.update, data)
 
     def request_backend_parse(self, update_id):
-        backend = 'http://ab24300f.ngrok.io'
+        backend = 'http://33d0c44b.ngrok.io'
         update = requests.get(
             '{}/v2/repository/nlp/update_interpreters/{}/'.format(
                 backend,
@@ -26,7 +26,7 @@ class BothubPersistor(Persistor):
         return update
 
     def send_training_backend(self, update_id, botdata):
-        backend = 'http://ab24300f.ngrok.io'
+        backend = 'http://33d0c44b.ngrok.io'
         update = requests.post(
             '{}/v2/repository/nlp/update_interpreters/'.format(
                 backend

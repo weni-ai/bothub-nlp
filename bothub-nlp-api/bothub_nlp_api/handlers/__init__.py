@@ -66,7 +66,7 @@ class ApiHandler(SentryMixin, RequestHandler):
         return authorization_uuid
 
     def request_backend_parse(self, router, repository_authorization, language=None):
-        backend = 'http://ab24300f.ngrok.io'
+        backend = 'http://33d0c44b.ngrok.io'
         update = requests.get(
             '{}/v2/repository/nlp/authorization/{}/{}/?language={}'.format(
                 backend,

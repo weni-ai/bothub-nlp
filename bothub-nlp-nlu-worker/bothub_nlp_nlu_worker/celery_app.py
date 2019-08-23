@@ -14,12 +14,8 @@ def parse_text(update_id, *args, **kwargs):
 
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
 def train_update(update_id, by_id):
-    # update = RepositoryUpdate.objects.get(id=)
-    # by = User.objects.get(id=)
     return train_update_core(update_id, by_id)
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def evaluate_update(update_id, by_id):
-    # update = RepositoryUpdate.objects.get(id=update_id)
-    # by = User.objects.get(id=by_id)
     return evaluate_update_core(update_id, by_id)

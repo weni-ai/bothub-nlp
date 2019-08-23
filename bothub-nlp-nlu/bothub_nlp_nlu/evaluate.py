@@ -1,6 +1,7 @@
 import logging
 import json
 import uuid
+import requests
 
 from rasa_nlu.training_data import Message
 from rasa_nlu.training_data import TrainingData
@@ -19,12 +20,6 @@ from rasa_nlu.evaluate import (
     get_entity_predictions,
     _targets_predictions_from,
 )
-
-from bothub.common.models import RepositoryEntity
-from bothub.common.models import RepositoryEvaluateResult
-from bothub.common.models import RepositoryEvaluateResultScore
-from bothub.common.models import RepositoryEvaluateResultEntity
-from bothub.common.models import RepositoryEvaluateResultIntent
 
 from .utils import update_interpreters
 
@@ -215,21 +210,109 @@ def entity_rasa_nlu_data(entity, evaluate):
         'entity': entity.entity.value,
     }
 
+def request_backend_start_evaluation(update_id):
+    backend = 'http://33d0c44b.ngrok.io'
+    update = requests.get(
+        '{}/v2/repository/nlp/authorization/evaluate/evaluations/?update_id={}'.format(
+            backend,
+            update_id
+        )
+    ).json()
+    return update
+
+
+def request_backend_create_evaluateresults(
+    update_id, 
+    matrix_chart, 
+    confidence_chart, 
+    log,
+    intentprecision,
+    intentf1_score,
+    intentaccuracy,
+    entityprecision,
+    entityf1_score,
+    entityaccuracy):
+    backend = 'http://33d0c44b.ngrok.io'
+    update = requests.post(
+        '{}/v2/repository/nlp/authorization/evaluate/evaluateresults/'.format(
+            backend,
+        ),
+        data={
+            'update_id': update_id,
+            'matrix_chart': matrix_chart,
+            'confidence_chart': confidence_chart,
+            'log': log,
+            'intentprecision': intentprecision,
+            'intentf1_score': intentf1_score,
+            'intentaccuracy': intentaccuracy,
+            'entityprecision': entityprecision,
+            'entityf1_score': entityf1_score,
+            'entityaccuracy': entityaccuracy
+        }
+    ).json()
+    return update
+
+def request_backend_create_evaluateresultsintent(
+    evaluate_id, 
+    precision, 
+    recall, 
+    f1_score,
+    support,
+    intent_key):
+    backend = 'http://33d0c44b.ngrok.io'
+    update = requests.post(
+        '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsintent/'.format(
+            backend,
+        ),
+        data={
+            'evaluate_id': evaluate_id,
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1_score,
+            'support': support,
+            'intent_key': intent_key
+        }
+    ).json()
+    return update
+
+def request_backend_create_evaluateresultsscore(
+    evaluate_id, 
+    update_id, 
+    precision, 
+    recall,
+    f1_score,
+    support,
+    entity_key):
+    backend = 'http://33d0c44b.ngrok.io'
+    update = requests.post(
+        '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsscore/'.format(
+            backend,
+        ),
+        data={
+            'evaluate_id': evaluate_id,
+            'update_id': update_id,
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1_score,
+            'support': support,
+            'entity_key': entity_key
+        }
+    ).json()
+    return update
 
 def evaluate_update(update, by):
-    # evaluations_request = request_backend_start_training(update, by)
-    evaluations = update.repository.evaluations(language=update.language)
+    print(update)
+    evaluations = request_backend_start_evaluation(update)
+    training_examples = []
 
-    training_examples = [
-        Message.build(
-            text=evaluate.get_text(update.language),
-            intent=evaluate.intent,
-            entities=[
-                entity_rasa_nlu_data(evaluate_entity, evaluate)
-                for evaluate_entity in evaluate.get_entities(
-                    update.language)])
-        for evaluate in evaluations
-    ]
+    for evaluate in evaluations:
+        training_examples.append(
+            Message.build(
+                text=evaluate.get('text'),
+                intent=evaluate.get('intent'),
+                entities=evaluate.get('entities')
+            )
+        )
 
     test_data = TrainingData(training_examples=training_examples)
     interpreter = update_interpreters.get(update, use_cache=False)
@@ -259,26 +342,19 @@ def evaluate_update(update, by):
     intent_evaluation = result.get('intent_evaluation')
     entity_evaluation = result.get('entity_evaluation')
 
-    intents_score = RepositoryEvaluateResultScore.objects.create(
-        precision=intent_evaluation.get('precision'),
-        f1_score=intent_evaluation.get('f1_score'),
-        accuracy=intent_evaluation.get('accuracy'),
-    )
-
-    entities_score = RepositoryEvaluateResultScore.objects.create(
-        precision=entity_evaluation.get('precision'),
-        f1_score=entity_evaluation.get('f1_score'),
-        accuracy=entity_evaluation.get('accuracy'),
-    )
-
     charts = plot_and_save_charts(update, intent_results)
-    evaluate_result = RepositoryEvaluateResult.objects.create(
-        repository_update=update,
-        entity_results=entities_score,
-        intent_results=intents_score,
-        matrix_chart=charts.get('matrix_chart'),
-        confidence_chart=charts.get('confidence_chart'),
-        log=json.dumps(intent_evaluation.get('log')),
+
+    evaluate_result = request_backend_create_evaluateresults(
+        update, 
+        charts.get('matrix_chart'),
+        charts.get('confidence_chart'),
+        intent_evaluation.get('log'),
+        intent_evaluation.get('precision'),
+        intent_evaluation.get('f1_score'),
+        intent_evaluation.get('accuracy'),
+        entity_evaluation.get('precision'),
+        entity_evaluation.get('f1_score'),
+        entity_evaluation.get('accuracy')
     )
 
     intent_reports = intent_evaluation.get('report')
@@ -287,39 +363,31 @@ def evaluate_update(update, by):
     for intent_key in intent_reports.keys():
         if intent_key and intent_key not in excluded_itens:
             intent = intent_reports.get(intent_key)
-            intent_score = RepositoryEvaluateResultScore.objects.create(
-                precision=intent.get('precision'),
-                recall=intent.get('recall'),
-                f1_score=intent.get('f1-score'),
-                support=intent.get('support'),
-            )
 
-            RepositoryEvaluateResultIntent.objects.create(
-                intent=intent_key,
-                evaluate_result=evaluate_result,
-                score=intent_score,
+            request_backend_create_evaluateresultsintent(
+                evaluate_result.get('evaluate_id'),
+                intent.get('precision'),
+                intent.get('recall'),
+                intent.get('f1-score'),
+                intent.get('support'),
+                intent_key
             )
 
     for entity_key in entity_reports.keys():
         if entity_key and entity_key not in excluded_itens:
             entity = entity_reports.get(entity_key)
-            entity_score = RepositoryEvaluateResultScore.objects.create(
-                precision=entity.get('precision'),
-                recall=entity.get('recall'),
-                f1_score=entity.get('f1-score'),
-                support=entity.get('support'),
-            )
 
-            RepositoryEvaluateResultEntity.objects.create(
-                entity=RepositoryEntity.objects.get(
-                    repository=update.repository,
-                    value=entity_key,
-                    create_entity=False),
-                evaluate_result=evaluate_result,
-                score=entity_score,
+            request_backend_create_evaluateresultsscore(
+                evaluate_result.get('evaluate_id'),
+                update,
+                entity.get('precision'),
+                entity.get('recall'),
+                entity.get('f1-score'),
+                entity.get('support'),
+                entity_key
             )
 
     return {
-        'id': evaluate_result.id,
-        'version': evaluate_result.version,
+        'id': evaluate_result.get('evaluate_id'),
+        'version': evaluate_result.get('evaluate_version'),
     }

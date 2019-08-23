@@ -5,7 +5,7 @@ from rest_framework import status
 
 NEXT_LANGS = requests.get(
     '{}/v2/repository/nlp/authorization/langs/'.format(
-        'http://ab24300f.ngrok.io'
+        'http://33d0c44b.ngrok.io'
     )
 ).json()
 

@@ -106,7 +106,7 @@ class UpdateInterpreters:
     interpreters = {}
 
     def request_backend_parse(self, update_id):
-        backend = 'http://ab24300f.ngrok.io'
+        backend = 'http://33d0c44b.ngrok.io'
         update = requests.get(
             '{}/v2/repository/nlp/update_interpreters/{}/'.format(
                 backend,

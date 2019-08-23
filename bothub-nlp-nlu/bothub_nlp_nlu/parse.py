@@ -32,7 +32,7 @@ def position_match(a, b):
     return True
 
 def request_backend_repository_entity(update_id, entity):
-    backend = 'http://ab24300f.ngrok.io'
+    backend = 'http://33d0c44b.ngrok.io'
     update = requests.get(
         '{}/v2/repository/nlp/authorization/parse/repositoryentity/?update_id={}&entity={}'.format(
             backend,
