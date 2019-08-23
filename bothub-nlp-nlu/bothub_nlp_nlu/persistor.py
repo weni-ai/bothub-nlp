@@ -3,6 +3,7 @@ import requests
 from tempfile import NamedTemporaryFile
 
 from rasa_nlu.persistor import Persistor
+from decouple import config
 
 
 class BothubPersistor(Persistor):
@@ -16,20 +17,18 @@ class BothubPersistor(Persistor):
             self.send_training_backend(self.update, data)
 
     def request_backend_parse(self, update_id):
-        backend = 'http://33d0c44b.ngrok.io'
         update = requests.get(
             '{}/v2/repository/nlp/update_interpreters/{}/'.format(
-                backend,
+                config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
                 update_id
             )
         ).json()
         return update
 
     def send_training_backend(self, update_id, botdata):
-        backend = 'http://33d0c44b.ngrok.io'
         update = requests.post(
             '{}/v2/repository/nlp/update_interpreters/'.format(
-                backend
+                config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
             ),
             data={
                 "id": update_id,

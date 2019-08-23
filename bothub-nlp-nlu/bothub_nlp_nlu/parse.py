@@ -2,6 +2,7 @@ import requests
 from collections import OrderedDict
 
 from .utils import update_interpreters
+from decouple import config
 
 
 def order_by_confidence(l):
@@ -32,10 +33,9 @@ def position_match(a, b):
     return True
 
 def request_backend_repository_entity(update_id, entity):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.get(
         '{}/v2/repository/nlp/authorization/parse/repositoryentity/?update_id={}&entity={}'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             entity
         )

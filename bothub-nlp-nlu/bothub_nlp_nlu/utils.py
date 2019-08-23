@@ -12,6 +12,7 @@ from rasa_nlu.model import Metadata
 from rasa_nlu import components
 
 from .persistor import BothubPersistor
+from decouple import config
 
 
 def get_rasa_nlu_config_from_update(update):
@@ -106,10 +107,9 @@ class UpdateInterpreters:
     interpreters = {}
 
     def request_backend_parse(self, update_id):
-        backend = 'http://33d0c44b.ngrok.io'
         update = requests.get(
             '{}/v2/repository/nlp/update_interpreters/{}/'.format(
-                backend,
+                config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
                 update_id
             )
         ).json()

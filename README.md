@@ -62,6 +62,7 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | BOTHUB_NLP_AWS_ACCESS_KEY_ID | ```string``` | ```None``` | 
 | BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | ```string``` | ```None``` | 
 | BOTHUB_NLP_DOCKER_CLIENT_BASE_URL | ```string``` | ```None``` | 
+| BOTHUB_ENGINE_URL | ```string```|  ```https://api.bothub.it``` | Bothub-engine API URL
 
 
 ## Docker Arguments

@@ -12,6 +12,7 @@ from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
 from .persistor import BothubPersistor
 from . import logger
+from decouple import config
 
 
 class BothubWriter(TrainingDataWriter):
@@ -57,10 +58,9 @@ class BothubTrainingData(TrainingData):
 
 
 def request_backend_start_training(update_id, by):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.post(
         '{}/v2/repository/nlp/authorization/train/starttraining/'.format(
-            backend
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
         ),
         data={
             "update_id": update_id,
@@ -71,10 +71,9 @@ def request_backend_start_training(update_id, by):
 
 
 def request_backend_get_entities(update_id, language, example_id):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.get(
         '{}/v2/repository/nlp/authorization/train/getentities/?update_id={}&language={}&example_id={}'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             language,
             example_id
@@ -83,10 +82,9 @@ def request_backend_get_entities(update_id, language, example_id):
     return update
 
 def request_backend_get_entities_label(update_id, language, example_id):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.get(
         '{}/v2/repository/nlp/authorization/train/getentitieslabel/?update_id={}&language={}&example_id={}'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             language,
             example_id
@@ -96,10 +94,9 @@ def request_backend_get_entities_label(update_id, language, example_id):
 
 
 def request_backend_get_text(update_id, language, example_id):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.get(
         '{}/v2/repository/nlp/authorization/train/gettext/?update_id={}&language={}&example_id={}'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             language,
             example_id
@@ -108,10 +105,9 @@ def request_backend_get_text(update_id, language, example_id):
     return update
 
 def request_backend_trainfail(update_id):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.post(
         '{}/v2/repository/nlp/authorization/train/trainfail/'.format(
-            backend
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
         ),
         data={
             'update_id': update_id
@@ -120,10 +116,9 @@ def request_backend_trainfail(update_id):
     return update
 
 def request_backend_traininglog(update_id, training_log):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.post(
         '{}/v2/repository/nlp/authorization/train/traininglog/'.format(
-            backend
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
         ),
         data={
             'update_id': update_id,

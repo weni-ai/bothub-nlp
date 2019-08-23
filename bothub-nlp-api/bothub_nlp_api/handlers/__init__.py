@@ -7,6 +7,7 @@ from raven.contrib.tornado import SentryMixin
 
 from bothub_nlp import settings as bothub_nlp_settings
 from ..utils import ApiError, ValidationError
+from decouple import config
 
 
 class ApiHandler(SentryMixin, RequestHandler):
@@ -65,10 +66,9 @@ class ApiHandler(SentryMixin, RequestHandler):
         return authorization_uuid
 
     def request_backend_parse(self, router, repository_authorization, language=None):
-        backend = 'http://33d0c44b.ngrok.io'
         update = requests.get(
             '{}/v2/repository/nlp/authorization/{}/{}/?language={}'.format(
-                backend,
+                config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
                 router,
                 repository_authorization,
                 language

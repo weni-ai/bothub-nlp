@@ -22,6 +22,7 @@ from rasa_nlu.evaluate import (
 )
 
 from .utils import update_interpreters
+from decouple import config
 
 logger = logging.getLogger(__name__)
 
@@ -211,10 +212,9 @@ def entity_rasa_nlu_data(entity, evaluate):
     }
 
 def request_backend_start_evaluation(update_id):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.get(
         '{}/v2/repository/nlp/authorization/evaluate/evaluations/?update_id={}'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id
         )
     ).json()
@@ -232,10 +232,9 @@ def request_backend_create_evaluateresults(
     entityprecision,
     entityf1_score,
     entityaccuracy):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.post(
         '{}/v2/repository/nlp/authorization/evaluate/evaluateresults/'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
         ),
         data={
             'update_id': update_id,
@@ -259,10 +258,9 @@ def request_backend_create_evaluateresultsintent(
     f1_score,
     support,
     intent_key):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.post(
         '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsintent/'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
         ),
         data={
             'evaluate_id': evaluate_id,
@@ -283,10 +281,9 @@ def request_backend_create_evaluateresultsscore(
     f1_score,
     support,
     entity_key):
-    backend = 'http://33d0c44b.ngrok.io'
     update = requests.post(
         '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsscore/'.format(
-            backend,
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
         ),
         data={
             'evaluate_id': evaluate_id,
