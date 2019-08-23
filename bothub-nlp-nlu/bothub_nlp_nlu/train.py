@@ -7,7 +7,6 @@ from rasa_nlu.training_data import Message, TrainingData
 from rasa_nlu.components import ComponentBuilder
 from rasa_nlu.training_data.formats.readerwriter import TrainingDataWriter
 from rasa_nlu.utils import json_to_string
-# from django.db import models
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
@@ -138,16 +137,6 @@ def train_update(update, by):
     update_request = request_backend_start_training(update, by)
     with PokeLogging() as pl:
         try:
-            # examples = [
-            #     Message.build(
-            #         text=example.get_text(update_request.get('language')),
-            #         intent=example.intent,
-            #         entities=[
-            #             example_entity.rasa_nlu_data
-            #             for example_entity in example.get_entities(
-            #                 update_request.get('language'))])
-            #     for example in update_request.get('examples')]
-
             examples = []
 
             for example in update_request.get('examples'):
@@ -162,7 +151,6 @@ def train_update(update, by):
 
                 examples.append(
                     Message.build(
-                        # text=example.get_text(update_request.get('language')),
                         text=request_backend_get_text(
                             update, 
                             update_request.get('language'), 
@@ -175,20 +163,6 @@ def train_update(update, by):
             
 
             label_examples_query = update_request.get('label_examples_query')
-
-            # label_examples = [
-            #     Message.build(
-            #         text=example.get_text(update_request.get('language')),
-            #         entities=[
-            #             example_entity.get_rasa_nlu_data(
-            #                 label_as_entity=True)
-            #             for example_entity in filter(
-            #                 lambda ee: ee.entity.label,
-            #                 example.get_entities(update_request.get('language')))
-            #         ]
-            #     )
-            #     for example in label_examples_query]###
-
 
             label_examples = []
 
@@ -204,7 +178,6 @@ def train_update(update, by):
 
                 label_examples.append(
                     Message.build(
-                        # text=example.get_text(update_request.get('language')),
                         text=request_backend_get_text(
                             update, 
                             update_request.get('language'), 
@@ -233,10 +206,7 @@ def train_update(update, by):
                 fixed_model_name=str(update_request.get('update_id')))
         except Exception as e:
             logger.exception(e)
-            # update.train_fail()
             request_backend_trainfail(update)
             raise e
         finally:
             request_backend_traininglog(update, pl.getvalue())
-            # update.training_log = pl.getvalue()
-            # update.save(update_fields=['training_log'])

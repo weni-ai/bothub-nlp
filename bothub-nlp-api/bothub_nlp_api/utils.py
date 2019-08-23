@@ -1,6 +1,5 @@
 import requests
 from tornado.web import HTTPError
-# from rest_framework import status
 
 
 NEXT_LANGS = requests.get(
