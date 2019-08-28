@@ -1,10 +1,11 @@
 import requests
 from tornado.web import HTTPError
+from decouple import config
 
 
 NEXT_LANGS = requests.get(
     '{}/v2/repository/nlp/authorization/langs/'.format(
-        'http://33d0c44b.ngrok.io'
+        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
     )
 ).json()
 

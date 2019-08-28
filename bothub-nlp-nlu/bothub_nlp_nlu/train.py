@@ -57,7 +57,7 @@ class BothubTrainingData(TrainingData):
         return BothubWriter().dumps(self)
 
 
-def request_backend_start_training(update_id, by):
+def request_backend_start_training(update_id, by, repository_authorization):
     update = requests.post(
         '{}/v2/repository/nlp/authorization/train/starttraining/'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
@@ -65,57 +65,62 @@ def request_backend_start_training(update_id, by):
         data={
             "update_id": update_id,
             "by_user": by
-        }
+        },
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
 
-def request_backend_get_entities(update_id, language, example_id):
+def request_backend_get_entities(update_id, language, example_id, repository_authorization):
     update = requests.get(
         '{}/v2/repository/nlp/authorization/train/getentities/?update_id={}&language={}&example_id={}'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             language,
             example_id
-        )
+        ),
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
-def request_backend_get_entities_label(update_id, language, example_id):
+def request_backend_get_entities_label(update_id, language, example_id, repository_authorization):
     update = requests.get(
         '{}/v2/repository/nlp/authorization/train/getentitieslabel/?update_id={}&language={}&example_id={}'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             language,
             example_id
-        )
+        ),
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
 
-def request_backend_get_text(update_id, language, example_id):
+def request_backend_get_text(update_id, language, example_id, repository_authorization):
     update = requests.get(
         '{}/v2/repository/nlp/authorization/train/gettext/?update_id={}&language={}&example_id={}'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             language,
             example_id
-        )
+        ),
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
-def request_backend_trainfail(update_id):
+def request_backend_trainfail(update_id, repository_authorization):
     update = requests.post(
         '{}/v2/repository/nlp/authorization/train/trainfail/'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
         ),
         data={
             'update_id': update_id
-        }
+        },
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
-def request_backend_traininglog(update_id, training_log):
+def request_backend_traininglog(update_id, training_log, repository_authorization):
     update = requests.post(
         '{}/v2/repository/nlp/authorization/train/traininglog/'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
@@ -123,13 +128,14 @@ def request_backend_traininglog(update_id, training_log):
         data={
             'update_id': update_id,
             'training_log': training_log
-        }
+        },
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
 
-def train_update(update, by):
-    update_request = request_backend_start_training(update, by)
+def train_update(update, by, repository_authorization):
+    update_request = request_backend_start_training(update, by, repository_authorization)
     with PokeLogging() as pl:
         try:
             examples = []
@@ -139,7 +145,8 @@ def train_update(update, by):
                 request_entities = request_backend_get_entities(
                     update, 
                     update_request.get('language'),
-                    example.get('example_id')
+                    example.get('example_id'),
+                    repository_authorization
                 )
                 for example_entity in request_entities.get('entities'):
                     entities.append(example_entity)
@@ -149,7 +156,8 @@ def train_update(update, by):
                         text=request_backend_get_text(
                             update, 
                             update_request.get('language'), 
-                            example.get('example_id')
+                            example.get('example_id'),
+                            repository_authorization
                         ).get('get_text'),
                         intent=example.get('example_intent'),
                         entities=entities
@@ -166,7 +174,8 @@ def train_update(update, by):
                 request_entities = request_backend_get_entities_label(
                     update, 
                     update_request.get('language'),
-                    example.get('example_id')
+                    example.get('example_id'),
+                    repository_authorization
                 )
                 for example_entity in request_entities.get('entities'):
                     entities.append(example_entity)
@@ -176,7 +185,8 @@ def train_update(update, by):
                         text=request_backend_get_text(
                             update, 
                             update_request.get('language'), 
-                            example.get('example_id')
+                            example.get('example_id'),
+                            repository_authorization
                         ).get('get_text'),
                         entities=entities
                     )
@@ -193,7 +203,7 @@ def train_update(update, by):
 
             trainer.train(training_data)
 
-            persistor = BothubPersistor(update)
+            persistor = BothubPersistor(update, repository_authorization)
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
@@ -201,7 +211,7 @@ def train_update(update, by):
                 fixed_model_name=str(update_request.get('update_id')))
         except Exception as e:
             logger.exception(e)
-            request_backend_trainfail(update)
+            request_backend_trainfail(update, repository_authorization)
             raise e
         finally:
-            request_backend_traininglog(update, pl.getvalue())
+            request_backend_traininglog(update, pl.getvalue(), repository_authorization)

@@ -10,9 +10,9 @@ def parse_text(update_id, *args, **kwargs):
     return parse_text_core(update_id, *args, **kwargs)
 
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
-def train_update(update_id, by_id):
-    return train_update_core(update_id, by_id)
+def train_update(update_id, by_id, repository_authorization):
+    return train_update_core(update_id, by_id, repository_authorization)
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
-def evaluate_update(update_id, by_id):
-    return evaluate_update_core(update_id, by_id)
+def evaluate_update(update_id, by_id, repository_authorization):
+    return evaluate_update_core(update_id, by_id, repository_authorization)

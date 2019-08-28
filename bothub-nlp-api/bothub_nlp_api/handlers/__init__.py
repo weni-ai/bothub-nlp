@@ -72,7 +72,8 @@ class ApiHandler(SentryMixin, RequestHandler):
                 router,
                 repository_authorization,
                 language
-            )
+            ),
+            headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
         ).json()
         return update
 

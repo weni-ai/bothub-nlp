@@ -211,12 +211,13 @@ def entity_rasa_nlu_data(entity, evaluate):
         'entity': entity.entity.value,
     }
 
-def request_backend_start_evaluation(update_id):
+def request_backend_start_evaluation(update_id, repository_authorization):
     update = requests.get(
         '{}/v2/repository/nlp/authorization/evaluate/evaluations/?update_id={}'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id
-        )
+        ),
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
@@ -231,7 +232,8 @@ def request_backend_create_evaluateresults(
     intentaccuracy,
     entityprecision,
     entityf1_score,
-    entityaccuracy):
+    entityaccuracy,
+    repository_authorization):
     update = requests.post(
         '{}/v2/repository/nlp/authorization/evaluate/evaluateresults/'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
@@ -247,7 +249,8 @@ def request_backend_create_evaluateresults(
             'entityprecision': entityprecision,
             'entityf1_score': entityf1_score,
             'entityaccuracy': entityaccuracy
-        }
+        },
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
@@ -257,7 +260,8 @@ def request_backend_create_evaluateresultsintent(
     recall, 
     f1_score,
     support,
-    intent_key):
+    intent_key,
+    repository_authorization):
     update = requests.post(
         '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsintent/'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
@@ -269,7 +273,8 @@ def request_backend_create_evaluateresultsintent(
             'f1_score': f1_score,
             'support': support,
             'intent_key': intent_key
-        }
+        },
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
@@ -280,7 +285,8 @@ def request_backend_create_evaluateresultsscore(
     recall,
     f1_score,
     support,
-    entity_key):
+    entity_key,
+    repository_authorization):
     update = requests.post(
         '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsscore/'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
@@ -293,13 +299,13 @@ def request_backend_create_evaluateresultsscore(
             'f1_score': f1_score,
             'support': support,
             'entity_key': entity_key
-        }
+        },
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
-def evaluate_update(update, by):
-    print(update)
-    evaluations = request_backend_start_evaluation(update)
+def evaluate_update(update, by, repository_authorization):
+    evaluations = request_backend_start_evaluation(update, repository_authorization)
     training_examples = []
 
     for evaluate in evaluations:
@@ -312,7 +318,7 @@ def evaluate_update(update, by):
         )
 
     test_data = TrainingData(training_examples=training_examples)
-    interpreter = update_interpreters.get(update, use_cache=False)
+    interpreter = update_interpreters.get(update, repository_authorization, use_cache=False)
     extractor = get_entity_extractors(interpreter)
     entity_predictions, tokens = get_entity_predictions(interpreter,
                                                         test_data)
@@ -351,7 +357,8 @@ def evaluate_update(update, by):
         intent_evaluation.get('accuracy'),
         entity_evaluation.get('precision'),
         entity_evaluation.get('f1_score'),
-        entity_evaluation.get('accuracy')
+        entity_evaluation.get('accuracy'),
+        repository_authorization
     )
 
     intent_reports = intent_evaluation.get('report')
@@ -367,7 +374,8 @@ def evaluate_update(update, by):
                 intent.get('recall'),
                 intent.get('f1-score'),
                 intent.get('support'),
-                intent_key
+                intent_key,
+                repository_authorization
             )
 
     for entity_key in entity_reports.keys():
@@ -381,7 +389,8 @@ def evaluate_update(update, by):
                 entity.get('recall'),
                 entity.get('f1-score'),
                 entity.get('support'),
-                entity_key
+                entity_key,
+                repository_authorization
             )
 
     return {

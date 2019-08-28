@@ -41,6 +41,7 @@ class TrainHandler(ApiHandler):
                     args=[
                         current_update.get('current_update_id'),
                         current_update.get('repository_authorization_user_id'),
+                        repository_authorization,
                     ],
                     queue=queue_name(ACTION_TRAIN, current_update.get('language')))
                 train_task.wait()

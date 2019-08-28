@@ -106,23 +106,23 @@ class BothubInterpreter(Interpreter):
 class UpdateInterpreters:
     interpreters = {}
 
-    def request_backend_parse(self, update_id):
+    def request_backend_parse(self, update_id, repository_authorization):
         update = requests.get(
             '{}/v2/repository/nlp/update_interpreters/{}/'.format(
                 config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
                 update_id
-            )
+            ),
+            headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
         ).json()
         return update
 
-    def get(self, update, use_cache=True):
-
-        update_request = self.request_backend_parse(update)
+    def get(self, update, repository_authorization, use_cache=True):
+        update_request = self.request_backend_parse(update, repository_authorization)
 
         interpreter = self.interpreters.get(update_request.get('update_id'))
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(update)#####
+        persistor = BothubPersistor(update, repository_authorization)#####
         model_directory = mkdtemp()
         persistor.retrieve(
             str(update_request.get('repository_uuid')),
@@ -131,7 +131,7 @@ class UpdateInterpreters:
         self.interpreters[update_request.get('update_id')] = BothubInterpreter.load(
             model_directory,
             components.ComponentBuilder(use_cache=False))
-        return self.get(update)
+        return self.get(update, repository_authorization)
 
 
 class SpacyNLPLanguageManager:

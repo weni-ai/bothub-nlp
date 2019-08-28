@@ -49,6 +49,7 @@ class EvaluateHandler(ApiHandler):
                 args=[
                     update.get('update_id'),
                     update.get('user_id'),
+                    repository_authorization
                 ],
                 queue=queue_name(ACTION_EVALUATE, update.get('language')))
             evaluate_task.wait()
