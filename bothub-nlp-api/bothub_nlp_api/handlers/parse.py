@@ -72,6 +72,7 @@ class ParseHandler(ApiHandler):
             TASK_NLU_PARSE_TEXT,
             args=[
                 update.get('update_id'),
+                repository_authorization,
                 text,
             ],
             kwargs={

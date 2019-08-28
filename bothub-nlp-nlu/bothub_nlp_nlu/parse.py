@@ -32,17 +32,18 @@ def position_match(a, b):
         return False
     return True
 
-def request_backend_repository_entity(update_id, entity):
+def request_backend_repository_entity(update_id, repository_authorization, entity):
     update = requests.get(
         '{}/v2/repository/nlp/authorization/parse/repositoryentity/?update_id={}&entity={}'.format(
             config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
             update_id,
             entity
-        )
+        ),
+        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
     ).json()
     return update
 
-def format_parse_output(update, r):
+def format_parse_output(update, r, repository_authorization):
     intent = r.get('intent', None)
     intent_ranking = r.get('intent_ranking')
     labels_as_entity = r.get('labels_as_entity')
@@ -68,7 +69,7 @@ def format_parse_output(update, r):
         if is_label:
             label_value = entity.get('entity')
         else:
-            repository_entity = request_backend_repository_entity(update, entity.get('entity'))
+            repository_entity = request_backend_repository_entity(update, repository_authorization, entity.get('entity'))
             if repository_entity.get('label'):
                 label_value = repository_entity.get('label_value')
 
@@ -96,11 +97,11 @@ def format_parse_output(update, r):
     return out
 
 
-def parse_text(update, text, rasa_format=False, use_cache=True):
-    interpreter = update_interpreters.get(update, use_cache=use_cache)
+def parse_text(update, repository_authorization, text, rasa_format=False, use_cache=True):
+    interpreter = update_interpreters.get(update, repository_authorization, use_cache=use_cache)
     r = interpreter.parse(text)
 
     if rasa_format:
         return r
 
-    return format_parse_output(update, r)
+    return format_parse_output(update, r, repository_authorization)

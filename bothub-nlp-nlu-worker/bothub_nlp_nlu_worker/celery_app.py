@@ -6,8 +6,8 @@ from bothub_nlp_nlu.evaluate import evaluate_update as evaluate_update_core
 
 
 @celery_app.task(name=TASK_NLU_PARSE_TEXT)
-def parse_text(update_id, *args, **kwargs):
-    return parse_text_core(update_id, *args, **kwargs)
+def parse_text(update_id, repository_authorization, *args, **kwargs):
+    return parse_text_core(update_id, repository_authorization, *args, **kwargs)
 
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
 def train_update(update_id, by_id, repository_authorization):
