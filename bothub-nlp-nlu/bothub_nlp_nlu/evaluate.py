@@ -253,17 +253,19 @@ def evaluate_update(update, by, repository_authorization):
 
     charts = plot_and_save_charts(update, intent_results)
 
-    evaluate_result = backend().request_backend_create_evaluateresults(
-        update, 
-        charts.get('matrix_chart'),
-        charts.get('confidence_chart'),
-        intent_evaluation.get('log'),
-        intent_evaluation.get('precision'),
-        intent_evaluation.get('f1_score'),
-        intent_evaluation.get('accuracy'),
-        entity_evaluation.get('precision'),
-        entity_evaluation.get('f1_score'),
-        entity_evaluation.get('accuracy'),
+    evaluate_result = backend().request_backend_create_evaluate_results(
+        {
+            'update_id': update,
+            'matrix_chart': charts.get('matrix_chart'),
+            'confidence_chart': charts.get('confidence_chart'),
+            'log': intent_evaluation.get('log'),
+            'intentprecision': intent_evaluation.get('precision'),
+            'intentf1_score': intent_evaluation.get('f1_score'),
+            'intentaccuracy': intent_evaluation.get('accuracy'),
+            'entityprecision': entity_evaluation.get('precision'),
+            'entityf1_score': entity_evaluation.get('f1_score'),
+            'entityaccuracy': entity_evaluation.get('accuracy')
+        },
         repository_authorization
     )
 
@@ -274,13 +276,15 @@ def evaluate_update(update, by, repository_authorization):
         if intent_key and intent_key not in excluded_itens:
             intent = intent_reports.get(intent_key)
 
-            backend().request_backend_create_evaluateresultsintent(
-                evaluate_result.get('evaluate_id'),
-                intent.get('precision'),
-                intent.get('recall'),
-                intent.get('f1-score'),
-                intent.get('support'),
-                intent_key,
+            backend().request_backend_create_evaluate_results_intent(
+                {
+                    'evaluate_id': evaluate_result.get('evaluate_id'),
+                    'precision': intent.get('precision'),
+                    'recall': intent.get('recall'),
+                    'f1_score': intent.get('f1-score'),
+                    'support': intent.get('support'),
+                    'intent_key': intent_key
+                },
                 repository_authorization
             )
 
@@ -288,14 +292,16 @@ def evaluate_update(update, by, repository_authorization):
         if entity_key and entity_key not in excluded_itens:
             entity = entity_reports.get(entity_key)
 
-            backend().request_backend_create_evaluateresultsscore(
-                evaluate_result.get('evaluate_id'),
-                update,
-                entity.get('precision'),
-                entity.get('recall'),
-                entity.get('f1-score'),
-                entity.get('support'),
-                entity_key,
+            backend().request_backend_create_evaluate_results_score(
+                {
+                    'evaluate_id': evaluate_result.get('evaluate_id'),
+                    'update_id': update,
+                    'precision': entity.get('precision'),
+                    'recall': entity.get('recall'),
+                    'f1_score': entity.get('f1-score'),
+                    'support': entity.get('support'),
+                    'entity_key': entity_key
+                },
                 repository_authorization
             )
 

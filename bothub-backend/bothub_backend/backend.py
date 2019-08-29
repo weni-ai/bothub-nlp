@@ -16,44 +16,15 @@ class BaseBackend(object):
         pass
 
     @abstractmethod
-    def request_backend_create_evaluateresults(
-        self,
-        update_id, 
-        matrix_chart, 
-        confidence_chart, 
-        log,
-        intentprecision,
-        intentf1_score,
-        intentaccuracy,
-        entityprecision,
-        entityf1_score,
-        entityaccuracy,
-        repository_authorization):
+    def request_backend_create_evaluate_results(self, data, repository_authorization):
         pass
 
     @abstractmethod
-    def request_backend_create_evaluateresultsintent(
-        self,
-        evaluate_id, 
-        precision, 
-        recall, 
-        f1_score,
-        support,
-        intent_key,
-        repository_authorization):
+    def request_backend_create_evaluate_results_intent(self, data, repository_authorization):
         pass
 
     @abstractmethod
-    def request_backend_create_evaluateresultsscore(
-        self,
-        evaluate_id, 
-        update_id, 
-        precision, 
-        recall,
-        f1_score,
-        support,
-        entity_key,
-        repository_authorization):
+    def request_backend_create_evaluate_results_score(self, data, repository_authorization):
         pass
 
     @abstractmethod
@@ -61,7 +32,7 @@ class BaseBackend(object):
         pass
 
     @abstractmethod
-    def request_backend_parse(self, router, repository_authorization, language=None):#api
+    def request_backend_parse(self, router, repository_authorization, language=None):
         pass
 
     @abstractmethod

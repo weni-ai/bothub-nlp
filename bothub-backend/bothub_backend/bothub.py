@@ -18,87 +18,38 @@ class BothubBackend(BaseBackend):
         ).json()
         return update
 
-    def request_backend_create_evaluateresults(
-        self,
-        update_id, 
-        matrix_chart, 
-        confidence_chart, 
-        log,
-        intentprecision,
-        intentf1_score,
-        intentaccuracy,
-        entityprecision,
-        entityf1_score,
-        entityaccuracy,
-        repository_authorization):
+    def request_backend_create_evaluate_results(self, data, repository_authorization):
         update = requests.post(
-            '{}/v2/repository/nlp/authorization/evaluate/evaluateresults/'.format(
+            '{}/v2/repository/nlp/authorization/evaluate/evaluate_results/'.format(
                 self.backend,
             ),
-            data={
-                'update_id': update_id,
-                'matrix_chart': matrix_chart,
-                'confidence_chart': confidence_chart,
-                'log': log,
-                'intentprecision': intentprecision,
-                'intentf1_score': intentf1_score,
-                'intentaccuracy': intentaccuracy,
-                'entityprecision': entityprecision,
-                'entityf1_score': entityf1_score,
-                'entityaccuracy': entityaccuracy
-            },
+            data=data,
             headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
         ).json()
         return update
 
-    def request_backend_create_evaluateresultsintent(
+    def request_backend_create_evaluate_results_intent(
         self,
-        evaluate_id, 
-        precision, 
-        recall, 
-        f1_score,
-        support,
-        intent_key,
+        data,
         repository_authorization):
         update = requests.post(
-            '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsintent/'.format(
+            '{}/v2/repository/nlp/authorization/evaluate/evaluate_results_intent/'.format(
                 self.backend,
             ),
-            data={
-                'evaluate_id': evaluate_id,
-                'precision': precision,
-                'recall': recall,
-                'f1_score': f1_score,
-                'support': support,
-                'intent_key': intent_key
-            },
+            data=data,
             headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
         ).json()
         return update
 
-    def request_backend_create_evaluateresultsscore(
+    def request_backend_create_evaluate_results_score(
         self,
-        evaluate_id, 
-        update_id, 
-        precision, 
-        recall,
-        f1_score,
-        support,
-        entity_key,
+        data,
         repository_authorization):
         update = requests.post(
-            '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsscore/'.format(
+            '{}/v2/repository/nlp/authorization/evaluate/evaluate_results_score/'.format(
                 self.backend,
             ),
-            data={
-                'evaluate_id': evaluate_id,
-                'update_id': update_id,
-                'precision': precision,
-                'recall': recall,
-                'f1_score': f1_score,
-                'support': support,
-                'entity_key': entity_key
-            },
+            data=data,
             headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
         ).json()
         return update
@@ -135,7 +86,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_start_training_nlu(self, update_id, by, repository_authorization):
         update = requests.post(
-            '{}/v2/repository/nlp/authorization/train/starttraining/'.format(
+            '{}/v2/repository/nlp/authorization/train/start_training/'.format(
                 self.backend
             ),
             data={
@@ -148,7 +99,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_get_entities_nlu(self, update_id, language, example_id, repository_authorization):
         update = requests.get(
-            '{}/v2/repository/nlp/authorization/train/getentities/?update_id={}&language={}&example_id={}'.format(
+            '{}/v2/repository/nlp/authorization/train/get_entities/?update_id={}&language={}&example_id={}'.format(
                 self.backend,
                 update_id,
                 language,
@@ -160,7 +111,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_get_entities_label_nlu(self, update_id, language, example_id, repository_authorization):
         update = requests.get(
-            '{}/v2/repository/nlp/authorization/train/getentitieslabel/?update_id={}&language={}&example_id={}'.format(
+            '{}/v2/repository/nlp/authorization/train/get_entities_label/?update_id={}&language={}&example_id={}'.format(
                 self.backend,
                 update_id,
                 language,
@@ -172,7 +123,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_get_text_nlu(self, update_id, language, example_id, repository_authorization):
         update = requests.get(
-            '{}/v2/repository/nlp/authorization/train/gettext/?update_id={}&language={}&example_id={}'.format(
+            '{}/v2/repository/nlp/authorization/train/get_text/?update_id={}&language={}&example_id={}'.format(
                 self.backend,
                 update_id,
                 language,
@@ -184,7 +135,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_trainfail_nlu(self, update_id, repository_authorization):
         update = requests.post(
-            '{}/v2/repository/nlp/authorization/train/trainfail/'.format(
+            '{}/v2/repository/nlp/authorization/train/train_fail/'.format(
                 self.backend
             ),
             data={
@@ -196,7 +147,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_traininglog_nlu(self, update_id, training_log, repository_authorization):
         update = requests.post(
-            '{}/v2/repository/nlp/authorization/train/traininglog/'.format(
+            '{}/v2/repository/nlp/authorization/train/training_log/'.format(
                 self.backend
             ),
             data={
@@ -232,7 +183,7 @@ class BothubBackend(BaseBackend):
 
     def request_backend_repository_entity_nlu_parse(self, update_id, repository_authorization, entity):
         update = requests.get(
-            '{}/v2/repository/nlp/authorization/parse/repositoryentity/?update_id={}&entity={}'.format(
+            '{}/v2/repository/nlp/authorization/parse/repository_entity/?update_id={}&entity={}'.format(
                 self.backend,
                 update_id,
                 entity

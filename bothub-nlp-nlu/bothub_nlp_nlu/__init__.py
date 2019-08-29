@@ -1,4 +1,3 @@
-import os
 import logging
 
 from rasa_nlu import registry

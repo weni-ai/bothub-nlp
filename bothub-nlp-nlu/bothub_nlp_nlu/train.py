@@ -86,9 +86,7 @@ def train_update(update, by, repository_authorization):
                     )
                 )
             
-
             label_examples_query = update_request.get('label_examples_query')
-
             label_examples = []
 
             for example in label_examples_query:
@@ -113,7 +111,6 @@ def train_update(update, by, repository_authorization):
                         entities=entities
                     )
                 )
-            
 
             rasa_nlu_config = get_rasa_nlu_config_from_update(update_request)
             trainer = Trainer(
