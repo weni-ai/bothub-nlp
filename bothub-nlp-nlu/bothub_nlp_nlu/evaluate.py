@@ -1,7 +1,6 @@
 import logging
 import json
 import uuid
-import requests
 
 from rasa_nlu.training_data import Message
 from rasa_nlu.training_data import TrainingData
@@ -22,7 +21,7 @@ from rasa_nlu.evaluate import (
 )
 
 from .utils import update_interpreters
-from decouple import config
+from .utils import backend
 
 logger = logging.getLogger(__name__)
 
@@ -211,101 +210,8 @@ def entity_rasa_nlu_data(entity, evaluate):
         'entity': entity.entity.value,
     }
 
-def request_backend_start_evaluation(update_id, repository_authorization):
-    update = requests.get(
-        '{}/v2/repository/nlp/authorization/evaluate/evaluations/?update_id={}'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-            update_id
-        ),
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-
-def request_backend_create_evaluateresults(
-    update_id, 
-    matrix_chart, 
-    confidence_chart, 
-    log,
-    intentprecision,
-    intentf1_score,
-    intentaccuracy,
-    entityprecision,
-    entityf1_score,
-    entityaccuracy,
-    repository_authorization):
-    update = requests.post(
-        '{}/v2/repository/nlp/authorization/evaluate/evaluateresults/'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-        ),
-        data={
-            'update_id': update_id,
-            'matrix_chart': matrix_chart,
-            'confidence_chart': confidence_chart,
-            'log': log,
-            'intentprecision': intentprecision,
-            'intentf1_score': intentf1_score,
-            'intentaccuracy': intentaccuracy,
-            'entityprecision': entityprecision,
-            'entityf1_score': entityf1_score,
-            'entityaccuracy': entityaccuracy
-        },
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-def request_backend_create_evaluateresultsintent(
-    evaluate_id, 
-    precision, 
-    recall, 
-    f1_score,
-    support,
-    intent_key,
-    repository_authorization):
-    update = requests.post(
-        '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsintent/'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-        ),
-        data={
-            'evaluate_id': evaluate_id,
-            'precision': precision,
-            'recall': recall,
-            'f1_score': f1_score,
-            'support': support,
-            'intent_key': intent_key
-        },
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-def request_backend_create_evaluateresultsscore(
-    evaluate_id, 
-    update_id, 
-    precision, 
-    recall,
-    f1_score,
-    support,
-    entity_key,
-    repository_authorization):
-    update = requests.post(
-        '{}/v2/repository/nlp/authorization/evaluate/evaluateresultsscore/'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-        ),
-        data={
-            'evaluate_id': evaluate_id,
-            'update_id': update_id,
-            'precision': precision,
-            'recall': recall,
-            'f1_score': f1_score,
-            'support': support,
-            'entity_key': entity_key
-        },
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
 def evaluate_update(update, by, repository_authorization):
-    evaluations = request_backend_start_evaluation(update, repository_authorization)
+    evaluations = backend().request_backend_start_evaluation(update, repository_authorization)
     training_examples = []
 
     for evaluate in evaluations:
@@ -347,7 +253,7 @@ def evaluate_update(update, by, repository_authorization):
 
     charts = plot_and_save_charts(update, intent_results)
 
-    evaluate_result = request_backend_create_evaluateresults(
+    evaluate_result = backend().request_backend_create_evaluateresults(
         update, 
         charts.get('matrix_chart'),
         charts.get('confidence_chart'),
@@ -368,7 +274,7 @@ def evaluate_update(update, by, repository_authorization):
         if intent_key and intent_key not in excluded_itens:
             intent = intent_reports.get(intent_key)
 
-            request_backend_create_evaluateresultsintent(
+            backend().request_backend_create_evaluateresultsintent(
                 evaluate_result.get('evaluate_id'),
                 intent.get('precision'),
                 intent.get('recall'),
@@ -382,7 +288,7 @@ def evaluate_update(update, by, repository_authorization):
         if entity_key and entity_key not in excluded_itens:
             entity = entity_reports.get(entity_key)
 
-            request_backend_create_evaluateresultsscore(
+            backend().request_backend_create_evaluateresultsscore(
                 evaluate_result.get('evaluate_id'),
                 update,
                 entity.get('precision'),

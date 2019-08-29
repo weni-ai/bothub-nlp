@@ -1,5 +1,6 @@
 import tornado.web
 from tornado import gen
+from decouple import config
 
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
@@ -11,6 +12,7 @@ from ..utils import ValidationError
 from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
 from ..utils import NEXT_LANGS
+from ..utils import backend
 
 
 EVALUATE_STATUS_EVALUATED = 'evaluated'
@@ -36,7 +38,7 @@ class EvaluateHandler(ApiHandler):
         if not repository_authorization:
             raise AuthorizationIsRequired()
 
-        update = self.request_backend_parse('evaluate', repository_authorization, language)
+        update = backend().request_backend_parse('evaluate', repository_authorization, language)
 
         if not update.get('update'):
             raise ValidationError(

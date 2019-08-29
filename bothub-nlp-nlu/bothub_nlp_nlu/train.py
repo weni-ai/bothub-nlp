@@ -1,4 +1,3 @@
-import requests
 from tempfile import mkdtemp
 from collections import defaultdict
 
@@ -10,9 +9,9 @@ from rasa_nlu.utils import json_to_string
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
+from .utils import backend
 from .persistor import BothubPersistor
 from . import logger
-from decouple import config
 
 
 class BothubWriter(TrainingDataWriter):
@@ -57,92 +56,15 @@ class BothubTrainingData(TrainingData):
         return BothubWriter().dumps(self)
 
 
-def request_backend_start_training(update_id, by, repository_authorization):
-    update = requests.post(
-        '{}/v2/repository/nlp/authorization/train/starttraining/'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
-        ),
-        data={
-            "update_id": update_id,
-            "by_user": by
-        },
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-
-def request_backend_get_entities(update_id, language, example_id, repository_authorization):
-    update = requests.get(
-        '{}/v2/repository/nlp/authorization/train/getentities/?update_id={}&language={}&example_id={}'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-            update_id,
-            language,
-            example_id
-        ),
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-def request_backend_get_entities_label(update_id, language, example_id, repository_authorization):
-    update = requests.get(
-        '{}/v2/repository/nlp/authorization/train/getentitieslabel/?update_id={}&language={}&example_id={}'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-            update_id,
-            language,
-            example_id
-        ),
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-
-def request_backend_get_text(update_id, language, example_id, repository_authorization):
-    update = requests.get(
-        '{}/v2/repository/nlp/authorization/train/gettext/?update_id={}&language={}&example_id={}'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-            update_id,
-            language,
-            example_id
-        ),
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-def request_backend_trainfail(update_id, repository_authorization):
-    update = requests.post(
-        '{}/v2/repository/nlp/authorization/train/trainfail/'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
-        ),
-        data={
-            'update_id': update_id
-        },
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-def request_backend_traininglog(update_id, training_log, repository_authorization):
-    update = requests.post(
-        '{}/v2/repository/nlp/authorization/train/traininglog/'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
-        ),
-        data={
-            'update_id': update_id,
-            'training_log': training_log
-        },
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
-
 def train_update(update, by, repository_authorization):
-    update_request = request_backend_start_training(update, by, repository_authorization)
+    update_request = backend().request_backend_start_training_nlu(update, by, repository_authorization)
     with PokeLogging() as pl:
         try:
             examples = []
 
             for example in update_request.get('examples'):
                 entities = []
-                request_entities = request_backend_get_entities(
+                request_entities = backend().request_backend_get_entities_nlu(
                     update, 
                     update_request.get('language'),
                     example.get('example_id'),
@@ -153,7 +75,7 @@ def train_update(update, by, repository_authorization):
 
                 examples.append(
                     Message.build(
-                        text=request_backend_get_text(
+                        text=backend().request_backend_get_text_nlu(
                             update, 
                             update_request.get('language'), 
                             example.get('example_id'),
@@ -171,7 +93,7 @@ def train_update(update, by, repository_authorization):
 
             for example in label_examples_query:
                 entities = []
-                request_entities = request_backend_get_entities_label(
+                request_entities = backend().request_backend_get_entities_label_nlu(
                     update, 
                     update_request.get('language'),
                     example.get('example_id'),
@@ -182,7 +104,7 @@ def train_update(update, by, repository_authorization):
 
                 label_examples.append(
                     Message.build(
-                        text=request_backend_get_text(
+                        text=backend().request_backend_get_text_nlu(
                             update, 
                             update_request.get('language'), 
                             example.get('example_id'),
@@ -211,7 +133,7 @@ def train_update(update, by, repository_authorization):
                 fixed_model_name=str(update_request.get('update_id')))
         except Exception as e:
             logger.exception(e)
-            request_backend_trainfail(update, repository_authorization)
+            backend().request_backend_trainfail_nlu(update, repository_authorization)
             raise e
         finally:
-            request_backend_traininglog(update, pl.getvalue(), repository_authorization)
+            backend().request_backend_traininglog_nlu(update, pl.getvalue(), repository_authorization)

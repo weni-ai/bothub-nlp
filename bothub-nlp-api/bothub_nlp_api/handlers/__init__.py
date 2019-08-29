@@ -1,13 +1,11 @@
 import tornado.escape
 import traceback
-import requests
 
 from tornado.web import RequestHandler
 from raven.contrib.tornado import SentryMixin
 
 from bothub_nlp import settings as bothub_nlp_settings
 from ..utils import ApiError, ValidationError
-from decouple import config
 
 
 class ApiHandler(SentryMixin, RequestHandler):
@@ -64,18 +62,6 @@ class ApiHandler(SentryMixin, RequestHandler):
             return False
 
         return authorization_uuid
-
-    def request_backend_parse(self, router, repository_authorization, language=None):
-        update = requests.get(
-            '{}/v2/repository/nlp/authorization/{}/{}/?language={}'.format(
-                config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-                router,
-                repository_authorization,
-                language
-            ),
-            headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-        ).json()
-        return update
 
     def get(self):
         self.set_status(405)

@@ -1,9 +1,7 @@
-import requests
 from collections import OrderedDict
 
 from .utils import update_interpreters
-from decouple import config
-
+from .utils import backend
 
 def order_by_confidence(l):
     return sorted(
@@ -32,17 +30,6 @@ def position_match(a, b):
         return False
     return True
 
-def request_backend_repository_entity(update_id, repository_authorization, entity):
-    update = requests.get(
-        '{}/v2/repository/nlp/authorization/parse/repositoryentity/?update_id={}&entity={}'.format(
-            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-            update_id,
-            entity
-        ),
-        headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-    ).json()
-    return update
-
 def format_parse_output(update, r, repository_authorization):
     intent = r.get('intent', None)
     intent_ranking = r.get('intent_ranking')
@@ -69,7 +56,7 @@ def format_parse_output(update, r, repository_authorization):
         if is_label:
             label_value = entity.get('entity')
         else:
-            repository_entity = request_backend_repository_entity(update, repository_authorization, entity.get('entity'))
+            repository_entity = backend().request_backend_repository_entity_nlu_parse(update, repository_authorization, entity.get('entity'))
             if repository_entity.get('label'):
                 label_value = repository_entity.get('label_value')
 

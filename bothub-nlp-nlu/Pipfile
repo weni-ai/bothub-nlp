@@ -18,6 +18,7 @@ pythainlp = "==1.7.2"
 "pymorphy2" = "==0.8"
 plac = "==0.9.6"
 requests = "==2.20.1"
+bothub-backend = {path = "./../bothub-backend"}
 
 [dev-packages]
 "flake8" = "*"

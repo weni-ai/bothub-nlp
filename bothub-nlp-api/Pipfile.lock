@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "58ea0bb0191dd3bc0a2fda6ed98fd285e684c8d04d4a449ad9dfa0dea07abefa"
+            "sha256": "142f2771753a404acf52deb1e2df806d7f1497a0afaeb221c3dbfbe37dbf89cc"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,9 @@
         ]
     },
     "default": {
+        "bothub-backend": {
+            "path": "./../bothub-backend"
+        },
         "bothub-nlp": {
             "path": "./../bothub-nlp"
         },

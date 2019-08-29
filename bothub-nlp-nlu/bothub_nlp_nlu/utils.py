@@ -2,7 +2,7 @@ import logging
 import io
 import contextvars
 import spacy
-import requests
+import bothub_backend
 
 from tempfile import mkdtemp
 
@@ -14,6 +14,12 @@ from rasa_nlu import components
 from .persistor import BothubPersistor
 from decouple import config
 
+
+def backend():
+    return bothub_backend.get_backend(
+        'bothub_backend.bothub.BothubBackend', 
+        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
+    )
 
 def get_rasa_nlu_config_from_update(update):
     pipeline = []
@@ -106,18 +112,8 @@ class BothubInterpreter(Interpreter):
 class UpdateInterpreters:
     interpreters = {}
 
-    def request_backend_parse(self, update_id, repository_authorization):
-        update = requests.get(
-            '{}/v2/repository/nlp/update_interpreters/{}/'.format(
-                config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
-                update_id
-            ),
-            headers={'Authorization': 'Bearer {}'.format(repository_authorization)}
-        ).json()
-        return update
-
     def get(self, update, repository_authorization, use_cache=True):
-        update_request = self.request_backend_parse(update, repository_authorization)
+        update_request = backend().request_backend_parse_nlu(update, repository_authorization)
 
         interpreter = self.interpreters.get(update_request.get('update_id'))
         if interpreter and use_cache:

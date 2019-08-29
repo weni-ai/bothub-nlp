@@ -2,6 +2,7 @@
 ./../bothub-nlp
 ./../bothub-nlp-celery
 ./../bothub-nlp-nlu
+./../bothub-backend
 plac==0.9.6
 psycopg2-binary==2.7.6.1
 requests==2.20.1

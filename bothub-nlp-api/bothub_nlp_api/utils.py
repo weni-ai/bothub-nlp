@@ -1,13 +1,15 @@
-import requests
+import bothub_backend
 from tornado.web import HTTPError
 from decouple import config
 
 
-NEXT_LANGS = requests.get(
-    '{}/v2/repository/nlp/authorization/langs/'.format(
-        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it'),
+def backend():
+    return bothub_backend.get_backend(
+        'bothub_backend.bothub.BothubBackend', 
+        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
     )
-).json()
+
+NEXT_LANGS = backend().get_langs()
 
 
 class ApiError(HTTPError):

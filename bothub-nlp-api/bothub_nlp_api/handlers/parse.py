@@ -1,5 +1,6 @@
 import tornado.web
 from tornado import gen
+from decouple import config
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
@@ -10,6 +11,7 @@ from . import ApiHandler
 from ..utils import ValidationError
 from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
+from ..utils import backend
 
 
 class ParseHandler(ApiHandler):
@@ -53,13 +55,13 @@ class ParseHandler(ApiHandler):
         repository_authorization = self.repository_authorization()
         if not repository_authorization:
             raise AuthorizationIsRequired()
-      
-        update = self.request_backend_parse('parse', repository_authorization, language)
+
+        update = backend().request_backend_parse('parse', repository_authorization, language)
 
         if not update.get('update'):
             next_languages = NEXT_LANGS.get(language, [])
             for next_language in next_languages:
-                update = self.request_backend_parse('parse', repository_authorization, next_language)
+                update = backend().request_backend_parse('parse', repository_authorization, next_language)
                 if update.get('update'):
                     break
 
