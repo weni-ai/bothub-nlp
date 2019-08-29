@@ -1,8 +1,9 @@
 import base64
+import bothub_backend
 from tempfile import NamedTemporaryFile
 
 from rasa_nlu.persistor import Persistor
-from .utils import backend
+from decouple import config
 
 
 class BothubPersistor(Persistor):
@@ -11,17 +12,22 @@ class BothubPersistor(Persistor):
         self.update = update
         self.repository_authorization = repository_authorization
 
+    def backend(self):
+        return bothub_backend.get_backend(
+            'bothub_backend.bothub.BothubBackend', 
+            config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
+        )
+
     def _persist_tar(self, filekey, tarname):
         with open(tarname, 'rb') as tar_file:
             data = tar_file.read()
-            backend().send_training_backend_nlu_persistor(self.update, data, self.repository_authorization)
+            self.backend().send_training_backend_nlu_persistor(self.update, data, self.repository_authorization)
 
     def retrieve(self, model_name, project, target_path):
-        print(self.repository_authorization)
         tar_name = self._tar_name(model_name, project)
         
         tar_data = base64.b64decode(
-            backend().request_backend_parse_nlu_persistor(self.update, self.repository_authorization).get('bot_data')
+            self.backend().request_backend_parse_nlu_persistor(self.update, self.repository_authorization).get('bot_data')
         )
         tar_file = NamedTemporaryFile(suffix=tar_name, delete=False)
         tar_file.write(tar_data)
