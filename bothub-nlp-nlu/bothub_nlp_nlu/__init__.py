@@ -1,5 +1,3 @@
-import os
-import django
 import logging
 
 from rasa_nlu import registry
@@ -9,9 +7,6 @@ from .pipeline_components.regex_featurizer_with_labels import RegexFeaturizer
 from .pipeline_components.optimized_spacy_nlp_with_labels import SpacyNLP
 from .pipeline_components.tokenizer_spacy_with_labels import SpacyTokenizer
 
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bothub.settings')
-django.setup()
 
 logger = logging.getLogger('bothub_nlp_nlu')
 

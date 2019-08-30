@@ -1,26 +1,15 @@
+import bothub_backend
 from tornado.web import HTTPError
-from rest_framework import status
-from bothub.common import languages
+from decouple import config
 
 
-NEXT_LANGS = {
-    'english': [
-        languages.LANGUAGE_EN,
-    ],
-    'portuguese': [
-        languages.LANGUAGE_PT,
-        languages.LANGUAGE_PT_BR,
-    ],
-    languages.LANGUAGE_PT: [
-        languages.LANGUAGE_PT_BR,
-    ],
-    'pt-br': [
-        languages.LANGUAGE_PT_BR,
-    ],
-    'br': [
-        languages.LANGUAGE_PT_BR,
-    ],
-}
+def backend():
+    return bothub_backend.get_backend(
+        'bothub_backend.bothub.BothubBackend', 
+        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
+    )
+
+NEXT_LANGS = backend().get_langs()
 
 
 class ApiError(HTTPError):
@@ -33,7 +22,7 @@ class ValidationError(ApiError):
     def __init__(self, *args, field=None, status_code=None, **kwargs):
         super().__init__(
             *args,
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=400,
             **kwargs)
         self.field = field
 
@@ -43,7 +32,7 @@ class AuthorizationIsRequired(ApiError):
         super().__init__(
             'Authorization is required',
             *args,
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=401,
             **kwargs)
 
 

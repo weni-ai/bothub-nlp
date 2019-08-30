@@ -2,9 +2,7 @@ import tornado.escape
 import traceback
 
 from tornado.web import RequestHandler
-from rest_framework import status
 from raven.contrib.tornado import SentryMixin
-from bothub.common.models import RepositoryAuthorization
 
 from bothub_nlp import settings as bothub_nlp_settings
 from ..utils import ApiError, ValidationError
@@ -63,20 +61,16 @@ class ApiHandler(SentryMixin, RequestHandler):
         if not authorization_uuid:
             return False
 
-        try:
-            return RepositoryAuthorization.objects.get(
-                uuid=authorization_uuid)
-        except RepositoryAuthorization.DoesNotExist:
-            return False
+        return authorization_uuid
 
     def get(self):
-        self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.set_status(405)
         self.finish()
 
     def post(self):
-        self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.set_status(405)
         self.finish()
 
     def options(self):
-        self.set_status(status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.set_status(405)
         self.finish()

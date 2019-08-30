@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+lint = "flake8"
+
+[packages]
+
+[dev-packages]
+"flake8" = "*"
+"requests" = "*"
+
+[requires]
+python_version = "3.6"

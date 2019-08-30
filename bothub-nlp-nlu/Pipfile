@@ -8,7 +8,6 @@ lint = "flake8"
 test = "coverage run -m unittest"
 
 [packages]
-bothub-engine = {ref = "1.21.0", git = "https://github.com/Ilhasoft/bothub-engine"}
 contextvars = "==2.3"
 spacy = "==2.0.18"
 rasa-nlu = "==0.14.1"
@@ -18,6 +17,8 @@ sklearn-crfsuite = "==0.3.6"
 pythainlp = "==1.7.2"
 "pymorphy2" = "==0.8"
 plac = "==0.9.6"
+requests = "==2.20.1"
+bothub-backend = {path = "./../bothub-backend"}
 
 [dev-packages]
 "flake8" = "*"

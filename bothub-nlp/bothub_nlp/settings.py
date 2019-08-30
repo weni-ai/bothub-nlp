@@ -1,6 +1,12 @@
+from collections import OrderedDict
 from decouple import config
-from bothub.utils import cast_supported_languages
 
+
+def cast_supported_languages(i):
+    return OrderedDict([
+        x.split(':', 1) if ':' in x else (x, x) for x in
+        i.split('|')
+    ])
 
 BOTHUB_NLP_DEBUG = config(
     'BOTHUB_NLP_DEBUG',

@@ -1,5 +1,6 @@
 import tornado.web
 from tornado import gen
+from decouple import config
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
@@ -10,6 +11,7 @@ from . import ApiHandler
 from ..utils import ValidationError
 from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
+from ..utils import backend
 
 
 class ParseHandler(ApiHandler):
@@ -54,17 +56,16 @@ class ParseHandler(ApiHandler):
         if not repository_authorization:
             raise AuthorizationIsRequired()
 
-        repository = repository_authorization.repository
-        update = repository.last_trained_update(language)
+        update = backend().request_backend_parse('parse', repository_authorization, language)
 
-        if not update:
+        if not update.get('update'):
             next_languages = NEXT_LANGS.get(language, [])
             for next_language in next_languages:
-                update = repository.last_trained_update(next_language)
-                if update:
+                update = backend().request_backend_parse('parse', repository_authorization, next_language)
+                if update.get('update'):
                     break
 
-        if not update:
+        if not update.get('update'):
             raise ValidationError(
                 'This repository has never been trained',
                 field='language')
@@ -72,20 +73,21 @@ class ParseHandler(ApiHandler):
         answer_task = celery_app.send_task(
             TASK_NLU_PARSE_TEXT,
             args=[
-                update.id,
+                update.get('update_id'),
+                repository_authorization,
                 text,
             ],
             kwargs={
                 'rasa_format': rasa_format,
             },
-            queue=queue_name(ACTION_PARSE, update.language))
+            queue=queue_name(ACTION_PARSE, update.get('language')))
         answer_task.wait()
 
         answer = answer_task.result
         answer.update({
             'text': text,
-            'update_id': update.id,
-            'language': update.language,
+            'update_id': update.get('update_id'),
+            'language': update.get('language'),
         })
 
         self.finish(answer)

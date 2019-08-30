@@ -2,6 +2,7 @@ import logging
 import io
 import contextvars
 import spacy
+import bothub_backend
 
 from tempfile import mkdtemp
 
@@ -9,27 +10,32 @@ from rasa_nlu.config import RasaNLUModelConfig
 from rasa_nlu.model import Interpreter
 from rasa_nlu.model import Metadata
 from rasa_nlu import components
-from bothub.common.models import Repository
 
 from .persistor import BothubPersistor
+from decouple import config
 
+
+def backend():
+    return bothub_backend.get_backend(
+        'bothub_backend.bothub.BothubBackend', 
+        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
+    )
 
 def get_rasa_nlu_config_from_update(update):
     pipeline = []
-    if update.algorithm == Repository.ALGORITHM_STATISTICAL_MODEL:
+    if update.get('algorithm') == update.get('ALGORITHM_STATISTICAL_MODEL'):
         pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
         pipeline.append({'name': 'tokenizer_spacy_with_labels'})
         pipeline.append({'name': 'intent_entity_featurizer_regex'})
         pipeline.append({'name': 'intent_featurizer_spacy'})
         pipeline.append({'name': 'ner_crf'})
         # spacy named entity recognition
-        if update.use_name_entities:
+        if update.get('use_name_entities'):
             pipeline.append({'name': 'ner_spacy'})
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
         pipeline.append({'name': 'intent_classifier_sklearn'})
     else:
-        use_spacy = update.algorithm == Repository \
-            .ALGORITHM_NEURAL_NETWORK_EXTERNAL
+        use_spacy = update.get('algorithm') == update.get('ALGORITHM_NEURAL_NETWORK_EXTERNAL')
         # load spacy
         pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
         # tokenizer
@@ -42,18 +48,18 @@ def get_rasa_nlu_config_from_update(update):
         # intent classifier
         pipeline.append({
             'name': 'intent_classifier_tensorflow_embedding',
-            'similarity_type': 'inner' if update.use_competing_intents else
+            'similarity_type': 'inner' if update.get('use_competing_intents') else
                                'cosine'
         })
         # entity extractor
         pipeline.append({'name': 'ner_crf'})
         # spacy named entity recognition
-        if update.use_name_entities:
+        if update.get('use_name_entities'):
             pipeline.append({'name': 'ner_spacy'})
         # label extractor
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
     return RasaNLUModelConfig({
-        'language': update.language,
+        'language': update.get('language'),
         'pipeline': pipeline,
     })
 
@@ -106,20 +112,22 @@ class BothubInterpreter(Interpreter):
 class UpdateInterpreters:
     interpreters = {}
 
-    def get(self, update, use_cache=True):
-        interpreter = self.interpreters.get(update.id)
+    def get(self, update, repository_authorization, use_cache=True):
+        update_request = backend().request_backend_parse_nlu(update, repository_authorization)
+
+        interpreter = self.interpreters.get(update_request.get('update_id'))
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(update)
+        persistor = BothubPersistor(update, repository_authorization)#####
         model_directory = mkdtemp()
         persistor.retrieve(
-            str(update.repository.uuid),
-            str(update.id),
+            str(update_request.get('repository_uuid')),
+            str(update_request.get('update_id')),
             model_directory)
-        self.interpreters[update.id] = BothubInterpreter.load(
+        self.interpreters[update_request.get('update_id')] = BothubInterpreter.load(
             model_directory,
             components.ComponentBuilder(use_cache=False))
-        return self.get(update)
+        return self.get(update, repository_authorization)
 
 
 class SpacyNLPLanguageManager:

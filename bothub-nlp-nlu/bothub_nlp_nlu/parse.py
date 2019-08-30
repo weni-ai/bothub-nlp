@@ -1,9 +1,7 @@
 from collections import OrderedDict
 
-from bothub.common.models import RepositoryEntity
-
 from .utils import update_interpreters
-
+from .utils import backend
 
 def order_by_confidence(l):
     return sorted(
@@ -32,8 +30,7 @@ def position_match(a, b):
         return False
     return True
 
-
-def format_parse_output(update, r):
+def format_parse_output(update, r, repository_authorization):
     intent = r.get('intent', None)
     intent_ranking = r.get('intent_ranking')
     labels_as_entity = r.get('labels_as_entity')
@@ -59,11 +56,9 @@ def format_parse_output(update, r):
         if is_label:
             label_value = entity.get('entity')
         else:
-            repository_entity = RepositoryEntity.objects.get(
-                repository=update.repository,
-                value=entity.get('entity'))
-            if repository_entity.label:
-                label_value = repository_entity.label.value
+            repository_entity = backend().request_backend_repository_entity_nlu_parse(update, repository_authorization, entity.get('entity'))
+            if repository_entity.get('label'):
+                label_value = repository_entity.get('label_value')
 
         if not entities_dict.get(label_value):
             entities_dict[label_value] = []
@@ -89,11 +84,11 @@ def format_parse_output(update, r):
     return out
 
 
-def parse_text(update, text, rasa_format=False, use_cache=True):
-    interpreter = update_interpreters.get(update, use_cache=use_cache)
+def parse_text(update, repository_authorization, text, rasa_format=False, use_cache=True):
+    interpreter = update_interpreters.get(update, repository_authorization, use_cache=use_cache)
     r = interpreter.parse(text)
 
     if rasa_format:
         return r
 
-    return format_parse_output(update, r)
+    return format_parse_output(update, r, repository_authorization)

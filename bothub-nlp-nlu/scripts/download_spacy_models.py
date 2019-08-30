@@ -9,10 +9,17 @@ from decouple import config
 from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
-from bothub.utils import cast_supported_languages
+from collections import OrderedDict
 
 
 logger = logging.getLogger('download_spacy_models')
+
+
+def cast_supported_languages(i):
+    return OrderedDict([
+        x.split(':', 1) if ':' in x else (x, x) for x in
+        i.split('|')
+    ])
 
 
 @plac.annotations(

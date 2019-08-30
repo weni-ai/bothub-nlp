@@ -20,13 +20,8 @@ from rasa_nlu.evaluate import (
     _targets_predictions_from,
 )
 
-from bothub.common.models import RepositoryEntity
-from bothub.common.models import RepositoryEvaluateResult
-from bothub.common.models import RepositoryEvaluateResultScore
-from bothub.common.models import RepositoryEvaluateResultEntity
-from bothub.common.models import RepositoryEvaluateResultIntent
-
 from .utils import update_interpreters
+from .utils import backend
 
 logger = logging.getLogger(__name__)
 
@@ -215,23 +210,21 @@ def entity_rasa_nlu_data(entity, evaluate):
         'entity': entity.entity.value,
     }
 
+def evaluate_update(update, by, repository_authorization):
+    evaluations = backend().request_backend_start_evaluation(update, repository_authorization)
+    training_examples = []
 
-def evaluate_update(update, by):
-    evaluations = update.repository.evaluations(language=update.language)
-
-    training_examples = [
-        Message.build(
-            text=evaluate.get_text(update.language),
-            intent=evaluate.intent,
-            entities=[
-                entity_rasa_nlu_data(evaluate_entity, evaluate)
-                for evaluate_entity in evaluate.get_entities(
-                    update.language)])
-        for evaluate in evaluations
-    ]
+    for evaluate in evaluations:
+        training_examples.append(
+            Message.build(
+                text=evaluate.get('text'),
+                intent=evaluate.get('intent'),
+                entities=evaluate.get('entities')
+            )
+        )
 
     test_data = TrainingData(training_examples=training_examples)
-    interpreter = update_interpreters.get(update, use_cache=False)
+    interpreter = update_interpreters.get(update, repository_authorization, use_cache=False)
     extractor = get_entity_extractors(interpreter)
     entity_predictions, tokens = get_entity_predictions(interpreter,
                                                         test_data)
@@ -258,26 +251,22 @@ def evaluate_update(update, by):
     intent_evaluation = result.get('intent_evaluation')
     entity_evaluation = result.get('entity_evaluation')
 
-    intents_score = RepositoryEvaluateResultScore.objects.create(
-        precision=intent_evaluation.get('precision'),
-        f1_score=intent_evaluation.get('f1_score'),
-        accuracy=intent_evaluation.get('accuracy'),
-    )
-
-    entities_score = RepositoryEvaluateResultScore.objects.create(
-        precision=entity_evaluation.get('precision'),
-        f1_score=entity_evaluation.get('f1_score'),
-        accuracy=entity_evaluation.get('accuracy'),
-    )
-
     charts = plot_and_save_charts(update, intent_results)
-    evaluate_result = RepositoryEvaluateResult.objects.create(
-        repository_update=update,
-        entity_results=entities_score,
-        intent_results=intents_score,
-        matrix_chart=charts.get('matrix_chart'),
-        confidence_chart=charts.get('confidence_chart'),
-        log=json.dumps(intent_evaluation.get('log')),
+
+    evaluate_result = backend().request_backend_create_evaluate_results(
+        {
+            'update_id': update,
+            'matrix_chart': charts.get('matrix_chart'),
+            'confidence_chart': charts.get('confidence_chart'),
+            'log': intent_evaluation.get('log'),
+            'intentprecision': intent_evaluation.get('precision'),
+            'intentf1_score': intent_evaluation.get('f1_score'),
+            'intentaccuracy': intent_evaluation.get('accuracy'),
+            'entityprecision': entity_evaluation.get('precision'),
+            'entityf1_score': entity_evaluation.get('f1_score'),
+            'entityaccuracy': entity_evaluation.get('accuracy')
+        },
+        repository_authorization
     )
 
     intent_reports = intent_evaluation.get('report')
@@ -286,39 +275,37 @@ def evaluate_update(update, by):
     for intent_key in intent_reports.keys():
         if intent_key and intent_key not in excluded_itens:
             intent = intent_reports.get(intent_key)
-            intent_score = RepositoryEvaluateResultScore.objects.create(
-                precision=intent.get('precision'),
-                recall=intent.get('recall'),
-                f1_score=intent.get('f1-score'),
-                support=intent.get('support'),
-            )
 
-            RepositoryEvaluateResultIntent.objects.create(
-                intent=intent_key,
-                evaluate_result=evaluate_result,
-                score=intent_score,
+            backend().request_backend_create_evaluate_results_intent(
+                {
+                    'evaluate_id': evaluate_result.get('evaluate_id'),
+                    'precision': intent.get('precision'),
+                    'recall': intent.get('recall'),
+                    'f1_score': intent.get('f1-score'),
+                    'support': intent.get('support'),
+                    'intent_key': intent_key
+                },
+                repository_authorization
             )
 
     for entity_key in entity_reports.keys():
         if entity_key and entity_key not in excluded_itens:
             entity = entity_reports.get(entity_key)
-            entity_score = RepositoryEvaluateResultScore.objects.create(
-                precision=entity.get('precision'),
-                recall=entity.get('recall'),
-                f1_score=entity.get('f1-score'),
-                support=entity.get('support'),
-            )
 
-            RepositoryEvaluateResultEntity.objects.create(
-                entity=RepositoryEntity.objects.get(
-                    repository=update.repository,
-                    value=entity_key,
-                    create_entity=False),
-                evaluate_result=evaluate_result,
-                score=entity_score,
+            backend().request_backend_create_evaluate_results_score(
+                {
+                    'evaluate_id': evaluate_result.get('evaluate_id'),
+                    'update_id': update,
+                    'precision': entity.get('precision'),
+                    'recall': entity.get('recall'),
+                    'f1_score': entity.get('f1-score'),
+                    'support': entity.get('support'),
+                    'entity_key': entity_key
+                },
+                repository_authorization
             )
 
     return {
-        'id': evaluate_result.id,
-        'version': evaluate_result.version,
+        'id': evaluate_result.get('evaluate_id'),
+        'version': evaluate_result.get('evaluate_version'),
     }

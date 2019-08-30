@@ -1,5 +1,6 @@
 import tornado.web
 from tornado import gen
+from decouple import config
 
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
@@ -11,6 +12,7 @@ from ..utils import ValidationError
 from ..utils import authorization_required
 from ..utils import AuthorizationIsRequired
 from ..utils import NEXT_LANGS
+from ..utils import backend
 
 
 EVALUATE_STATUS_EVALUATED = 'evaluated'
@@ -36,10 +38,9 @@ class EvaluateHandler(ApiHandler):
         if not repository_authorization:
             raise AuthorizationIsRequired()
 
-        repository = repository_authorization.repository
-        update = repository.last_trained_update(language)
+        update = backend().request_backend_parse('evaluate', repository_authorization, language)
 
-        if not update:
+        if not update.get('update'):
             raise ValidationError(
                 'This repository has never been trained',
                 field='language')
@@ -48,16 +49,17 @@ class EvaluateHandler(ApiHandler):
             evaluate_task = celery_app.send_task(
                 TASK_NLU_EVALUATE_UPDATE,
                 args=[
-                    update.id,
-                    repository_authorization.user.id,
+                    update.get('update_id'),
+                    update.get('user_id'),
+                    repository_authorization
                 ],
-                queue=queue_name(ACTION_EVALUATE, update.language))
+                queue=queue_name(ACTION_EVALUATE, update.get('language')))
             evaluate_task.wait()
             evaluate = evaluate_task.result
             evaluate_report = {
                 'language': language,
                 'status': EVALUATE_STATUS_EVALUATED,
-                'update_id': update.id,
+                'update_id': update.get('update_id'),
                 'evaluate_id': evaluate.get('id'),
                 'evaluate_version': evaluate.get('version'),
             }

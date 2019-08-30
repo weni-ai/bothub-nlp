@@ -6,10 +6,10 @@ from rasa_nlu.training_data import Message, TrainingData
 from rasa_nlu.components import ComponentBuilder
 from rasa_nlu.training_data.formats.readerwriter import TrainingDataWriter
 from rasa_nlu.utils import json_to_string
-from django.db import models
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
+from .utils import backend
 from .persistor import BothubPersistor
 from . import logger
 
@@ -56,37 +56,63 @@ class BothubTrainingData(TrainingData):
         return BothubWriter().dumps(self)
 
 
-def train_update(update, by):
-    update.start_training(by)
+def train_update(update, by, repository_authorization):
+    update_request = backend().request_backend_start_training_nlu(update, by, repository_authorization)
     with PokeLogging() as pl:
         try:
-            examples = [
-                Message.build(
-                    text=example.get_text(update.language),
-                    intent=example.intent,
-                    entities=[
-                        example_entity.rasa_nlu_data
-                        for example_entity in example.get_entities(
-                            update.language)])
-                for example in update.examples]
+            examples = []
 
-            label_examples_query = update.examples \
-                .filter(entities__entity__label__isnull=False) \
-                .annotate(entities_count=models.Count('entities')) \
-                .filter(entities_count__gt=0)
+            for example in update_request.get('examples'):
+                entities = []
+                request_entities = backend().request_backend_get_entities_nlu(
+                    update, 
+                    update_request.get('language'),
+                    example.get('example_id'),
+                    repository_authorization
+                )
+                for example_entity in request_entities.get('entities'):
+                    entities.append(example_entity)
 
-            label_examples = [
-                Message.build(
-                    text=example.get_text(update.language),
-                    entities=[
-                        example_entity.get_rasa_nlu_data(
-                            label_as_entity=True)
-                        for example_entity in filter(
-                            lambda ee: ee.entity.label,
-                            example.get_entities(update.language))])
-                for example in label_examples_query]
+                examples.append(
+                    Message.build(
+                        text=backend().request_backend_get_text_nlu(
+                            update, 
+                            update_request.get('language'), 
+                            example.get('example_id'),
+                            repository_authorization
+                        ).get('get_text'),
+                        intent=example.get('example_intent'),
+                        entities=entities
+                    )
+                )
+            
+            label_examples_query = update_request.get('label_examples_query')
+            label_examples = []
 
-            rasa_nlu_config = get_rasa_nlu_config_from_update(update)
+            for example in label_examples_query:
+                entities = []
+                request_entities = backend().request_backend_get_entities_label_nlu(
+                    update, 
+                    update_request.get('language'),
+                    example.get('example_id'),
+                    repository_authorization
+                )
+                for example_entity in request_entities.get('entities'):
+                    entities.append(example_entity)
+
+                label_examples.append(
+                    Message.build(
+                        text=backend().request_backend_get_text_nlu(
+                            update, 
+                            update_request.get('language'), 
+                            example.get('example_id'),
+                            repository_authorization
+                        ).get('get_text'),
+                        entities=entities
+                    )
+                )
+
+            rasa_nlu_config = get_rasa_nlu_config_from_update(update_request)
             trainer = Trainer(
                 rasa_nlu_config,
                 ComponentBuilder(use_cache=False))
@@ -96,16 +122,15 @@ def train_update(update, by):
 
             trainer.train(training_data)
 
-            persistor = BothubPersistor(update)
+            persistor = BothubPersistor(update, repository_authorization)
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                project_name=str(update.repository.uuid),
-                fixed_model_name=str(update.id))
+                project_name=str(update_request.get('repository_uuid')),
+                fixed_model_name=str(update_request.get('update_id')))
         except Exception as e:
             logger.exception(e)
-            update.train_fail()
+            backend().request_backend_trainfail_nlu(update, repository_authorization)
             raise e
         finally:
-            update.training_log = pl.getvalue()
-            update.save(update_fields=['training_log'])
+            backend().request_backend_traininglog_nlu(update, pl.getvalue(), repository_authorization)

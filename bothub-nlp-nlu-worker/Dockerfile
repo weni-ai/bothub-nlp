@@ -26,6 +26,7 @@ RUN apt-get install -y ttf-mscorefonts-installer \
     && rm -rf /var/lib/apt/lists/*
 
 COPY bothub-nlp ../bothub-nlp
+COPY bothub-backend ../bothub-backend
 COPY bothub-nlp-celery ../bothub-nlp-celery
 COPY bothub-nlp-nlu ../bothub-nlp-nlu
 COPY bothub-nlp-nlu-worker/requirements.txt .

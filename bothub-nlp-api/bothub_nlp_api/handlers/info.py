@@ -1,10 +1,10 @@
 import tornado.web
 from tornado import gen
-
-from bothub.api.v1.serializers.repository import RepositorySerializer
+from decouple import config
 
 from . import ApiHandler
 from ..utils import authorization_required
+from ..utils import backend
 
 
 class InfoHandler(ApiHandler):
@@ -13,6 +13,5 @@ class InfoHandler(ApiHandler):
     @authorization_required
     def get(self):
         repository_authorization = self.repository_authorization()
-        repository = repository_authorization.repository
-        serializer = RepositorySerializer(repository)
-        self.finish(serializer.data)
+        info = backend().request_backend_parse('info', repository_authorization)
+        self.finish(info)

@@ -6,6 +6,7 @@ ENV BOTHUB_NLP_API_PORT 2657
 WORKDIR $WORKDIR
 
 COPY bothub-nlp ../bothub-nlp
+COPY bothub-backend ../bothub-backend
 COPY bothub-nlp-celery ../bothub-nlp-celery
 COPY bothub-nlp-api/Pipfile .
 COPY bothub-nlp-api/Pipfile.lock .
