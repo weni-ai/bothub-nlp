@@ -2,10 +2,10 @@ import tornado.web
 from tornado import gen
 from decouple import config
 
-from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
-from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
-from bothub_nlp_celery.app import celery_app
-from bothub_nlp import settings as bothub_nlp_settings
+from ..celery.actions import ACTION_EVALUATE, queue_name
+from ..celery.tasks import TASK_NLU_EVALUATE_UPDATE
+from ..celery.app import celery_app
+from .. import settings
 
 from . import ApiHandler
 from ..utils import ValidationError
@@ -27,7 +27,7 @@ class EvaluateHandler(ApiHandler):
         language = self.get_argument('language', default=None)
 
         if language and (
-            language not in bothub_nlp_settings.SUPPORTED_LANGUAGES.keys() and
+            language not in settings.SUPPORTED_LANGUAGES.keys() and
             language not in NEXT_LANGS.keys()
         ):
             raise ValidationError(

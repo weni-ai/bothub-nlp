@@ -1,0 +1,33 @@
+{
+  "rasa_nlu_data": {
+    "common_examples": [
+      {
+        "intent": "no",
+        "text": "nothing"
+      },
+      {
+        "intent": "yes",
+        "text": "ok"
+      },
+      {
+        "intent": "no",
+        "text": "never"
+      },
+      {
+        "intent": "no",
+        "text": "no"
+      },
+      {
+        "intent": "yes",
+        "text": "sure"
+      },
+      {
+        "intent": "yes",
+        "text": "yes"
+      }
+    ],
+    "label_examples": [],
+    "regex_features": [],
+    "entity_synonyms": []
+  }
+}

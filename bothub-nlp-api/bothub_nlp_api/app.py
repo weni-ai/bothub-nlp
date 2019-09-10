@@ -5,7 +5,6 @@ import multiprocessing
 from tornado.web import Application, url
 from tornado.httpserver import HTTPServer
 from raven.contrib.tornado import AsyncSentryClient
-from bothub_nlp import settings as bothub_nlp_settings
 
 from . import settings
 from .handlers.parse import ParseHandler
@@ -33,12 +32,12 @@ def load_app():
     global app
     app = make_app()
 
-    if bothub_nlp_settings.BOTHUB_NLP_SENTRY_CLIENT:
+    if settings.BOTHUB_NLP_SENTRY_CLIENT:
         app.sentry_client = AsyncSentryClient(
-            bothub_nlp_settings.BOTHUB_NLP_SENTRY_CLIENT,
+            settings.BOTHUB_NLP_SENTRY_CLIENT,
         )
 
-    if bothub_nlp_settings.BOTHUB_NLP_DEVELOPMENT_MODE:
+    if settings.BOTHUB_NLP_DEVELOPMENT_MODE:
         app.listen(settings.BOTHUB_NLP_API_PORT)
     else:
         server = HTTPServer(app)

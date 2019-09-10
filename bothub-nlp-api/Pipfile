@@ -10,11 +10,10 @@ lint = "flake8"
 [packages]
 tornado = "==5.1.1"
 raven = "*"
-bothub-nlp-celery = {path = "./../bothub-nlp-celery"}
 python-decouple = "*"
-bothub-nlp = {path = "./../bothub-nlp"}
 requests = "==2.20.1"
-bothub-backend = {path = "./../bothub-backend"}
+bothub_backend = {ref = "master", git = "https://github.com/dyohan9/get_backend_python"}
+celery = "==4.2.1"
 
 [dev-packages]
 redis = "*"

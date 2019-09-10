@@ -25,10 +25,10 @@ RUN apt-get install -y ttf-mscorefonts-installer \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY bothub-nlp ../bothub-nlp
-COPY bothub-backend ../bothub-backend
-COPY bothub-nlp-celery ../bothub-nlp-celery
-COPY bothub-nlp-nlu ../bothub-nlp-nlu
+# COPY bothub-nlp ../bothub-nlp
+# COPY bothub-backend ../bothub-backend
+# COPY bothub-nlp-celery ../bothub-nlp-celery
+# COPY bothub-nlp-nlu ../bothub-nlp-nlu
 COPY bothub-nlp-nlu-worker/requirements.txt .
 
 FROM base as builder
@@ -48,6 +48,8 @@ RUN pip install --no-index --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS
 
 COPY bothub-nlp-nlu-worker .
 
+# RUN pip install pipenv && pipenv install --system --deploy
+
 RUN git clone --branch master --depth 1 --single-branch \
     https://github.com/Ilhasoft/spacy-lang-models \
     spacy-langs \
@@ -57,7 +59,7 @@ RUN git clone --branch master --depth 1 --single-branch \
 ARG DOWNLOAD_SPACY_MODELS
 
 RUN if [ ${DOWNLOAD_SPACY_MODELS} ]; then \
-        python3.6 ../bothub-nlp-nlu/scripts/download_spacy_models.py ${DOWNLOAD_SPACY_MODELS}; \
+        python3.6 bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/download_spacy_models.py ${DOWNLOAD_SPACY_MODELS}; \
     fi
 
 ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp_nlu_worker.celery_app", "-c", "1", "-l", "INFO", "-E" ]
