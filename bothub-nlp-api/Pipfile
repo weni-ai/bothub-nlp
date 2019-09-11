@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [scripts]
-start = "python -m tornado.autoreload -m bothub_nlp_api"
 lint = "flake8"
 
 [packages]
@@ -12,8 +11,11 @@ tornado = "==5.1.1"
 raven = "*"
 python-decouple = "*"
 requests = "==2.20.1"
-bothub_backend = {ref = "master", git = "https://github.com/dyohan9/get_backend_python"}
+bothub_backend = {ref = "master",git = "https://github.com/dyohan9/get_backend_python"}
 celery = "==4.2.1"
+flask = "*"
+gunicorn = "*"
+gevent = "*"
 
 [dev-packages]
 redis = "*"

@@ -21,4 +21,7 @@ RUN apk update \
 
 COPY bothub-nlp-api .
 
-ENTRYPOINT [ "python", "-m", "bothub_nlp_api" ]
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT [ "./entrypoint.sh" ]
+
+#ENTRYPOINT [ "python", "-m", "bothub_nlp_api" ]
