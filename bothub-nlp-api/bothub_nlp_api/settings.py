@@ -9,6 +9,7 @@ def cast_supported_languages(i):
         i.split('|')
     ])
 
+
 BOTHUB_NLP_API_PORT = config(
     'BOTHUB_NLP_API_PORT',
     default=2657,

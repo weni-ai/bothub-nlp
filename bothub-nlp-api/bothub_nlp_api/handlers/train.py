@@ -21,7 +21,11 @@ def train_handler():
 
     for language in settings.SUPPORTED_LANGUAGES.keys():
 
-        current_update = backend().request_backend_parse('train', repository_authorization, language)
+        current_update = backend().request_backend_parse(
+            'train',
+            repository_authorization,
+            language
+        )
 
         if not current_update.get('ready_for_train'):
             languages_report[language] = {

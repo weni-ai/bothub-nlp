@@ -28,7 +28,11 @@ def evaluate_handler():
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
-    update = backend().request_backend_parse('evaluate', repository_authorization, language)
+    update = backend().request_backend_parse(
+        'evaluate',
+        repository_authorization,
+        language
+    )
 
     if not update.get('update'):
         raise ValidationError(
@@ -65,4 +69,3 @@ def evaluate_handler():
     resp = jsonify(evaluate_report)
     resp.status_code = 200
     return resp
-

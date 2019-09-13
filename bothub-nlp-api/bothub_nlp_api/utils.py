@@ -6,7 +6,7 @@ from flask import request
 
 def backend():
     return bothub_backend.get_backend(
-        'bothub_backend.bothub.BothubBackend', 
+        'bothub_backend.bothub.BothubBackend',
         config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
     )
 
