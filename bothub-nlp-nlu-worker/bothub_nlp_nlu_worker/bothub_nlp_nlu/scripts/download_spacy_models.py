@@ -53,7 +53,7 @@ def download_spacy_models(languages=None, debug=False):
                 pip_package,
             ]
             logger.debug(' '.join(cmd))
-            if subprocess.call(cmd, env=os.environ.copy()) is 0:
+            if subprocess.call(cmd, env=os.environ.copy()) == 0:
                 logger.debug('linking: {} to {}'.format(model_name, lang))
                 package_path = get_package_path(model_name)
                 link(model_name, lang, force=True, model_path=package_path)

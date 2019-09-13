@@ -17,9 +17,10 @@ from decouple import config
 
 def backend():
     return bothub_backend.get_backend(
-        'bothub_backend.bothub.BothubBackend', 
+        'bothub_backend.bothub.BothubBackend',
         config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
     )
+
 
 def get_rasa_nlu_config_from_update(update):
     pipeline = []
@@ -35,7 +36,9 @@ def get_rasa_nlu_config_from_update(update):
         pipeline.append({'name': 'crf_label_as_entity_extractor'})
         pipeline.append({'name': 'intent_classifier_sklearn'})
     else:
-        use_spacy = update.get('algorithm') == update.get('ALGORITHM_NEURAL_NETWORK_EXTERNAL')
+        use_spacy = update.get('algorithm') == update.get(
+            'ALGORITHM_NEURAL_NETWORK_EXTERNAL'
+        )
         # load spacy
         pipeline.append({'name': 'optimized_spacy_nlp_with_labels'})
         # tokenizer
@@ -48,8 +51,8 @@ def get_rasa_nlu_config_from_update(update):
         # intent classifier
         pipeline.append({
             'name': 'intent_classifier_tensorflow_embedding',
-            'similarity_type': 'inner' if update.get('use_competing_intents') else
-                               'cosine'
+            'similarity_type':
+                'inner' if update.get('use_competing_intents') else 'cosine'
         })
         # entity extractor
         pipeline.append({'name': 'ner_crf'})
@@ -113,20 +116,25 @@ class UpdateInterpreters:
     interpreters = {}
 
     def get(self, update, repository_authorization, use_cache=True):
-        update_request = backend().request_backend_parse_nlu(update, repository_authorization)
+        update_request = backend().request_backend_parse_nlu(
+            update,
+            repository_authorization
+        )
 
         interpreter = self.interpreters.get(update_request.get('update_id'))
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(update, repository_authorization)#####
+        persistor = BothubPersistor(update, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(
             str(update_request.get('repository_uuid')),
             str(update_request.get('update_id')),
             model_directory)
-        self.interpreters[update_request.get('update_id')] = BothubInterpreter.load(
-            model_directory,
-            components.ComponentBuilder(use_cache=False))
+        self.interpreters[update_request.get('update_id')] = \
+            BothubInterpreter.load(
+                model_directory,
+                components.ComponentBuilder(use_cache=False)
+            )
         return self.get(update, repository_authorization)
 
 
