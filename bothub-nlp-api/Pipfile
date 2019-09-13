@@ -11,7 +11,7 @@ tornado = "==5.1.1"
 raven = "*"
 python-decouple = "*"
 requests = "==2.20.1"
-bothub_backend = {ref = "master",git = "https://github.com/dyohan9/get_backend_python"}
+bothub_backend = {ref = "master",git = "https://github.com/Ilhasoft/bothub-backend"}
 celery = "==4.2.1"
 flask = "*"
 gunicorn = "*"

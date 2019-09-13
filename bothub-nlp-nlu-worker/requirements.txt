@@ -14,4 +14,4 @@ plac==0.9.6
 requests==2.20.1
 python-decouple==3.1
 celery==4.2.1
-git+https://github.com/dyohan9/get_backend_python.git@master
+git+https://github.com/Ilhasoft/bothub-backend.git@master
