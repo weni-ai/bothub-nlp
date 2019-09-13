@@ -5,7 +5,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV PYTHON_WHEELS_PATH /wheels
 ENV PYTHON_BUILD_PACKAGES "software-properties-common curl"
-ENV PIP_REQUIREMENTS "-r requirements.txt redis"
+ENV PIP_REQUIREMENTS "-r requirements.txt"
 
 WORKDIR ${WORKDIR}
 
@@ -43,8 +43,6 @@ COPY --from=builder ${PYTHON_WHEELS_PATH} ${PYTHON_WHEELS_PATH}
 RUN pip install --no-index --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
 COPY bothub-nlp-nlu-worker .
-
-# RUN pip install pipenv && pipenv install --system --deploy
 
 RUN git clone --branch master --depth 1 --single-branch \
     https://github.com/Ilhasoft/spacy-lang-models \
