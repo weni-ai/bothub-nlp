@@ -14,7 +14,7 @@ EVALUATE_STATUS_FAILED = 'failed'
 
 
 def evaluate_handler():
-    language = request.json.get('language', default=None)
+    language = request.get_json().get('language', default=None)
 
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys() and
