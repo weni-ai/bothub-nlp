@@ -24,3 +24,6 @@ db.sqlite3
 
 # spacy-langs
 bothub-nlp-nlu-worker/spacy-langs
+
+# celery tasks
+bothub-nlp-api/bothub_nlp_api/celerytasks/
