@@ -73,4 +73,4 @@ def evaluate_handler():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=config('SERVER_PORT', default=5000))
+    app.run(host='0.0.0.0', port=config('NLP_API_SERVER_PORT', default=5000))
