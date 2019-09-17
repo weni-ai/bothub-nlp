@@ -1,6 +1,8 @@
 from flask import jsonify, Flask, Response
 from flask import request
 
+from decouple import config
+
 from bothub_nlp_api.utils import authorization_required
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
@@ -71,4 +73,4 @@ def evaluate_handler():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=config('SERVER_PORT', default=5000))
