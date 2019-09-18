@@ -1,8 +1,8 @@
 from flask import jsonify
 
-from ..celerytasks.actions import ACTION_TRAIN, queue_name
-from ..celerytasks.tasks import TASK_NLU_TRAIN_UPDATE
-from ..celerytasks.app import celery_app
+from bothub_nlp_celery.actions import ACTION_TRAIN, queue_name
+from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
+from bothub_nlp_celery.app import celery_app
 from .. import settings
 
 from ..utils import get_repository_authorization

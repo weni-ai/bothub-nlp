@@ -16,6 +16,7 @@ celery = "==4.2.1"
 flask = "*"
 gunicorn = "*"
 gevent = "*"
+bothub_nlp_celery = {ref = "master",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 
 [dev-packages]
 redis = "*"

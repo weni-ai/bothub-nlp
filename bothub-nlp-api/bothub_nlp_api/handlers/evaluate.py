@@ -1,9 +1,9 @@
 from flask import jsonify, request
 
 from .. import settings
-from ..celerytasks.actions import ACTION_EVALUATE, queue_name
-from ..celerytasks.app import celery_app
-from ..celerytasks.tasks import TASK_NLU_EVALUATE_UPDATE
+from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
+from bothub_nlp_celery.app import celery_app
+from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 from ..utils import AuthorizationIsRequired
 from ..utils import NEXT_LANGS
 from ..utils import ValidationError, get_repository_authorization

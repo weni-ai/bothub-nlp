@@ -17,3 +17,4 @@ celery==4.2.1
 git+https://github.com/Ilhasoft/bothub-backend.git@master
 redis
 flake8
+git+https://github.com/Ilhasoft/bothub-nlp-celery.git@master

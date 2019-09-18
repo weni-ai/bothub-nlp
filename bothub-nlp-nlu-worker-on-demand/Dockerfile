@@ -6,7 +6,6 @@ ENV BOTHUB_NLP_WORKER_ON_DEMAND_API_PORT 2658
 WORKDIR $WORKDIR
 
 COPY bothub-nlp-nlu-worker-on-demand .
-COPY bothub-nlp-nlu-worker/bothub_nlp_nlu_worker/bothub_nlp_celery ./bothub_nlp_nlu_worker_on_demand/celery_nlp
 
 RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \

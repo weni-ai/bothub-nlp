@@ -7,8 +7,6 @@ WORKDIR $WORKDIR
 
 COPY bothub-nlp-api .
 
-COPY bothub-nlp-nlu-worker/bothub_nlp_nlu_worker/bothub_nlp_celery bothub_nlp_api/celerytasks
-
 RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \
         alpine-sdk \

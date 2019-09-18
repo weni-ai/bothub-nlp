@@ -1,6 +1,6 @@
 import logging
 
-from .celery_nlp.app import celery_app
+from bothub_nlp_celery.app import celery_app
 from . import settings
 
 from . import MyDemand
