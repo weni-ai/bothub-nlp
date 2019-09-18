@@ -11,7 +11,24 @@ def backend():
     )
 
 
-NEXT_LANGS = backend().get_langs()
+NEXT_LANGS = {
+    'english': [
+        'en',
+    ],
+    'portuguese': [
+        'pt',
+        'pt_br',
+    ],
+    'pt': [
+        'pt_br',
+    ],
+    'pt-br': [
+        'pt_br',
+    ],
+    'br': [
+        'pt_br',
+    ],
+}
 
 
 class AuthorizationIsRequired(Exception):

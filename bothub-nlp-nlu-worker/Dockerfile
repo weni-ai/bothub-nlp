@@ -31,8 +31,7 @@ FROM base as builder
 
 ENV BUILD_PACKAGES "build-essential"
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
+RUN apt-get update && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
 
 RUN pip wheel --wheel-dir=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
