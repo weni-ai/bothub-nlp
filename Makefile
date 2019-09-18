@@ -14,9 +14,8 @@ lint:
 mode_development:
 	@echo "${INFO}Mode Development...${NC}"
 	@echo "SUPPORTED_LANGUAGES=en:en_core_web_md" >> .env
-	@echo "DEFAULT_DATABASE=postgres://bothub:bothub@database:5432/bothub" >> .env
 	@echo "BOTHUB_ENGINE_URL=https://api.bothub.it" >> .env
-	@cp -a bothub-nlp-nlu-worker/bothub_nlp_nlu_worker/bothub_nlp_celery/* bothub-nlp-api/bothub_nlp_api/celerytasks/
+	@echo "ENGINE_PORT=8000" >> .env
 	@docker-compose build --build-arg DOWNLOAD_SPACY_MODELS=en:en_core_web_md
 	@docker-compose up -d
 	@echo "${SUCCESS}Finish...${NC}"
