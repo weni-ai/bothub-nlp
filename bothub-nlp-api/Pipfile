@@ -9,7 +9,6 @@ lint = "flake8"
 [packages]
 tornado = "==5.1.1"
 raven = "*"
-python-decouple = "*"
 requests = "==2.20.1"
 bothub_backend = {ref = "master",git = "https://github.com/Ilhasoft/bothub-backend"}
 celery = "==4.2.1"
@@ -17,6 +16,7 @@ flask = "*"
 gunicorn = "*"
 gevent = "*"
 bothub_nlp_celery = {ref = "master",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+django-environ = "*"
 
 [dev-packages]
 redis = "*"

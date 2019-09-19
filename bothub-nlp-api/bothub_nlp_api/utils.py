@@ -1,5 +1,5 @@
 import bothub_backend
-from decouple import config
+import bothub_nlp_api.settings
 from functools import wraps
 from flask import request
 
@@ -7,7 +7,7 @@ from flask import request
 def backend():
     return bothub_backend.get_backend(
         'bothub_backend.bothub.BothubBackend',
-        config('BOTHUB_ENGINE_URL', default='https://api.bothub.it')
+        bothub_nlp_api.settings.BOTHUB_ENGINE_URL
     )
 
 

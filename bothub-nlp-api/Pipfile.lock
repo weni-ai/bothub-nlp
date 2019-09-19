@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f93aa27bdb2473681e6d562a9c6742fb69be52350e6ac372d877c8c24f7da783"
+            "sha256": "593210efa62b073b0ceaded2f7cff4df92c83d87228ade1e3d4fe8456a6b3fa0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -35,7 +35,7 @@
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "349a21210a1cf3c6637ad4e8adbcf4cc6084d60d"
+            "ref": "af3ab788a31fd9bbeed6e1098db413f979bf6cd3"
         },
         "celery": {
             "hashes": [
@@ -65,6 +65,14 @@
                 "sha256:5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
             ],
             "version": "==7.0"
+        },
+        "django-environ": {
+            "hashes": [
+                "sha256:6c9d87660142608f63ec7d5ce5564c49b603ea8ff25da595fd6098f6dc82afde",
+                "sha256:c57b3c11ec1f319d9474e3e5a79134f40174b17c7cc024bbb2fad84646b120c4"
+            ],
+            "index": "pypi",
+            "version": "==0.4.5"
         },
         "flask": {
             "hashes": [
@@ -211,13 +219,6 @@
             ],
             "version": "==7.2.0"
         },
-        "python-decouple": {
-            "hashes": [
-                "sha256:1317df14b43efee4337a4aa02914bf004f010cd56d6c4bd894e6474ec8c4fe2d"
-            ],
-            "index": "pypi",
-            "version": "==3.1"
-        },
         "pytz": {
             "hashes": [
                 "sha256:26c0b32e437e54a18161324a2fca3c4b9846b74a8dccddd843113109e1116b32",
@@ -270,10 +271,10 @@
         },
         "werkzeug": {
             "hashes": [
-                "sha256:00d32beac38fcd48d329566f80d39f10ec2ed994efbecfb8dd4b320062d05902",
-                "sha256:0a24d43be6a7dce81bae05292356176d6c46d63e42a0dd3f9504b210a9cfaa43"
+                "sha256:7280924747b5733b246fe23972186c6b348f9ae29724135a6dfc1e53cea433e7",
+                "sha256:e5f4a1f98b52b18a93da705a7458e55afb26f32bff83ff5d19189f92462d65c4"
             ],
-            "version": "==0.15.6"
+            "version": "==0.16.0"
         },
         "zipp": {
             "hashes": [

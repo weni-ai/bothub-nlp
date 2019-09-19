@@ -1,7 +1,7 @@
+import bothub_nlp_api.settings
+
 from flask import jsonify, Flask, Response
 from flask import request
-
-from decouple import config
 
 from bothub_nlp_api.utils import authorization_required
 from bothub_nlp_api.utils import backend
@@ -73,4 +73,7 @@ def evaluate_handler():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=config('NLP_API_SERVER_PORT', default=5000))
+    app.run(
+        host='0.0.0.0',
+        port=bothub_nlp_api.settings.BOTHUB_NLP_API_SERVER_PORT
+    )
