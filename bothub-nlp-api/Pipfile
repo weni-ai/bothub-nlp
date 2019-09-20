@@ -7,7 +7,6 @@ name = "pypi"
 lint = "flake8"
 
 [packages]
-tornado = "==5.1.1"
 raven = "*"
 requests = "==2.20.1"
 bothub_backend = {ref = "master",git = "https://github.com/Ilhasoft/bothub-backend"}
