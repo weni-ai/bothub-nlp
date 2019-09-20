@@ -117,6 +117,3 @@ dmypy.json
 .DS_Store
 .idea/
 .env
-
-# celery tasks
-bothub-nlp-api/bothub_nlp_api/celerytasks/
