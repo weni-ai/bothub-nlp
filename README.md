@@ -48,8 +48,6 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 |--|--|--|--|
 | SECRET_KEY | ```string```|  ```None``` | A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.
 | DEBUG | ```boolean``` | ```False``` | A boolean that turns on/off debug mode.
-| BOTHUB_NLP_DEBUG | ```boolean``` | ```False``` | A boolean that turns on/off debug mode.
-| BOTHUB_NLP_DEVELOPMENT_MODE | ```boolean``` | ```False``` | A boolean that turns on/off development mode.
 | DEFAULT_DATABASE | ```string``` | ```sqlite:///db.sqlite3``` | Read [dj-database-url](https://github.com/kennethreitz/dj-database-url) to configure the database connection.
 | SUPPORTED_LANGUAGES | ```string```| ```en\|pt``` | Set supported languages. Separe languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]:[LANGUAGE_LOCATION]```.
 | BOTHUB_NLP_SENTRY_CLIENT | ```string``` | ```None``` | 

@@ -75,5 +75,5 @@ def evaluate_handler():
 if __name__ == "__main__":
     app.run(
         host='0.0.0.0',
-        port=bothub_nlp_api.settings.BOTHUB_NLP_API_SERVER_PORT
+        port=bothub_nlp_api.settings.BOTHUB_NLP_API_PORT
     )

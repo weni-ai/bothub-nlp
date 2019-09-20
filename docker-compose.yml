@@ -17,24 +17,15 @@ services:
       - bothub-nlp-celery-redis
     networks:
       - default
-      - bothub
     environment:
       - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
-      # bothub-engine env vars
-      - SECRET_KEY=${SECRET_KEY:-SK}
-      - DEBUG=${DEBUG:-true}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@database:5432/bothub}
       # bothub-nlp env vars
-      - BOTHUB_NLP_DEBUG=${BOTHUB_NLP_DEBUG:-true}
-      - BOTHUB_NLP_DEVELOPMENT_MODE=${BOTHUB_NLP_DEVELOPMENT_MODE:-false}
       - BOTHUB_NLP_SENTRY_CLIENT=${BOTHUB_NLP_SENTRY_CLIENT}
       # bothub-nlp-celery env vars
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
       - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL:-redis://bothub-nlp-celery-redis:6379/0}
       - BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE:-True}
       # env vars
-      - BOTHUB_NLP_API_LOGGER_FORMAT=${BOTHUB_NLP_API_LOGGER_FORMAT:-%(asctime)s - %(name)s - %(levelname)s - %(message)s}
-      - BOTHUB_NLP_API_LOGGER_LEVEL=${BOTHUB_NLP_API_LOGGER_LEVEL:-10}
       - BOTHUB_ENGINE_URL=${BOTHUB_ENGINE_URL:-https://api.bothub.it}
 
   bothub-nlp-nlu-worker:
@@ -48,20 +39,13 @@ services:
       - bothub-nlp-celery-redis
     networks:
       - default
-      - bothub
     environment:
       - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
       # bothub-nlp aws to save charts
       - BOTHUB_NLP_AWS_S3_BUCKET_NAME=${BOTHUB_NLP_AWS_S3_BUCKET_NAME}
       - BOTHUB_NLP_AWS_ACCESS_KEY_ID=${BOTHUB_NLP_AWS_ACCESS_KEY_ID}
       - BOTHUB_NLP_AWS_SECRET_ACCESS_KEY=${BOTHUB_NLP_AWS_SECRET_ACCESS_KEY}
-      # bothub-engine env vars
-      - SECRET_KEY=${SECRET_KEY:-SK}
-      - DEBUG=${DEBUG:-true}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@database:5432/bothub}
       # bothub-nlp env vars
-      - BOTHUB_NLP_DEBUG=${BOTHUB_NLP_DEBUG:-true}
-      - BOTHUB_NLP_DEVELOPMENT_MODE=${BOTHUB_NLP_DEVELOPMENT_MODE:-false}
       - BOTHUB_NLP_SENTRY_CLIENT=${BOTHUB_NLP_SENTRY_CLIENT}
       # bothub-nlp-celery env vars
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
@@ -80,7 +64,6 @@ services:
       - bothub-nlp-celery-redis
     networks:
       - default
-      - bothub
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
@@ -89,13 +72,7 @@ services:
       - BOTHUB_NLP_AWS_S3_BUCKET_NAME=${BOTHUB_NLP_AWS_S3_BUCKET_NAME}
       - BOTHUB_NLP_AWS_ACCESS_KEY_ID=${BOTHUB_NLP_AWS_ACCESS_KEY_ID}
       - BOTHUB_NLP_AWS_SECRET_ACCESS_KEY=${BOTHUB_NLP_AWS_SECRET_ACCESS_KEY}
-      # bothub-engine env vars
-      - SECRET_KEY=${SECRET_KEY:-SK}
-      - DEBUG=${DEBUG:-true}
-      - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://bothub:bothub@database:5432/bothub}
       # bothub-nlp env vars
-      - BOTHUB_NLP_DEBUG=${BOTHUB_NLP_DEBUG:-true}
-      - BOTHUB_NLP_DEVELOPMENT_MODE=${BOTHUB_NLP_DEVELOPMENT_MODE:-false}
       - BOTHUB_NLP_SENTRY_CLIENT=${BOTHUB_NLP_SENTRY_CLIENT}
       # bothub-nlp-celery env vars
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
@@ -109,7 +86,3 @@ services:
     image: redis
     ports:
       - 6379:6379
-
-networks:
-  bothub:
-    external: true
