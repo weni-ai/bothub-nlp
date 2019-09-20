@@ -19,6 +19,7 @@ ENV_LIST = [
     '{}={}'.format(var, config(var, default=EMPTY))
     for var in [
         'SUPPORTED_LANGUAGES',
+        'BOTHUB_ENGINE_URL',
         'NLP_SENTRY_CLIENT',
         'BOTHUB_NLP_CELERY_BROKER_URL',
         'BOTHUB_NLP_CELERY_BACKEND_URL',
@@ -26,6 +27,7 @@ ENV_LIST = [
         'BOTHUB_NLP_AWS_S3_BUCKET_NAME',
         'BOTHUB_NLP_AWS_ACCESS_KEY_ID',
         'BOTHUB_NLP_AWS_SECRET_ACCESS_KEY',
+        'BOTHUB_NLP_AWS_REGION_NAME',
     ]
 ]
 
