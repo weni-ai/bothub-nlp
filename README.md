@@ -30,14 +30,13 @@ Check the [main Bothub project repository](https://github.com/Ilhasoft/bothub).
 
 ## Development
 
-Use ```make``` commands to ```lint```, ```test```, ```mode_development```, ```dev_update```.
+Use ```make``` commands to ```lint```, ```init_env```, ```start_development```.
 
 | Command | Description |
 |--|--|
 | make lint | Show lint warnings and errors
-| make test | Run unit tests
-| make mode_development | Create .env with variable environment and start build docker
-| make dev_update | Updates containers docker that have changed
+| make init_env | Init file .env with variables environment
+| make start_development | Create .env with variable environment and start build docker
 
 
 ## Environment Variables
