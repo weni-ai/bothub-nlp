@@ -4,6 +4,7 @@ import bothub_nlp_api.settings
 
 from flask import jsonify, Flask, Response
 from flask import request
+from flask_cors import CORS
 
 from bothub_nlp_api.utils import authorization_required
 from bothub_nlp_api.utils import backend
@@ -16,6 +17,7 @@ from bothub_nlp_api.handlers import train
 from bothub_nlp_api.handlers import evaluate
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.errorhandler(AuthorizationIsRequired)
