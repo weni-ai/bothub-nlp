@@ -1,5 +1,4 @@
 import logging
-import json
 import uuid
 
 from rasa_nlu.training_data import Message
@@ -76,6 +75,8 @@ def evaluate_entities(targets,
                                                        tokens, extractors)
     merged_targets = merge_labels(aligned_predictions)
     merged_targets = substitute_labels(merged_targets, 'O', 'no_entity')
+
+    result = {}
 
     for extractor in extractors:
         merged_predictions = merge_labels(aligned_predictions, extractor)
@@ -210,8 +211,12 @@ def entity_rasa_nlu_data(entity, evaluate):
         'entity': entity.entity.value,
     }
 
+
 def evaluate_update(update, by, repository_authorization):
-    evaluations = backend().request_backend_start_evaluation(update, repository_authorization)
+    evaluations = backend().request_backend_start_evaluation(
+        update,
+        repository_authorization
+    )
     training_examples = []
 
     for evaluate in evaluations:
@@ -224,7 +229,11 @@ def evaluate_update(update, by, repository_authorization):
         )
 
     test_data = TrainingData(training_examples=training_examples)
-    interpreter = update_interpreters.get(update, repository_authorization, use_cache=False)
+    interpreter = update_interpreters.get(
+        update,
+        repository_authorization,
+        use_cache=False
+    )
     extractor = get_entity_extractors(interpreter)
     entity_predictions, tokens = get_entity_predictions(interpreter,
                                                         test_data)

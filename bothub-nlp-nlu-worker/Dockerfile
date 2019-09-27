@@ -5,7 +5,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV PYTHON_WHEELS_PATH /wheels
 ENV PYTHON_BUILD_PACKAGES "software-properties-common curl"
-ENV PIP_REQUIREMENTS "-r requirements.txt redis"
+ENV PIP_REQUIREMENTS "-r requirements.txt"
 
 WORKDIR ${WORKDIR}
 
@@ -25,18 +25,13 @@ RUN apt-get install -y ttf-mscorefonts-installer \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY bothub-nlp ../bothub-nlp
-COPY bothub-backend ../bothub-backend
-COPY bothub-nlp-celery ../bothub-nlp-celery
-COPY bothub-nlp-nlu ../bothub-nlp-nlu
 COPY bothub-nlp-nlu-worker/requirements.txt .
 
 FROM base as builder
 
 ENV BUILD_PACKAGES "build-essential"
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
+RUN apt-get update && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
 
 RUN pip wheel --wheel-dir=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
@@ -57,7 +52,7 @@ RUN git clone --branch master --depth 1 --single-branch \
 ARG DOWNLOAD_SPACY_MODELS
 
 RUN if [ ${DOWNLOAD_SPACY_MODELS} ]; then \
-        python3.6 ../bothub-nlp-nlu/scripts/download_spacy_models.py ${DOWNLOAD_SPACY_MODELS}; \
+        python3.6 bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/download_spacy_models.py ${DOWNLOAD_SPACY_MODELS}; \
     fi
 
 ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp_nlu_worker.celery_app", "-c", "1", "-l", "INFO", "-E" ]

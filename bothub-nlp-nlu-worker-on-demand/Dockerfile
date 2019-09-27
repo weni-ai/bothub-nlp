@@ -5,10 +5,7 @@ ENV BOTHUB_NLP_WORKER_ON_DEMAND_API_PORT 2658
 
 WORKDIR $WORKDIR
 
-COPY bothub-nlp ../bothub-nlp
-COPY bothub-nlp-celery ../bothub-nlp-celery
-COPY bothub-nlp-nlu-worker-on-demand/Pipfile .
-COPY bothub-nlp-nlu-worker-on-demand/Pipfile.lock .
+COPY bothub-nlp-nlu-worker-on-demand .
 
 RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \
@@ -20,7 +17,5 @@ RUN apk update \
     && pipenv install --system --deploy \
     && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
-
-COPY bothub-nlp-nlu-worker-on-demand .
 
 ENTRYPOINT [ "python", "-m", "bothub_nlp_nlu_worker_on_demand" ]

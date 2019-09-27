@@ -30,14 +30,13 @@ Check the [main Bothub project repository](https://github.com/Ilhasoft/bothub).
 
 ## Development
 
-Use ```make``` commands to ```lint```, ```test```, ```mode_development```, ```dev_update```.
+Use ```make``` commands to ```lint```, ```init_env```, ```start_development```.
 
 | Command | Description |
 |--|--|
 | make lint | Show lint warnings and errors
-| make test | Run unit tests
-| make mode_development | Create .env with variable environment and start build docker
-| make dev_update | Updates containers docker that have changed
+| make init_env | Init file .env with variables environment
+| make start_development | Create .env with variable environment and start build docker
 
 
 ## Environment Variables
@@ -46,22 +45,23 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-| SECRET_KEY | ```string```|  ```None``` | A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.
-| DEBUG | ```boolean``` | ```False``` | A boolean that turns on/off debug mode.
-| BOTHUB_NLP_DEBUG | ```boolean``` | ```False``` | A boolean that turns on/off debug mode.
-| BOTHUB_NLP_DEVELOPMENT_MODE | ```boolean``` | ```False``` | A boolean that turns on/off development mode.
-| DEFAULT_DATABASE | ```string``` | ```sqlite:///db.sqlite3``` | Read [dj-database-url](https://github.com/kennethreitz/dj-database-url) to configure the database connection.
 | SUPPORTED_LANGUAGES | ```string```| ```en\|pt``` | Set supported languages. Separe languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]:[LANGUAGE_LOCATION]```.
-| BOTHUB_NLP_SENTRY_CLIENT | ```string``` | ```None``` | 
-| BOTHUB_NLP_CELERY_BROKER_URL | ```string``` | ```None``` | 
-| BOTHUB_NLP_CELERY_BACKEND_URL | ```string``` | ```None``` | 
-| BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE | ```boolean``` | ```False``` | 
-| BOTHUB_NLP_API_LOGGER_FORMAT | ```string``` | ```None``` | 
-| BOTHUB_NLP_API_LOGGER_LEVEL | ```integer``` | ```10``` | 
-| BOTHUB_NLP_AWS_S3_BUCKET_NAME | ```string``` | ```None``` | 
-| BOTHUB_NLP_AWS_ACCESS_KEY_ID | ```string``` | ```None``` | 
-| BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | ```string``` | ```None``` | 
-| BOTHUB_NLP_DOCKER_CLIENT_BASE_URL | ```string``` | ```None``` | 
+| BOTHUB_NLP_SENTRY_CLIENT | ```bool``` | ```None``` | Sentry Client |
+| BOTHUB_NLP_CELERY_BROKER_URL | ```string``` | ```redis://localhost:6379/0	``` | Celery Broker URL, check usage instructions in Celery Docs |
+| BOTHUB_NLP_CELERY_BACKEND_URL | ```string``` | ```BOTHUB_NLP_CELERY_BROKER_URL``` value | Celery Backend URL, check usage instructions in Celery Docs
+| BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE | ```boolean``` | ```True``` | Agroup tasks by language in celery queue, if `True` there will be only one queue per language. |
+| BOTHUB_NLP_DOCKER_CLIENT_BASE_URL | `string` | `unix://var/run/docker.sock` | Docker Client Rest API URL. |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_API_PORT | `int` | `2658` | Port to server API webservice. |
+| BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME | `string` | `ilha/bothub-nlp-nlu-worker` | Bothub NLP NLU Worker Docker image. |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_DOWN_TIME | `int` | `10` | Down worker after x minutes without interaction. |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_NETWORKS | List separated by common. | `bothub-nlp` | Networks to assign in new worker service. |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_RUN_IN_WORKER_NODE | `boolean` | `False` | Run service just in Workers Nodes in Docker Swarm cluster. |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE | `string` | `bothub-nlp-nlu-worker-on-demand.cfg` | |
+| BOTHUB_NLP_NLU_WORKER_ON_DEMAND_API_BASIC_AUTHORIZATION | `string` | `None` | Fill `api_basic_authorization` kwarg in [CeleryWorkerOnDemand](https://github.com/Ilhasoft/celery-worker-on-demand#class-celeryworkerondemand) constructor |
+| BOTHUB_NLP_AWS_S3_BUCKET_NAME | `str` |  |  |
+| BOTHUB_NLP_AWS_ACCESS_KEY_ID | `str` |  |  |
+| BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | `str` |  |  |
+| BOTHUB_NLP_AWS_REGION_NAME | `str` |  |  |
 | BOTHUB_ENGINE_URL | ```string```|  ```https://api.bothub.it``` | Bothub-engine API URL
 
 

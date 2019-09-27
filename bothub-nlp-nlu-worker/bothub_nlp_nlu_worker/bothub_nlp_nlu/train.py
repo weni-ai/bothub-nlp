@@ -57,7 +57,11 @@ class BothubTrainingData(TrainingData):
 
 
 def train_update(update, by, repository_authorization):
-    update_request = backend().request_backend_start_training_nlu(update, by, repository_authorization)
+    update_request = backend().request_backend_start_training_nlu(
+        update,
+        by,
+        repository_authorization
+    )
     with PokeLogging() as pl:
         try:
             examples = []
@@ -65,7 +69,7 @@ def train_update(update, by, repository_authorization):
             for example in update_request.get('examples'):
                 entities = []
                 request_entities = backend().request_backend_get_entities_nlu(
-                    update, 
+                    update,
                     update_request.get('language'),
                     example.get('example_id'),
                     repository_authorization
@@ -76,8 +80,8 @@ def train_update(update, by, repository_authorization):
                 examples.append(
                     Message.build(
                         text=backend().request_backend_get_text_nlu(
-                            update, 
-                            update_request.get('language'), 
+                            update,
+                            update_request.get('language'),
                             example.get('example_id'),
                             repository_authorization
                         ).get('get_text'),
@@ -85,26 +89,27 @@ def train_update(update, by, repository_authorization):
                         entities=entities
                     )
                 )
-            
+
             label_examples_query = update_request.get('label_examples_query')
             label_examples = []
 
             for example in label_examples_query:
                 entities = []
-                request_entities = backend().request_backend_get_entities_label_nlu(
-                    update, 
-                    update_request.get('language'),
-                    example.get('example_id'),
-                    repository_authorization
-                )
+                request_entities = \
+                    backend().request_backend_get_entities_label_nlu(
+                        update,
+                        update_request.get('language'),
+                        example.get('example_id'),
+                        repository_authorization
+                    )
                 for example_entity in request_entities.get('entities'):
                     entities.append(example_entity)
 
                 label_examples.append(
                     Message.build(
                         text=backend().request_backend_get_text_nlu(
-                            update, 
-                            update_request.get('language'), 
+                            update,
+                            update_request.get('language'),
                             example.get('example_id'),
                             repository_authorization
                         ).get('get_text'),
@@ -130,7 +135,14 @@ def train_update(update, by, repository_authorization):
                 fixed_model_name=str(update_request.get('update_id')))
         except Exception as e:
             logger.exception(e)
-            backend().request_backend_trainfail_nlu(update, repository_authorization)
+            backend().request_backend_trainfail_nlu(
+                update,
+                repository_authorization
+            )
             raise e
         finally:
-            backend().request_backend_traininglog_nlu(update, pl.getvalue(), repository_authorization)
+            backend().request_backend_traininglog_nlu(
+                update,
+                pl.getvalue(),
+                repository_authorization
+            )
