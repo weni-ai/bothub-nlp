@@ -71,6 +71,9 @@ def get_repository_authorization():
 def authorization_required(f):
     @wraps(f)
     def check(*args, **kwargs):
+        if request.method == 'OPTIONS':
+            return f(*args, **kwargs)
+
         repository_authorization = get_repository_authorization()
         if not repository_authorization:
             raise AuthorizationIsRequired()
