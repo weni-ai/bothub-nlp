@@ -42,7 +42,6 @@ def parse_handler():
 
 
 @app.route('/parse/', methods=['POST'])
-@crossdomain(origin)
 @authorization_required
 def parsepost_handler():
     jsondata = json.loads(request.data)
