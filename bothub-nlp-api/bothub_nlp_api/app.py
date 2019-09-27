@@ -42,10 +42,10 @@ def parse_handler():
 @app.route('/parse/', methods=['POST'])
 @authorization_required
 def parsepost_handler():
-    jsondata = json.loads(request.data)
-    text = jsondata.get('text', default=None)
-    language = jsondata.get('language', default=None)
-    rasa_format = jsondata.get('rasa_format', default=False)
+    jsondata = dict(json.loads(request.data))
+    text = jsondata.get('text') if 'text' in jsondata else None
+    language = jsondata.get('language') if 'language' in jsondata else None
+    rasa_format = jsondata.get('rasa_format') if 'rasa_format' in jsondata else False
 
     if not text:
         raise ValidationError('text field is required')
