@@ -1,3 +1,5 @@
+import json
+
 import bothub_nlp_api.settings
 
 from flask import jsonify, Flask, Response
@@ -40,9 +42,10 @@ def parse_handler():
 @app.route('/parse/', methods=['POST'])
 @authorization_required
 def parsepost_handler():
-    text = request.args.get('text', default=None)
-    language = request.args.get('language', default=None)
-    rasa_format = request.args.get('rasa_format', default=False)
+    jsondata = json.loads(request.data)
+    text = jsondata.get('text', default=None)
+    language = jsondata.get('language', default=None)
+    rasa_format = jsondata.get('rasa_format', default=False)
 
     if not text:
         raise ValidationError('text field is required')
