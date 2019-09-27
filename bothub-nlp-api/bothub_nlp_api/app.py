@@ -28,7 +28,7 @@ def handle_invalid_usage(error):
     return response
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'OPTIONS'])
 @authorization_required
 def parse_handler():
     text = request.args.get('text', default=None)
@@ -41,7 +41,7 @@ def parse_handler():
     return parse._parse(text, language, rasa_format)
 
 
-@app.route('/parse/', methods=['POST'])
+@app.route('/parse/', methods=['POST', 'OPTIONS'])
 @authorization_required
 def parsepost_handler():
     jsondata = json.loads(request.data)
@@ -55,13 +55,13 @@ def parsepost_handler():
     return parse._parse(text, language, rasa_format)
 
 
-@app.route('/train/', methods=['POST'])
+@app.route('/train/', methods=['POST', 'OPTIONS'])
 @authorization_required
 def train_handler():
     return train.train_handler()
 
 
-@app.route('/info/')
+@app.route('/info/', methods=['GET', 'OPTIONS'])
 @authorization_required
 def info_handler():
     repository_authorization = get_repository_authorization()
@@ -71,7 +71,7 @@ def info_handler():
     return resp
 
 
-@app.route('/evaluate/', methods=['POST'])
+@app.route('/evaluate/', methods=['POST', 'OPTIONS'])
 @authorization_required
 def evaluate_handler():
     return evaluate.evaluate_handler()
