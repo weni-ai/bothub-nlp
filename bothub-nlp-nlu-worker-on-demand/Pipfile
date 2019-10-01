@@ -17,6 +17,7 @@ bothub_nlp_celery = {ref = "master",git = "https://github.com/Ilhasoft/bothub-nl
 [dev-packages]
 redis = "*"
 "flake8" = "*"
+black = "==19.3b0"
 
 [requires]
 python_version = "3.6"
