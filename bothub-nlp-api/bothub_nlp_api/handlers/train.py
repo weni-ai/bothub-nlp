@@ -47,8 +47,8 @@ def train_handler():
                 'status': TRAIN_STATUS_TRAINED,
             }
         except Exception as e:
-            from .. import logger
-            logger.exception(e)
+            # from .. import logger
+            # logger.exception(e)
 
             # if settings.BOTHUB_NLP_SENTRY_CLIENT:
             #     yield Task(self.captureException, exc_info=True)

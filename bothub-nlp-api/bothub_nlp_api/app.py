@@ -1,7 +1,10 @@
+import json
+
 import bothub_nlp_api.settings
 
 from flask import jsonify, Flask, Response
 from flask import request
+from flask_cors import CORS
 
 from bothub_nlp_api.utils import authorization_required
 from bothub_nlp_api.utils import backend
@@ -14,6 +17,7 @@ from bothub_nlp_api.handlers import train
 from bothub_nlp_api.handlers import evaluate
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.errorhandler(AuthorizationIsRequired)
@@ -24,9 +28,13 @@ def handle_invalid_usage(error):
     return response
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'OPTIONS'])
 @authorization_required
 def parse_handler():
+    if request.method == 'OPTIONS':
+        resp = jsonify({})
+        resp.status_code = 204
+        return resp
     text = request.args.get('text', default=None)
     language = request.args.get('language', default=None)
     rasa_format = request.args.get('rasa_format', default=False)
@@ -37,12 +45,17 @@ def parse_handler():
     return parse._parse(text, language, rasa_format)
 
 
-@app.route('/parse/', methods=['POST'])
+@app.route('/parse/', methods=['POST', 'OPTIONS'])
 @authorization_required
 def parsepost_handler():
-    text = request.args.get('text', default=None)
-    language = request.args.get('language', default=None)
-    rasa_format = request.args.get('rasa_format', default=False)
+    if request.method == 'OPTIONS':
+        resp = jsonify({})
+        resp.status_code = 204
+        return resp
+    jsondata = json.loads(request.data)
+    text = jsondata.get('text') if 'text' in jsondata else None
+    language = jsondata.get('language') if 'language' in jsondata else None
+    rasa_format = jsondata.get('rasa_format') if 'rasa_format' in jsondata else False
 
     if not text:
         raise ValidationError('text field is required')
@@ -50,15 +63,23 @@ def parsepost_handler():
     return parse._parse(text, language, rasa_format)
 
 
-@app.route('/train/', methods=['POST'])
+@app.route('/train/', methods=['POST', 'OPTIONS'])
 @authorization_required
 def train_handler():
+    if request.method == 'OPTIONS':
+        resp = jsonify({})
+        resp.status_code = 204
+        return resp
     return train.train_handler()
 
 
-@app.route('/info/')
+@app.route('/info/', methods=['GET', 'OPTIONS'])
 @authorization_required
 def info_handler():
+    if request.method == 'OPTIONS':
+        resp = jsonify({})
+        resp.status_code = 204
+        return resp
     repository_authorization = get_repository_authorization()
     info = backend().request_backend_parse('info', repository_authorization)
     resp = jsonify(info)
@@ -66,9 +87,13 @@ def info_handler():
     return resp
 
 
-@app.route('/evaluate/', methods=['POST'])
+@app.route('/evaluate/', methods=['POST', 'OPTIONS'])
 @authorization_required
 def evaluate_handler():
+    if request.method == 'OPTIONS':
+        resp = jsonify({})
+        resp.status_code = 204
+        return resp
     return evaluate.evaluate_handler()
 
 
