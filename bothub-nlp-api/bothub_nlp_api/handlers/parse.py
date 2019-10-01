@@ -15,56 +15,47 @@ def _parse(text, language, rasa_format=False):
     from ..utils import NEXT_LANGS
 
     if language and (
-        language not in settings.SUPPORTED_LANGUAGES.keys() and
-        language not in NEXT_LANGS.keys()
+        language not in settings.SUPPORTED_LANGUAGES.keys()
+        and language not in NEXT_LANGS.keys()
     ):
-        raise ValidationError(
-            'Language \'{}\' not supported by now.'.format(language))
+        raise ValidationError("Language '{}' not supported by now.".format(language))
 
     repository_authorization = get_repository_authorization()
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
     update = backend().request_backend_parse(
-        'parse',
-        repository_authorization,
-        language
+        "parse", repository_authorization, language
     )
 
-    if not update.get('update'):
+    if not update.get("update"):
         next_languages = NEXT_LANGS.get(language, [])
         for next_language in next_languages:
             update = backend().request_backend_parse(
-                'parse',
-                repository_authorization,
-                next_language
+                "parse", repository_authorization, next_language
             )
-            if update.get('update'):
+            if update.get("update"):
                 break
 
-    if not update.get('update'):
-        raise ValidationError(
-            'This repository has never been trained')
+    if not update.get("update"):
+        raise ValidationError("This repository has never been trained")
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
-        args=[
-            update.get('update_id'),
-            repository_authorization,
-            text,
-        ],
-        kwargs={
-            'rasa_format': rasa_format,
-        },
-        queue=queue_name(ACTION_PARSE, update.get('language')))
+        args=[update.get("update_id"), repository_authorization, text],
+        kwargs={"rasa_format": rasa_format},
+        queue=queue_name(ACTION_PARSE, update.get("language")),
+    )
     answer_task.wait()
 
     answer = answer_task.result
-    answer.update({
-        'text': text,
-        'update_id': update.get('update_id'),
-        'language': update.get('language'),
-    })
+    answer.update(
+        {
+            "text": text,
+            "update_id": update.get("update_id"),
+            "language": update.get("language"),
+        }
+    )
 
     resp = jsonify(answer)
     resp.status_code = 200

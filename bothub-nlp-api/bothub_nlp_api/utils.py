@@ -6,41 +6,29 @@ from flask import request
 
 def backend():
     return bothub_backend.get_backend(
-        'bothub_backend.bothub.BothubBackend',
-        bothub_nlp_api.settings.BOTHUB_ENGINE_URL
+        "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
     )
 
 
 NEXT_LANGS = {
-    'english': [
-        'en',
-    ],
-    'portuguese': [
-        'pt',
-        'pt_br',
-    ],
-    'pt': [
-        'pt_br',
-    ],
-    'pt-br': [
-        'pt_br',
-    ],
-    'br': [
-        'pt_br',
-    ],
+    "english": ["en"],
+    "portuguese": ["pt", "pt_br"],
+    "pt": ["pt_br"],
+    "pt-br": ["pt_br"],
+    "br": ["pt_br"],
 }
 
 
 class AuthorizationIsRequired(Exception):
     def __init__(self, payload=None):
         Exception.__init__(self)
-        self.message = 'Authorization is required'
+        self.message = "Authorization is required"
         self.status_code = 401
         self.payload = payload
 
     def to_dict(self):
         rv = dict(self.payload or ())
-        rv['message'] = self.message
+        rv["message"] = self.message
         return rv
 
 
@@ -53,14 +41,13 @@ class ValidationError(Exception):
 
     def to_dict(self):
         rv = dict(self.payload or ())
-        rv['message'] = self.message
+        rv["message"] = self.message
         return rv
 
 
 def get_repository_authorization():
-    authorization_header_value = request.headers.get('Authorization')
-    authorization_uuid = \
-        authorization_header_value and authorization_header_value[7:]
+    authorization_header_value = request.headers.get("Authorization")
+    authorization_uuid = authorization_header_value and authorization_header_value[7:]
 
     if not authorization_uuid:
         return False
@@ -71,7 +58,7 @@ def get_repository_authorization():
 def authorization_required(f):
     @wraps(f)
     def check(*args, **kwargs):
-        if request.method == 'OPTIONS':
+        if request.method == "OPTIONS":
             return f(*args, **kwargs)
 
         repository_authorization = get_repository_authorization()
