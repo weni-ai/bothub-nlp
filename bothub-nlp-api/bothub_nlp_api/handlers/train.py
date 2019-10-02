@@ -9,9 +9,9 @@ from ..utils import get_repository_authorization
 from ..utils import backend
 
 
-TRAIN_STATUS_TRAINED = 'trained'
-TRAIN_STATUS_FAILED = 'failed'
-TRAIN_STATUS_NOT_READY_FOR_TRAIN = 'not_ready_for_train'
+TRAIN_STATUS_TRAINED = "trained"
+TRAIN_STATUS_FAILED = "failed"
+TRAIN_STATUS_NOT_READY_FOR_TRAIN = "not_ready_for_train"
 
 
 def train_handler():
@@ -22,30 +22,25 @@ def train_handler():
     for language in settings.SUPPORTED_LANGUAGES.keys():
 
         current_update = backend().request_backend_parse(
-            'train',
-            repository_authorization,
-            language
+            "train", repository_authorization, language
         )
 
-        if not current_update.get('ready_for_train'):
-            languages_report[language] = {
-                'status': TRAIN_STATUS_NOT_READY_FOR_TRAIN,
-            }
+        if not current_update.get("ready_for_train"):
+            languages_report[language] = {"status": TRAIN_STATUS_NOT_READY_FOR_TRAIN}
             continue
 
         try:
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
                 args=[
-                    current_update.get('current_update_id'),
-                    current_update.get('repository_authorization_user_id'),
+                    current_update.get("current_update_id"),
+                    current_update.get("repository_authorization_user_id"),
                     repository_authorization,
                 ],
-                queue=queue_name(ACTION_TRAIN, current_update.get('language')))
+                queue=queue_name(ACTION_TRAIN, current_update.get("language")),
+            )
             train_task.wait()
-            languages_report[language] = {
-                'status': TRAIN_STATUS_TRAINED,
-            }
+            languages_report[language] = {"status": TRAIN_STATUS_TRAINED}
         except Exception as e:
             # from .. import logger
             # logger.exception(e)
@@ -54,15 +49,15 @@ def train_handler():
             #     yield Task(self.captureException, exc_info=True)
 
             languages_report[language] = {
-                'status': TRAIN_STATUS_FAILED,
-                'error': str(e),
+                "status": TRAIN_STATUS_FAILED,
+                "error": str(e),
             }
 
-    resp = jsonify({
-        'SUPPORTED_LANGUAGES': list(
-            settings.SUPPORTED_LANGUAGES.keys(),
-        ),
-        'languages_report': languages_report,
-    })
+    resp = jsonify(
+        {
+            "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),
+            "languages_report": languages_report,
+        }
+    )
     resp.status_code = 200
     return resp
