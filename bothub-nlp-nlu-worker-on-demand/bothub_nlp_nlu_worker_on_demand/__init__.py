@@ -70,9 +70,9 @@ class MyUpWorker(UpWorker):
                 [
                     "celery",
                     "worker",
+                    "--workdir",
+                    "bothub_nlp_nlu_worker",
                     "-A",
-                    "--workdir", 
-                    "bothub_nlp_nlu_worker", 
                     "celery_app",
                     "-c",
                     "1",
