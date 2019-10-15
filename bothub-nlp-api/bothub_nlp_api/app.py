@@ -75,7 +75,6 @@ def parsepost_handler():
     try:
         return parse._parse(text, language, rasa_format)
     except Exception as e:
-        print(e)
         resp = jsonify({'error': str(e)})
         resp.status_code = 500
         return resp
