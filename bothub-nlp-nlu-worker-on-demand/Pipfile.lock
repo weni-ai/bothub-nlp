@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "17a786bbd835dc56156c1e31aa011635d6d5157afceb214bf05cde9dd80a94c9"
+            "sha256": "f416b312652e95c4443a80c7281885fdf76a16469538a17fa73db66e9e9647ab"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,7 +22,7 @@
         },
         "celery-worker-on-demand": {
             "git": "https://github.com/Ilhasoft/celery-worker-on-demand",
-            "ref": "22fc1f0e0c839ecf4e7d661229101fc222bdca17"
+            "ref": "261517d09d85be5efbe59b2f4255adb001ddc705"
         },
         "certifi": {
             "hashes": [
@@ -107,10 +107,10 @@
         },
         "attrs": {
             "hashes": [
-                "sha256:69c0dbf2ed392de1cb5ec704444b08a5ef81680a61cb899dc08127123af36a79",
-                "sha256:f0b870f674851ecbfbbbd364d6b5cbdff9dcedbc7f3f5e18a6891057f21fe399"
+                "sha256:08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c",
+                "sha256:f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"
             ],
-            "version": "==19.1.0"
+            "version": "==19.3.0"
         },
         "black": {
             "hashes": [
@@ -165,11 +165,11 @@
         },
         "redis": {
             "hashes": [
-                "sha256:98a22fb750c9b9bb46e75e945dc3f61d0ab30d06117cbb21ff9cd1d315fedd3b",
-                "sha256:c504251769031b0dd7dd5cf786050a6050197c6de0d37778c80c08cb04ae8275"
+                "sha256:3613daad9ce5951e426f460deddd5caf469e08a3af633e9578fc77d362becf62",
+                "sha256:8d0fc278d3f5e1249967cba2eb4a5632d19e45ce5c09442b8422d15ee2c22cc2"
             ],
             "index": "pypi",
-            "version": "==3.3.8"
+            "version": "==3.3.11"
         },
         "toml": {
             "hashes": [
