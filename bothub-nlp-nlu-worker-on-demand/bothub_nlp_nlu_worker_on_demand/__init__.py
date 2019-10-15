@@ -70,6 +70,10 @@ class MyUpWorker(UpWorker):
                 [
                     "celery",
                     "worker",
+                    "--autoscale",
+                    "20,1",
+                    "-O",
+                    "fair",
                     "--workdir",
                     "bothub_nlp_nlu_worker",
                     "-A",
