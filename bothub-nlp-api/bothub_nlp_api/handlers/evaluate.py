@@ -26,9 +26,12 @@ def evaluate_handler():
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
-    update = backend().request_backend_parse(
-        "evaluate", repository_authorization, language
-    )
+    try:
+        update = backend().request_backend_parse(
+            "evaluate", repository_authorization, language
+        )
+    except Exception:
+        update = {}
 
     if not update.get("update"):
         raise ValidationError("This repository has never been trained")
