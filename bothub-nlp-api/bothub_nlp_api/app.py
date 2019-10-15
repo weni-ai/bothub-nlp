@@ -52,15 +52,32 @@ def parsepost_handler():
         resp = jsonify({})
         resp.status_code = 204
         return resp
-    jsondata = json.loads(request.data)
-    text = jsondata.get("text") if "text" in jsondata else None
-    language = jsondata.get("language") if "language" in jsondata else None
-    rasa_format = jsondata.get("rasa_format") if "rasa_format" in jsondata else False
+
+    if len(request.data) > 0:
+        jsondata = json.loads(request.data)
+        text = jsondata.get("text") if "text" in jsondata else None
+        language = jsondata.get("language") if "language" in jsondata else None
+        rasa_format = jsondata.get("rasa_format") if "rasa_format" in jsondata else False
+
+    elif len(request.form) > 0:
+        text = request.form.get("text") if "text" in request.form else None
+        language = request.form.get("language") if "language" in request.form else None
+        rasa_format = request.form.get("rasa_format") if "rasa_format" in request.form else False
+
+    else:
+        resp = jsonify({})
+        resp.status_code = 204
+        return resp
 
     if not text:
         raise ValidationError("text field is required")
 
-    return parse._parse(text, language, rasa_format)
+    try:
+        return parse._parse(text, language, rasa_format)
+    except Exception as e:
+        resp = jsonify({'error': str(e)})
+        resp.status_code = 500
+        return resp
 
 
 @app.route("/train/", methods=["POST", "OPTIONS"])
@@ -82,6 +99,8 @@ def info_handler():
         return resp
     repository_authorization = get_repository_authorization()
     info = backend().request_backend_parse("info", repository_authorization)
+    info['intents'] = info['intents_list']
+    info.pop('intents_list')
     resp = jsonify(info)
     resp.status_code = 200
     return resp

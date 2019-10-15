@@ -24,9 +24,12 @@ def _parse(text, language, rasa_format=False):
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
-    update = backend().request_backend_parse(
-        "parse", repository_authorization, language
-    )
+    try:
+        update = backend().request_backend_parse(
+            "parse", repository_authorization, language
+        )
+    except Exception:
+        update = {}
 
     if not update.get("update"):
         next_languages = NEXT_LANGS.get(language, [])
