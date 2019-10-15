@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "60e73b8ba18d9a34ba0bc136c7216154854bc6da42069731ac3e64b17ef7fc2c"
+            "sha256": "f2267c09394d35698ba873a547016b4be37b49c055a3c640bc9b6f644c57330f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,7 +22,7 @@
         },
         "celery-worker-on-demand": {
             "git": "https://github.com/Ilhasoft/celery-worker-on-demand",
-            "ref": "8ef5de8e683822edac92211fc7bab7a81c4f27f3"
+            "ref": "598f9594bbf3c3bdbaa3081f646cf23e09d0086f"
         },
         "certifi": {
             "hashes": [
