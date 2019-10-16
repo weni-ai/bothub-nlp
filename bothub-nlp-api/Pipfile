@@ -18,6 +18,7 @@ bothub_nlp_celery = {ref = "feature/update_celery",git = "https://github.com/Ilh
 django-environ = "*"
 flask-cors = "*"
 redis = "*"
+kombu = "==4.5.0"
 
 [dev-packages]
 "psycopg2-binary" = "*"
