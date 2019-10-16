@@ -1,20 +1,20 @@
 import json
 
-import bothub_nlp_api.settings
+from . import settings
 
 from flask import jsonify, Flask, Response
 from flask import request
 from flask_cors import CORS
 
-from bothub_nlp_api.utils import authorization_required
-from bothub_nlp_api.utils import backend
-from bothub_nlp_api.utils import get_repository_authorization
-from bothub_nlp_api.utils import AuthorizationIsRequired
-from bothub_nlp_api.utils import ValidationError
+from .utils import authorization_required
+from .utils import backend
+from .utils import get_repository_authorization
+from .utils import AuthorizationIsRequired
+from .utils import ValidationError
 
-from bothub_nlp_api.handlers import parse
-from bothub_nlp_api.handlers import train
-from bothub_nlp_api.handlers import evaluate
+from .handlers import parse
+from .handlers import train
+from .handlers import evaluate
 
 app = Flask(__name__)
 CORS(app)
@@ -117,4 +117,4 @@ def evaluate_handler():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=bothub_nlp_api.settings.BOTHUB_NLP_API_PORT)
+    app.run(host="0.0.0.0", port=settings.BOTHUB_NLP_API_PORT)
