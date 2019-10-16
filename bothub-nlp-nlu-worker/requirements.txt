@@ -13,9 +13,9 @@ pymorphy2==0.8
 plac==0.9.6
 requests==2.20.1
 python-decouple==3.1
-celery==4.2.1
+celery==4.3.0
 git+https://github.com/Ilhasoft/bothub-backend.git@master
 redis
 flake8
-git+https://github.com/Ilhasoft/bothub-nlp-celery.git@master
+git+https://github.com/Ilhasoft/bothub-nlp-celery.git@feature/update_celery
 black==19.3b0

@@ -10,16 +10,16 @@ lint = "flake8"
 raven = "*"
 requests = "==2.20.1"
 bothub_backend = {ref = "master",git = "https://github.com/Ilhasoft/bothub-backend"}
-celery = "==4.2.1"
+celery = "==4.3.0"
 flask = "*"
 gunicorn = "*"
 gevent = "*"
-bothub_nlp_celery = {ref = "master",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "feature/update_celery",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "*"
 flask-cors = "*"
+redis = "*"
 
 [dev-packages]
-redis = "*"
 "psycopg2-binary" = "*"
 "flake8" = "*"
 black = "==19.3b0"
