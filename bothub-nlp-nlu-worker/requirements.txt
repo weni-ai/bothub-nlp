@@ -19,3 +19,4 @@ redis
 flake8
 git+https://github.com/Ilhasoft/bothub-nlp-celery.git@feature/update_celery
 black==19.3b0
+kombu==4.5.0
