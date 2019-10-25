@@ -40,12 +40,10 @@ def get_rasa_nlu_config_from_update(update):
             "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
         )
         # tokenizer
-        if use_spacy:
-            pipeline.append({"name": "tokenizer_spacy_with_labels"})
-        else:
-            pipeline.append({'name': 'tokenizer_whitespace'})
+        pipeline.append({'name': 'tokenizer_whitespace'})
         # featurizer
         if use_spacy:
+            pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
             pipeline.append({"name": "intent_featurizer_spacy"})
         else:
             pipeline.append({"name": "intent_featurizer_count_vectors"})
@@ -59,8 +57,7 @@ def get_rasa_nlu_config_from_update(update):
             }
         )
         # load spacy
-        if use_spacy:
-            pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
+        pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
         # entity extractor
         pipeline.append({"name": "ner_crf"})
         # spacy named entity recognition
