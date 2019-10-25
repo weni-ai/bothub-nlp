@@ -39,9 +39,6 @@ def get_rasa_nlu_config_from_update(update):
         use_spacy = update.get("algorithm") == update.get(
             "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
         )
-        # load spacy
-        if use_spacy:
-            pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
         # tokenizer
         if use_spacy:
             pipeline.append({"name": "tokenizer_spacy_with_labels"})
@@ -61,6 +58,9 @@ def get_rasa_nlu_config_from_update(update):
                 else "cosine",
             }
         )
+        # load spacy
+        if use_spacy:
+            pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
         # entity extractor
         pipeline.append({"name": "ner_crf"})
         # spacy named entity recognition
