@@ -1,3 +1,4 @@
+import json
 import logging
 import uuid
 
@@ -264,7 +265,7 @@ def evaluate_update(update, by, repository_authorization):
             "update_id": update,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
-            "log": intent_evaluation.get("log"),
+            "log": json.dumps(intent_evaluation.get("log")),
             "intentprecision": intent_evaluation.get("precision"),
             "intentf1_score": intent_evaluation.get("f1_score"),
             "intentaccuracy": intent_evaluation.get("accuracy"),
