@@ -113,7 +113,17 @@ def evaluate_handler():
         resp = jsonify({})
         resp.status_code = 204
         return resp
-    return evaluate.evaluate_handler()
+
+    language = None
+
+    if len(request.data) > 0:
+        jsondata = json.loads(request.data)
+        language = jsondata.get("language") if "language" in jsondata else None
+
+    elif len(request.form) > 0:
+        language = request.form.get("language") if "language" in request.form else None
+
+    return evaluate.evaluate_handler(language)
 
 
 if __name__ == "__main__":

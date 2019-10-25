@@ -13,9 +13,7 @@ EVALUATE_STATUS_EVALUATED = "evaluated"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def evaluate_handler():
-    language = request.json["language"] if "language" in request.json else None
-
+def evaluate_handler(language):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in NEXT_LANGS.keys()
