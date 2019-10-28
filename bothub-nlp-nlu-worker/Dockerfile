@@ -33,8 +33,6 @@ ENV BUILD_PACKAGES "build-essential"
 
 RUN apt-get update && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
 
-RUN pip install --ignore-installed --upgrade "https://github.com/lakshayg/tensorflow-build/releases/download/tf1.12.0-ubuntu18.04-py3-avx512f/tensorflow-1.12.0-cp36-cp36m-linux_x86_64.whl"
-
 RUN pip wheel --wheel-dir=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
 FROM base
