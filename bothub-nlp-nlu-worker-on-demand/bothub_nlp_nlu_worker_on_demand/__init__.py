@@ -71,7 +71,7 @@ class MyUpWorker(UpWorker):
                     "celery",
                     "worker",
                     "--autoscale",
-                    "3,3",
+                    "50,10",
                     "-O",
                     "fair",
                     "--workdir",
@@ -86,7 +86,11 @@ class MyUpWorker(UpWorker):
                     "-Q",
                     self.queue.name,
                 ],
-                env=list(filter(lambda v: not v.endswith(EMPTY), ENV_LIST)),
+                env=list(
+                    list(filter(lambda v: not v.endswith(EMPTY), ENV_LIST)) +
+                    list([f'BOTHUB_NLP_LANGUAGE_QUEUE={self.queue.name}']) +
+                    list(['BOTHUB_NLP_SERVICE_WORKER=true'])
+                ),
                 labels={LABEL_KEY: self.queue.name},
                 networks=settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_NETWORKS,
                 constraints=constraints,
