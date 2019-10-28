@@ -11,6 +11,7 @@ COPY bothub-nlp-nlu-worker-on-demand .
 RUN apt-get update \
     && apt-get install --no-install-recommends -y ${PYTHON_BUILD_PACKAGES} git \
     && add-apt-repository ppa:fkrull/deadsnakes \
+    && apt-get update \
     && apt-get install --no-install-recommends -y python3.6 python3.6-dev python3.6-tk build-essential \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.6 get-pip.py \
