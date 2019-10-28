@@ -12,6 +12,8 @@ RUN apk update \
         alpine-sdk \
         git \
         python3-dev \
+        libstdc++ \
+        g++ \
     && apk add --no-cache postgresql-dev \
     && pip install pipenv psycopg2-binary redis \
     && pipenv install --system --deploy \
