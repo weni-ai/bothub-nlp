@@ -15,3 +15,5 @@ This the NLU Celery Worker service.
 | BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | `str` |  |  |
 | BOTHUB_NLP_AWS_S3_BUCKET_NAME | `str` |  |  |
 | BOTHUB_NLP_AWS_REGION_NAME | `str` |  |  |
+| BOTHUB_NLP_LANGUAGE_QUEUE | `str` | en | Set language that will be loaded in celery |
+| BOTHUB_NLP_SERVICE_WORKER | `boolean` | `False` | Set true if you are running celery bothub-nlp-nlu-worker |
