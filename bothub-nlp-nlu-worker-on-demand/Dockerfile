@@ -15,9 +15,10 @@ RUN apt-get update \
     && apt-get install --no-install-recommends -y python3.6 python3.6-dev python3.6-tk build-essential \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.6 get-pip.py \
-    && rm get-pip.py \
-    && pipenv install --system --deploy \
-    && apt-get autoremove -y \
+    && rm get-pip.py
+RUN pip install pipenv
+RUN pipenv install --system --deploy
+RUN apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
