@@ -63,7 +63,8 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 | BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | `str` |  |  |
 | BOTHUB_NLP_AWS_REGION_NAME | `str` |  |  |
 | BOTHUB_ENGINE_URL | ```string```|  ```https://api.bothub.it``` | Bothub-engine API URL
-
+| BOTHUB_NLP_LANGUAGE_QUEUE | `str` | en | Set language that will be loaded in celery |
+| BOTHUB_NLP_SERVICE_WORKER | `boolean` | `False` | Set true if you are running celery bothub-nlp-nlu-worker |
 
 ## Docker Arguments
 
