@@ -77,20 +77,20 @@ def train_update(update, by, repository_authorization):
                 repository_authorization,
             )
 
-            for example in get_examples.get('examples'):
+            for example in get_examples.get("examples"):
                 examples.append(
                     Message.build(
-                        text=example.get('text'),
+                        text=example.get("text"),
                         intent=example.get("intent"),
-                        entities=example.get('entities'),
+                        entities=example.get("entities"),
                     )
                 )
 
             for label_example in get_examples.get("label_examples"):
                 label_examples.append(
                     Message.build(
-                        text=label_example.get('text'),
-                        entities=label_example.get('entities'),
+                        text=label_example.get("text"),
+                        entities=label_example.get("entities"),
                     )
                 )
 

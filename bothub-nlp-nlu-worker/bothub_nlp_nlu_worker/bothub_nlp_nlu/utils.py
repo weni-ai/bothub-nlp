@@ -1,8 +1,9 @@
 import logging
 import io
 import contextvars
-import spacy
 import bothub_backend
+
+from bothub_nlp_celery.app import nlp_language
 
 from tempfile import mkdtemp
 
@@ -42,7 +43,7 @@ def get_rasa_nlu_config_from_update(update):
         # load spacy
         pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
         # tokenizer
-        pipeline.append({'name': 'tokenizer_spacy_with_labels'})
+        pipeline.append({"name": "tokenizer_spacy_with_labels"})
         # featurizer
         if use_spacy:
             pipeline.append({"name": "intent_featurizer_spacy"})
@@ -134,18 +135,6 @@ class UpdateInterpreters:
         return self.get(update, repository_authorization)
 
 
-class SpacyNLPLanguageManager:
-    nlps = {}
-
-    def get(self, lang):
-        if lang not in self.nlps:
-            from . import logger
-
-            logger.info(f"loading {lang} spacy lang model...")
-            self.nlps[lang] = spacy.load(lang, parser=False)
-        return self.nlps[lang]
-
-
 class PokeLoggingHandler(logging.StreamHandler):
     def __init__(self, pl, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -181,4 +170,3 @@ class PokeLogging:
 
 
 update_interpreters = UpdateInterpreters()
-spacy_nlp_languages = SpacyNLPLanguageManager()

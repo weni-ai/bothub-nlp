@@ -146,9 +146,7 @@ def plot_and_save_charts(update, intent_results):
     intent_hist_url = ""
 
     if all([aws_access_key_id, aws_secret_access_key, aws_bucket_name]):
-        confmat_filename = "repository_{}/confmat_{}.png".format(
-            update, uuid.uuid4()
-        )
+        confmat_filename = "repository_{}/confmat_{}.png".format(update, uuid.uuid4())
         intent_hist_filename = "repository_{}/intent_hist_{}.png".format(
             update, uuid.uuid4()
         )
