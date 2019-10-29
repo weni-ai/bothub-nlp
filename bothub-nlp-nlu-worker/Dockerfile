@@ -1,4 +1,4 @@
-FROM ubuntu:xenial as base
+FROM ubuntu:18.10 as base
 
 ENV WORKDIR /home/root/app
 ENV LC_ALL C.UTF-8
@@ -9,21 +9,18 @@ ENV PIP_REQUIREMENTS "-r requirements.txt"
 
 WORKDIR ${WORKDIR}
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ${PYTHON_BUILD_PACKAGES} git \
-    && add-apt-repository ppa:fkrull/deadsnakes \
-    && apt-get update \
-    && apt-get install --no-install-recommends -y python3.6 python3.6-dev python3.6-tk \
-    && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python3.6 get-pip.py \
-    && rm get-pip.py \
-    && apt-get remove -y ${PYTHON_BUILD_PACKAGES}
+RUN apt-get update && apt-get install --no-install-recommends -y ${PYTHON_BUILD_PACKAGES} git
+RUN apt-get install -y python3 python3-pip python3-venv
+RUN apt-get install build-essential
 
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 RUN apt-get install -y ttf-mscorefonts-installer \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+
+RUN bash -c "ln -s /usr/bin/python3 /usr/bin/python; ln -s /usr/bin/pip3 /usr/bin/pip"
 
 COPY bothub-nlp-nlu-worker/requirements.txt .
 
