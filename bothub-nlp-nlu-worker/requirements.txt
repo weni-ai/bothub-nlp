@@ -5,6 +5,7 @@ requests==2.20.1
 contextvars==2.3
 spacy==2.0.18
 rasa-nlu==0.14.1
+tensorflow==1.13.2
 scikit-learn==0.20.2
 sklearn-crfsuite==0.3.6
 pythainlp==1.7.2
