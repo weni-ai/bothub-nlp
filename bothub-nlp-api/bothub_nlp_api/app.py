@@ -22,10 +22,10 @@ logger = logging.getLogger('bothub_nlp.server')
 def make_app():
     return Application([
         url('/', ParseHandler),
-        url('/parse/', ParseHandler),
-        url('/train/', TrainHandler),
-        url('/info/', InfoHandler),
-        url('/evaluate/', EvaluateHandler)
+        url(r'/parse/?', ParseHandler),
+        url(r'/train/?', TrainHandler),
+        url(r'/info/?', InfoHandler),
+        url(r'/evaluate/?', EvaluateHandler)
     ])
 
 
