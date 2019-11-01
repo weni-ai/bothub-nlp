@@ -11,9 +11,9 @@ class SpacyNLP(RasaNLUSpacyNLP):
         if cached_component:
             return cached_component
 
-        component_meta = model_metadata.for_component(cls.name)
+        # component_meta = model_metadata.for_component(cls.name)
         cls.ensure_proper_language_model(nlp_language)
-        return cls(component_meta, nlp_language)
+        return cls(meta, nlp_language)
 
     @classmethod
     def create(cls, component_config, config):

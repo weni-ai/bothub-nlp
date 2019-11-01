@@ -77,35 +77,37 @@ class BothubInterpreter(Interpreter):
             "labels_as_entity": [],
         }
 
-    @classmethod
-    def load(cls, model_dir, component_builder=None, skip_validation=False):
-        model_metadata = Metadata.load(model_dir)
-        cls.ensure_model_compatibility(model_metadata)
-        return cls.create(model_metadata, component_builder, skip_validation)
-
-    @classmethod
-    def create(cls, model_metadata, component_builder=None, skip_validation=False):
-        context = {}
-        if component_builder is None:
-            component_builder = components.ComponentBuilder()
-        pipeline = []
-        if not skip_validation:
-            components.validate_requirements(model_metadata.component_classes)
-        for component_name in model_metadata.component_classes:
-            component = component_builder.load_component(
-                component_name, model_metadata.model_dir, model_metadata, **context
-            )
-            try:
-                updates = component.provide_context()
-                if updates:
-                    context.update(updates)
-                pipeline.append(component)
-            except components.MissingArgumentError as e:
-                raise Exception(
-                    "Failed to initialize component '{}'. "
-                    "{}".format(component.name, e)
-                )
-        return cls(pipeline, context, model_metadata)
+    # @classmethod
+    # def load(cls, model_dir, component_builder=None, skip_validation=False):
+    #     model_metadata = Metadata.load(model_dir)
+    #     cls.ensure_model_compatibility(model_metadata)
+    #     return cls.create(model_metadata, component_builder, skip_validation)
+    #
+    # @classmethod
+    # def create(cls, model_metadata, component_builder=None, skip_validation=False):
+    #     context = {}
+    #     if component_builder is None:
+    #         component_builder = components.ComponentBuilder()
+    #     pipeline = []
+    #     if not skip_validation:
+    #         components.validate_requirements(model_metadata.component_classes)
+    #
+    #     for i in range(model_metadata.number_of_components):
+    #         component_meta = model_metadata.for_component(i)
+    #         component = component_builder.load_component(
+    #             component_meta, model_metadata.model_dir, model_metadata, **context
+    #         )
+    #         try:
+    #             updates = component.provide_context()
+    #             if updates:
+    #                 context.update(updates)
+    #             pipeline.append(component)
+    #         except components.MissingArgumentError as e:
+    #             raise Exception(
+    #                 "Failed to initialize component '{}'. "
+    #                 "{}".format(component.name, e)
+    #             )
+    #     return cls(pipeline, context, model_metadata)
 
 
 class UpdateInterpreters:
