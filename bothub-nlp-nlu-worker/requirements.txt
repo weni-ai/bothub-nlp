@@ -12,3 +12,4 @@ git+https://github.com/Ilhasoft/bothub-nlp-celery.git@0.1.4-fix
 black==19.3b0
 kombu==4.5.0
 rasa==1.4.3
+spacy==2.1.9
