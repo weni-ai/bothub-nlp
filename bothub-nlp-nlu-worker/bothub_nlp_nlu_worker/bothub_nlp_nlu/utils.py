@@ -1,19 +1,16 @@
-import logging
 import io
-import contextvars
-import bothub_backend
-
-from bothub_nlp_celery.app import nlp_language
-
+import logging
 from tempfile import mkdtemp
 
-from rasa_nlu.config import RasaNLUModelConfig
-from rasa_nlu.model import Interpreter
-from rasa_nlu.model import Metadata
-from rasa_nlu import components
+import bothub_backend
+import contextvars
+from decouple import config
+from rasa.nlu import components
+from rasa.nlu.config import RasaNLUModelConfig
+from rasa.nlu.model import Interpreter
+from rasa.nlu.model import Metadata
 
 from .persistor import BothubPersistor
-from decouple import config
 
 
 def backend():
@@ -26,33 +23,33 @@ def backend():
 def get_rasa_nlu_config_from_update(update):
     pipeline = []
     if update.get("algorithm") == update.get("ALGORITHM_STATISTICAL_MODEL"):
-        pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
-        pipeline.append({"name": "tokenizer_spacy_with_labels"})
-        pipeline.append({"name": "intent_entity_featurizer_regex"})
-        pipeline.append({"name": "intent_featurizer_spacy"})
-        pipeline.append({"name": "ner_crf"})
+        pipeline.append({"name": "bothub_nlp_nlu.pipeline_components.optimized_spacy_nlp_with_labels.SpacyNLP"})
+        pipeline.append({"name": "bothub_nlp_nlu.pipeline_components.tokenizer_spacy_with_labels.SpacyTokenizer"})
+        pipeline.append({"name": "RegexFeaturizer"})
+        pipeline.append({"name": "SpacyFeaturizer"})
+        pipeline.append({"name": "CRFEntityExtractor"})
         # spacy named entity recognition
         if update.get("use_name_entities"):
-            pipeline.append({"name": "ner_spacy"})
-        pipeline.append({"name": "crf_label_as_entity_extractor"})
-        pipeline.append({"name": "intent_classifier_sklearn"})
+            pipeline.append({"name": "SpacyEntityExtractor"})
+        pipeline.append({"name": "bothub_nlp_nlu.pipeline_components.crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"})
+        pipeline.append({"name": "SklearnIntentClassifier"})
     else:
         use_spacy = update.get("algorithm") == update.get(
             "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
         )
         # load spacy
-        pipeline.append({"name": "optimized_spacy_nlp_with_labels"})
+        pipeline.append({"name": "bothub_nlp_nlu.pipeline_components.optimized_spacy_nlp_with_labels.SpacyNLP"})
         # tokenizer
-        pipeline.append({"name": "tokenizer_spacy_with_labels"})
+        pipeline.append({"name": "bothub_nlp_nlu.pipeline_components.tokenizer_spacy_with_labels.SpacyTokenizer"})
         # featurizer
         if use_spacy:
-            pipeline.append({"name": "intent_featurizer_spacy"})
+            pipeline.append({"name": "SpacyFeaturizer"})
         else:
-            pipeline.append({"name": "intent_featurizer_count_vectors"})
+            pipeline.append({"name": "CountVectorsFeaturizer"})
         # intent classifier
         pipeline.append(
             {
-                "name": "intent_classifier_tensorflow_embedding",
+                "name": "EmbeddingIntentClassifier",
                 "similarity_type": "inner"
                 if update.get("use_competing_intents")
                 else "cosine",
@@ -60,12 +57,12 @@ def get_rasa_nlu_config_from_update(update):
         )
 
         # entity extractor
-        pipeline.append({"name": "ner_crf"})
+        pipeline.append({"name": "CRFEntityExtractor"})
         # spacy named entity recognition
         if update.get("use_name_entities"):
-            pipeline.append({"name": "ner_spacy"})
+            pipeline.append({"name": "SpacyEntityExtractor"})
         # label extractor
-        pipeline.append({"name": "crf_label_as_entity_extractor"})
+        pipeline.append({"name": "bothub_nlp_nlu.pipeline_components.crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"})
     return RasaNLUModelConfig(
         {"language": update.get("language"), "pipeline": pipeline}
     )
@@ -126,7 +123,7 @@ class UpdateInterpreters:
         model_directory = mkdtemp()
         persistor.retrieve(
             str(update_request.get("repository_uuid")),
-            str(update_request.get("update_id")),
+            # str(update_request.get("update_id")),
             model_directory,
         )
         self.interpreters[update_request.get("update_id")] = BothubInterpreter.load(
