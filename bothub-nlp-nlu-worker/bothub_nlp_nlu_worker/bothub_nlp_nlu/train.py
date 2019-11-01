@@ -106,7 +106,6 @@ def train_update(update, by, repository_authorization):
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                # project_name=str(update_request.get("repository_uuid")),
                 fixed_model_name=str(update_request.get("update_id")),
             )
         except Exception as e:

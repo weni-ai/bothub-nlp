@@ -12,7 +12,9 @@ class CRFLabelAsEntityExtractor(CRFEntityExtractor):
     provides = ["labels_as_entity"]
 
     @classmethod
-    def load(cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs):
+    def load(
+        cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs
+    ):
         from sklearn.externals import joblib
 
         file_name = meta.get("classifier_file", CRF_MODEL_FILE_NAME)
@@ -24,8 +26,6 @@ class CRFLabelAsEntityExtractor(CRFEntityExtractor):
             return cls(meta)
 
     def train(self, training_data, config, **kwargs):
-        # self.component_config = config.for_component(self.name, self.defaults)
-        # self._validate_configuration()
         if training_data.label_training_examples:
             self._check_spacy_doc(training_data.training_examples[0])
             filtered_entity_examples = self.filter_trainable_entities(

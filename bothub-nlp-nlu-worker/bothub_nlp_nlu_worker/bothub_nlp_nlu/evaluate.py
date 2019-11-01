@@ -4,26 +4,24 @@ import uuid
 
 from rasa.nlu.training_data import Message
 from rasa.nlu.training_data import TrainingData
-from rasa.nlu.test import (
-    merge_labels,
-    substitute_labels,
-    get_evaluation_metrics,
-    is_intent_classifier_present,
-    get_entity_extractors,
-    plot_confusion_matrix,
-)
+from rasa.nlu.test import merge_labels
+from rasa.nlu.test import substitute_labels
+from rasa.nlu.test import get_evaluation_metrics
+from rasa.nlu.test import is_intent_classifier_present
+from rasa.nlu.test import get_entity_extractors
+from rasa.nlu.test import plot_confusion_matrix
 
-from .utils import (
-    update_interpreters,
-    backend,
-    get_entity_targets,
-    get_intent_targets,
-    plot_intent_confidences,
-    get_entity_predictions,
-    get_intent_predictions,
-    align_all_entity_predictions,
-    _targets_predictions_from
-)
+
+from .utils import update_interpreters
+from .utils import backend
+
+from .rasa_utils import get_entity_targets
+from .rasa_utils import get_intent_targets
+from .rasa_utils import plot_intent_confidences
+from .rasa_utils import get_entity_predictions
+from .rasa_utils import get_intent_predictions
+from .rasa_utils import align_all_entity_predictions
+from .rasa_utils import _targets_predictions_from
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +49,10 @@ def collect_nlu_successes(intent_results):
         {
             "text": r.message,
             "intent": r.intent_target,
-            "intent_prediction": {"name": r.intent_prediction, "confidence": r.confidence},
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
             "status": "success",
         }
         for r in intent_results
@@ -65,7 +66,10 @@ def collect_nlu_errors(intent_results):
         {
             "text": r.message,
             "intent": r.intent_target,
-            "intent_prediction": {"name": r.intent_prediction, "confidence": r.confidence},
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
             "status": "error",
         }
         for r in intent_results

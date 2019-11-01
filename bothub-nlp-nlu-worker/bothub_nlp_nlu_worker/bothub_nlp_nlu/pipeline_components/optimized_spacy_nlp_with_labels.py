@@ -7,11 +7,12 @@ class SpacyNLP(RasaNLUSpacyNLP):
     name = "optimized_spacy_nlp_with_labels"
 
     @classmethod
-    def load(cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs):
+    def load(
+        cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs
+    ):
         if cached_component:
             return cached_component
 
-        # component_meta = model_metadata.for_component(cls.name)
         cls.ensure_proper_language_model(nlp_language)
         return cls(meta, nlp_language)
 
