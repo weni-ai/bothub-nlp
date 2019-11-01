@@ -63,7 +63,17 @@ def get_rasa_nlu_config_from_update(update):
         if use_spacy:
             pipeline.append({"name": "SpacyFeaturizer"})
         else:
-            pipeline.append({"name": "CountVectorsFeaturizer"})
+            if update.get('use_analyze_char'):
+                pipeline.append(
+                    {
+                        "name": "CountVectorsFeaturizer",
+                        "analyzer": "char",
+                        "min_ngram": 3,
+                        "max_ngram": 3
+                    }
+                )
+            else:
+                pipeline.append({"name": "CountVectorsFeaturizer"})
         # intent classifier
         pipeline.append(
             {
