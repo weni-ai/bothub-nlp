@@ -2,26 +2,26 @@ import json
 import logging
 import uuid
 
-from rasa_nlu.training_data import Message
-from rasa_nlu.training_data import TrainingData
-from rasa_nlu.evaluate import (
-    merge_labels,
-    align_all_entity_predictions,
-    substitute_labels,
-    get_evaluation_metrics,
-    is_intent_classifier_present,
-    get_entity_targets,
-    get_entity_extractors,
-    get_intent_targets,
-    plot_intent_confidences,
-    plot_confusion_matrix,
-    get_intent_predictions,
-    get_entity_predictions,
-    _targets_predictions_from,
-)
+from rasa.nlu.training_data import Message
+from rasa.nlu.training_data import TrainingData
+from rasa.nlu.test import merge_labels
+from rasa.nlu.test import substitute_labels
+from rasa.nlu.test import get_evaluation_metrics
+from rasa.nlu.test import is_intent_classifier_present
+from rasa.nlu.test import get_entity_extractors
+from rasa.nlu.test import plot_confusion_matrix
+
 
 from .utils import update_interpreters
 from .utils import backend
+
+from .rasa_utils import get_entity_targets
+from .rasa_utils import get_intent_targets
+from .rasa_utils import plot_intent_confidences
+from .rasa_utils import get_entity_predictions
+from .rasa_utils import get_intent_predictions
+from .rasa_utils import align_all_entity_predictions
+from .rasa_utils import _targets_predictions_from
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +29,16 @@ excluded_itens = ["micro avg", "macro avg", "weighted avg", "no_entity", "no pre
 
 
 def remove_empty_intent_examples(intent_results):
+    """Remove those examples without an intent."""
+
     filtered = []
     for r in intent_results:
-        if r.prediction is None:
-            r = r._replace(prediction="no predicted")
+        # substitute None values with empty string
+        # to enable sklearn evaluation
+        if r.intent_prediction is None:
+            r = r._replace(intent_prediction="no predicted")
 
-        if r.target != "" and r.target is not None:
+        if r.intent_target != "" and r.intent_target is not None:
             filtered.append(r)
 
     return filtered
@@ -44,12 +48,15 @@ def collect_nlu_successes(intent_results):
     successes = [
         {
             "text": r.message,
-            "intent": r.target,
-            "intent_prediction": {"name": r.prediction, "confidence": r.confidence},
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
             "status": "success",
         }
         for r in intent_results
-        if r.target == r.prediction
+        if r.intent_target == r.intent_prediction
     ]
     return successes
 
@@ -58,12 +65,15 @@ def collect_nlu_errors(intent_results):
     errors = [
         {
             "text": r.message,
-            "intent": r.target,
-            "intent_prediction": {"name": r.prediction, "confidence": r.confidence},
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
             "status": "error",
         }
         for r in intent_results
-        if r.target != r.prediction
+        if r.intent_target != r.intent_prediction
     ]
     return errors
 
@@ -107,8 +117,8 @@ def evaluate_intents(intent_results):  # pragma: no cover
     predictions = [
         {
             "text": res.message,
-            "intent": res.target,
-            "predicted": res.prediction,
+            "intent": res.intent_target,
+            "predicted": res.intent_prediction,
             "confidence": res.confidence,
         }
         for res in intent_results
@@ -240,6 +250,8 @@ def evaluate_update(update, by, repository_authorization):
     entity_predictions, tokens = get_entity_predictions(interpreter, test_data)
 
     result = {"intent_evaluation": None, "entity_evaluation": None}
+
+    intent_results = []
 
     if is_intent_classifier_present(interpreter):
         intent_targets = get_intent_targets(test_data)

@@ -1,6 +1,6 @@
 import logging
 
-from rasa_nlu import registry
+from rasa.nlu import registry
 
 from .pipeline_components.crf_label_as_entity_extractor import (
     CRFLabelAsEntityExtractor,

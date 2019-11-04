@@ -2,11 +2,11 @@ import json
 from tempfile import mkdtemp
 from collections import defaultdict
 
-from rasa_nlu.model import Trainer
-from rasa_nlu.training_data import Message, TrainingData
-from rasa_nlu.components import ComponentBuilder
-from rasa_nlu.training_data.formats.readerwriter import TrainingDataWriter
-from rasa_nlu.utils import json_to_string
+from rasa.nlu.model import Trainer
+from rasa.nlu.training_data import Message, TrainingData
+from rasa.nlu.components import ComponentBuilder
+from rasa.nlu.training_data.formats.readerwriter import TrainingDataWriter
+from rasa.nlu.utils import json_to_string
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
@@ -106,7 +106,6 @@ def train_update(update, by, repository_authorization):
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                project_name=str(update_request.get("repository_uuid")),
                 fixed_model_name=str(update_request.get("update_id")),
             )
         except Exception as e:

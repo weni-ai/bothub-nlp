@@ -1,8 +1,7 @@
 import os
 
-from rasa_nlu import utils
-from rasa_nlu.featurizers.regex_featurizer import RegexFeaturizer as RasaRegexFeaturizer
-from rasa_nlu.featurizers.regex_featurizer import REGEX_FEATURIZER_FILE_NAME
+from rasa.nlu import utils
+from rasa.nlu.featurizers.regex_featurizer import RegexFeaturizer as RasaRegexFeaturizer
 
 
 class RegexFeaturizer(RasaRegexFeaturizer):
@@ -11,7 +10,7 @@ class RegexFeaturizer(RasaRegexFeaturizer):
     @classmethod
     def load(cls, model_dir=None, model_metadata=None, cached_component=None, **kwargs):
         meta = model_metadata.for_component(cls.name)
-        file_name = meta.get("regex_file", REGEX_FEATURIZER_FILE_NAME)
+        file_name = meta.get("file")
         regex_file = os.path.join(model_dir, file_name)
 
         if os.path.exists(regex_file):

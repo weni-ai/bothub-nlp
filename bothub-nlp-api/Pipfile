@@ -14,7 +14,7 @@ celery = "==4.3.0"
 flask = "*"
 gunicorn = "*"
 gevent = "*"
-bothub_nlp_celery = {ref = "0.1.4-fix",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "0.1.5",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "*"
 flask-cors = "*"
 redis = "*"
