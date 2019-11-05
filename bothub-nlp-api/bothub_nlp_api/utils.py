@@ -1,7 +1,8 @@
 import bothub_backend
+from fastapi import HTTPException
+from starlette.requests import Request
+
 import bothub_nlp_api.settings
-from functools import wraps
-from flask import request
 
 
 def backend():
@@ -19,33 +20,19 @@ NEXT_LANGS = {
 }
 
 
-class AuthorizationIsRequired(Exception):
-    def __init__(self, payload=None):
-        Exception.__init__(self)
-        self.message = "Authorization is required"
+class AuthorizationIsRequired(HTTPException):
+    def __init__(self):
         self.status_code = 401
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv["message"] = self.message
-        return rv
+        self.detail = "Authorization is required"
 
 
-class ValidationError(Exception):
-    def __init__(self, message, payload=None):
-        Exception.__init__(self)
-        self.message = message
+class ValidationError(HTTPException):
+    def __init__(self, message):
         self.status_code = 400
-        self.payload = payload
-
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv["message"] = self.message
-        return rv
+        self.detail = message
 
 
-def get_repository_authorization():
+def get_repository_authorization(request):
     authorization_header_value = request.headers.get("Authorization")
     authorization_uuid = authorization_header_value and authorization_header_value[7:]
 
@@ -55,17 +42,12 @@ def get_repository_authorization():
     return authorization_uuid
 
 
-def authorization_required(f):
-    @wraps(f)
-    def check(*args, **kwargs):
+class AuthorizationRequired:
+    async def __call__(self, request: Request):
         if request.method == "OPTIONS":
-            return f(*args, **kwargs)
+            return True
 
-        repository_authorization = get_repository_authorization()
+        repository_authorization = get_repository_authorization(request)
         if not repository_authorization:
-            raise AuthorizationIsRequired()
-        return f(*args, **kwargs)
-
-    check.__doc__ = f.__doc__
-    check.__name__ = f.__name__
-    return check
+            raise HTTPException(status_code=401, detail="Authorization is required")
+        return True
