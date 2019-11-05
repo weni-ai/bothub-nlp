@@ -36,11 +36,12 @@ async def parse_options():
 
 
 @router.post(r"/train/?", response_model=TrainResponse)
-def train_handler(
+async def train_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    return train.train_handler(Authorization)
+    result = await train.train_handler(Authorization)
+    return result
 
 
 @router.options(r"/train/?", status_code=204, include_in_schema=False)
@@ -49,7 +50,7 @@ async def train_options():
 
 
 @router.get(r"/info/?", response_model=InfoResponse)
-def info_handler(
+async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
@@ -66,12 +67,13 @@ async def info_options():
 
 
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
-def evaluate_handler(
+async def evaluate_handler(
     language: str = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    return evaluate.evaluate_handler(Authorization, language)
+    result = await evaluate.evaluate_handler(Authorization, language)
+    return result
 
 
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
