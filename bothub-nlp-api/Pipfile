@@ -11,14 +11,16 @@ raven = "*"
 requests = "==2.20.1"
 bothub_backend = {ref = "master",git = "https://github.com/Ilhasoft/bothub-backend"}
 celery = "==4.3.0"
-flask = "*"
 gunicorn = "*"
 gevent = "*"
 bothub_nlp_celery = {ref = "0.1.5",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "*"
-flask-cors = "*"
 redis = "*"
 kombu = "==4.5.0"
+fastapi = "==0.42.0"
+uvicorn = "*"
+python-multipart = "*"
+email-validator = "*"
 
 [dev-packages]
 "psycopg2-binary" = "*"

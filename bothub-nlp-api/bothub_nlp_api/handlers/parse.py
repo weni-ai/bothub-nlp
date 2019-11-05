@@ -1,17 +1,15 @@
-from flask import jsonify
-
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
-from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 from bothub_nlp_celery.app import celery_app
-from bothub_nlp_api import settings
+from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 
-from bothub_nlp_api.utils import ValidationError
+from bothub_nlp_api import settings
 from bothub_nlp_api.utils import AuthorizationIsRequired
+from bothub_nlp_api.utils import ValidationError
 from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _parse(text, language, rasa_format=False):
+def _parse(request, text, language, rasa_format=False):
     from ..utils import NEXT_LANGS
 
     if language and (
@@ -20,7 +18,7 @@ def _parse(text, language, rasa_format=False):
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
-    repository_authorization = get_repository_authorization()
+    repository_authorization = get_repository_authorization(request)
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
@@ -60,6 +58,4 @@ def _parse(text, language, rasa_format=False):
         }
     )
 
-    resp = jsonify(answer)
-    resp.status_code = 200
-    return resp
+    return answer
