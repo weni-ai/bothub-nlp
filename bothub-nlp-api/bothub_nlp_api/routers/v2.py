@@ -17,16 +17,15 @@ router = APIRouter(redirect_slashes=False)
 
 
 @router.post(r"/parse/?", response_model=ParseResponse)
-async def parsepost_handler(
+def parsepost_handler(
     item: ParseRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
 
-    result = await parse._parse(
+    return parse._parse(
         Authorization, item.text, item.language, item.rasa_format
     )
-    return result
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
@@ -35,12 +34,11 @@ async def parse_options():
 
 
 @router.post(r"/train/?", response_model=TrainResponse)
-async def train_handler(
+def train_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = await train.train_handler(Authorization)
-    return result
+    return train.train_handler(Authorization)
 
 
 @router.options(r"/train/?", status_code=204, include_in_schema=False)
@@ -49,7 +47,7 @@ async def train_options():
 
 
 @router.get(r"/info/?", response_model=InfoResponse)
-async def info_handler(
+def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
@@ -66,13 +64,12 @@ async def info_options():
 
 
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
-async def evaluate_handler(
+def evaluate_handler(
     item: EvaluateRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = await evaluate.evaluate_handler(Authorization, item.language)
-    return result
+    return evaluate.evaluate_handler(Authorization, item.language)
 
 
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
