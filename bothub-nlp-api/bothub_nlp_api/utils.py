@@ -33,7 +33,7 @@ class ValidationError(HTTPException):
 
 
 def get_repository_authorization(request):
-    authorization_header_value = request.headers.get("Authorization")
+    authorization_header_value = request.headers.get("authorization")
     authorization_uuid = authorization_header_value and authorization_header_value[7:]
 
     if not authorization_uuid:
