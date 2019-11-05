@@ -11,8 +11,8 @@ TRAIN_STATUS_FAILED = "failed"
 TRAIN_STATUS_NOT_READY_FOR_TRAIN = "not_ready_for_train"
 
 
-def train_handler(request):
-    repository_authorization = get_repository_authorization(request)
+def train_handler(authorization):
+    repository_authorization = get_repository_authorization(authorization)
 
     languages_report = {}
 

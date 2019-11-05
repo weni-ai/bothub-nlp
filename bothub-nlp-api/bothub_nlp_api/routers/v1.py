@@ -26,7 +26,7 @@ async def parse_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
 
-    result = await parse._parse(request, text, language, rasa_format)
+    result = await parse._parse(Authorization, text, language, rasa_format)
     return result
 
 
@@ -40,7 +40,7 @@ def train_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    return train.train_handler(request)
+    return train.train_handler(Authorization)
 
 
 @router.options(r"/train/?", status_code=204, include_in_schema=False)
@@ -53,7 +53,7 @@ def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    repository_authorization = get_repository_authorization(request)
+    repository_authorization = get_repository_authorization(Authorization)
     info = backend().request_backend_parse("info", repository_authorization)
     info["intents"] = info["intents_list"]
     info.pop("intents_list")
@@ -71,7 +71,7 @@ def evaluate_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    return evaluate.evaluate_handler(request, language)
+    return evaluate.evaluate_handler(Authorization, language)
 
 
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)

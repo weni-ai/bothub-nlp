@@ -9,7 +9,7 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _parse(request, text, language, rasa_format=False):
+def _parse(authorization, text, language, rasa_format=False):
     from ..utils import NEXT_LANGS
 
     if language and (
@@ -18,7 +18,7 @@ def _parse(request, text, language, rasa_format=False):
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
-    repository_authorization = get_repository_authorization(request)
+    repository_authorization = get_repository_authorization(authorization)
     if not repository_authorization:
         raise AuthorizationIsRequired()
 

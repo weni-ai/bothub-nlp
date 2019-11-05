@@ -12,14 +12,14 @@ EVALUATE_STATUS_EVALUATED = "evaluated"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def evaluate_handler(request, language):
+def evaluate_handler(authorization, language):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in NEXT_LANGS.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
-    repository_authorization = get_repository_authorization(request)
+    repository_authorization = get_repository_authorization(authorization)
     if not repository_authorization:
         raise AuthorizationIsRequired()
 

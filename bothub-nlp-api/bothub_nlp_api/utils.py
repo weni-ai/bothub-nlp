@@ -1,5 +1,5 @@
 import bothub_backend
-from fastapi import HTTPException
+from fastapi import HTTPException, Header
 from starlette.requests import Request
 
 import bothub_nlp_api.settings
@@ -32,8 +32,7 @@ class ValidationError(HTTPException):
         self.detail = message
 
 
-def get_repository_authorization(request):
-    authorization_header_value = request.headers.get("authorization")
+def get_repository_authorization(authorization_header_value):
     authorization_uuid = authorization_header_value and authorization_header_value[7:]
 
     if not authorization_uuid:
@@ -43,11 +42,15 @@ def get_repository_authorization(request):
 
 
 class AuthorizationRequired:
-    async def __call__(self, request: Request):
+    async def __call__(
+        self,
+        request: Request,
+        authorization: str = Header(..., description="Bearer your_key"),
+    ):
         if request.method == "OPTIONS":
             return True
 
-        repository_authorization = get_repository_authorization(request)
+        repository_authorization = get_repository_authorization(authorization)
         if not repository_authorization:
             raise HTTPException(status_code=401, detail="Authorization is required")
         return True
