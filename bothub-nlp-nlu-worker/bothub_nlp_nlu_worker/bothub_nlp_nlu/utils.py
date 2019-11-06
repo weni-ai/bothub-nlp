@@ -7,8 +7,18 @@ from decouple import config
 from rasa.nlu import components
 from rasa.nlu.config import RasaNLUModelConfig
 
-from .rasa_utils import BothubInterpreter
+from rasa.nlu.model import Interpreter
 from .persistor import BothubPersistor
+
+
+class BothubInterpreter(Interpreter):
+    @staticmethod
+    def default_output_attributes():
+        return {
+            "intent": {"name": None, "confidence": 0.0},
+            "entities": [],
+            "labels_as_entity": [],
+        }
 
 
 def backend():
@@ -63,13 +73,13 @@ def get_rasa_nlu_config_from_update(update):
         if use_spacy:
             pipeline.append({"name": "SpacyFeaturizer"})
         else:
-            if update.get('use_analyze_char'):
+            if update.get("use_analyze_char"):
                 pipeline.append(
                     {
                         "name": "CountVectorsFeaturizer",
                         "analyzer": "char",
                         "min_ngram": 3,
-                        "max_ngram": 3
+                        "max_ngram": 3,
                     }
                 )
             else:
