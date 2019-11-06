@@ -23,22 +23,12 @@ class IntentRankingResponse(BaseModel):
     confidence: float
 
 
-class EntintiesOthersResponse(BaseModel):
-    value: str
-    entity: str
-    confidence: float
-
-
-class EntintiesResponse(BaseModel):
-    other: List[EntintiesOthersResponse]
-
-
 class ParseResponse(BaseModel):
     intent: IntentResponse
     intent_ranking: List[IntentRankingResponse]
     labels_list: List[str]
     entities_list: List[str]
-    entities: EntintiesResponse
+    entities: Dict[str, List[str]]
     text: str
     update_id: int
     language: str
