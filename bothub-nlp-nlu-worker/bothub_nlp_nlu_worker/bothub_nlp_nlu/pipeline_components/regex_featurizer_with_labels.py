@@ -8,7 +8,9 @@ class RegexFeaturizer(RasaRegexFeaturizer):
     name = "intent_entity_featurizer_regex"
 
     @classmethod
-    def load(cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs):
+    def load(
+        cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs
+    ):
         file_name = meta.get("file")
         regex_file = os.path.join(model_dir, file_name)
 
