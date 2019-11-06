@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from pydantic import BaseModel
 
@@ -28,7 +28,7 @@ class ParseResponse(BaseModel):
     intent_ranking: List[IntentRankingResponse]
     labels_list: List[str]
     entities_list: List[str]
-    entities: Dict[str, List[str]]
+    entities: Dict[str, List[Dict[str, Any]]]
     text: str
     update_id: int
     language: str
