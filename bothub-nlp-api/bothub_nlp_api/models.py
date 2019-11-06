@@ -44,18 +44,9 @@ class ParseResponse(BaseModel):
     language: str
 
 
-class LanguagesReport(BaseModel):
-    status: bool
-    error: str
-
-
-class LanguagesListReport(BaseModel):
-    key: LanguagesReport
-
-
 class TrainResponse(BaseModel):
     SUPPORTED_LANGUAGES: List[str]
-    languages_report: LanguagesListReport
+    languages_report: Dict[str, Dict[str, str]]
 
 
 class CategoriesList(BaseModel):
@@ -68,10 +59,6 @@ class EvaluateLanguages(BaseModel):
     language: int
 
 
-class LanguagesReady(BaseModel):
-    language: bool
-
-
 class OtherLabel(BaseModel):
     entities: List[str]
     examples__count: int
@@ -82,7 +69,7 @@ class OtherLabel(BaseModel):
 class InfoResponse(BaseModel):
     absolute_url: str
     algorithm: str
-    authorization: str
+    authorization: str = None
     available_languages: List[str]
     available_request_authorization: bool
     categories: List[CategoriesList]
@@ -91,14 +78,14 @@ class InfoResponse(BaseModel):
     description: str
     entities: List[str]
     entities_list: List[str]
-    evaluate_languages_count: EvaluateLanguages
+    evaluate_languages_count: Dict[str, int]
     examples__count: int
     intents: List[str]
     is_private: bool
     labels: List[str]
     labels_list: List[str]
     language: str
-    languages_ready_for_train: LanguagesReady
+    languages_ready_for_train: Dict[str, bool]
     languages_warnings: Dict[str, str]
     name: str
     nlp_server: str

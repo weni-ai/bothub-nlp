@@ -53,9 +53,9 @@ def evaluate_handler(authorization, language):
             "evaluate_version": evaluate.get("version"),
         }
     except Exception as e:
-        from .. import logger
+        # from .. import logger
 
-        logger.exception(e)
+        # logger.exception(e)
 
         evaluate_report = {"status": EVALUATE_STATUS_FAILED, "error": str(e)}
 

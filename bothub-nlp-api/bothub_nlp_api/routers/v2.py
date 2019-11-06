@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, Header
+from fastapi import Depends, APIRouter, Header, HTTPException
 from starlette.requests import Request
 
 from bothub_nlp_api.handlers import evaluate
@@ -17,15 +17,13 @@ router = APIRouter(redirect_slashes=False)
 
 
 @router.post(r"/parse/?", response_model=ParseResponse)
-def parsepost_handler(
+async def parsepost_handler(
     item: ParseRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
 
-    return parse._parse(
-        Authorization, item.text, item.language, item.rasa_format
-    )
+    return parse._parse(Authorization, item.text, item.language, item.rasa_format)
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
@@ -34,11 +32,14 @@ async def parse_options():
 
 
 @router.post(r"/train/?", response_model=TrainResponse)
-def train_handler(
+async def train_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    return train.train_handler(Authorization)
+    result = train.train_handler(Authorization)
+    if result.get("status") and result.get("error"):
+        raise HTTPException(status_code=400, detail=result)
+    return result
 
 
 @router.options(r"/train/?", status_code=204, include_in_schema=False)
@@ -47,7 +48,7 @@ async def train_options():
 
 
 @router.get(r"/info/?", response_model=InfoResponse)
-def info_handler(
+async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
@@ -64,12 +65,15 @@ async def info_options():
 
 
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
-def evaluate_handler(
+async def evaluate_handler(
     item: EvaluateRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    return evaluate.evaluate_handler(Authorization, item.language)
+    result = evaluate.evaluate_handler(Authorization, item.language)
+    if result.get("status") and result.get("error"):
+        raise HTTPException(status_code=400, detail=result)
+    return result
 
 
 @router.options(r"/evaluate/?", status_code=204, include_in_schema=False)
