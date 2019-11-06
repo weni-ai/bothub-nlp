@@ -14,13 +14,13 @@ class EvaluateRequest(BaseModel):
 
 
 class IntentResponse(BaseModel):
-    name: str
-    confidence: float
+    name: Any
+    confidence: Any
 
 
 class IntentRankingResponse(BaseModel):
-    name: str
-    confidence: float
+    name: Any
+    confidence: Any
 
 
 class ParseResponse(BaseModel):
@@ -59,7 +59,7 @@ class OtherLabel(BaseModel):
 class InfoResponse(BaseModel):
     absolute_url: str
     algorithm: str
-    authorization: str = None
+    authorization: Any
     available_languages: List[str]
     available_request_authorization: bool
     categories: List[CategoriesList]
