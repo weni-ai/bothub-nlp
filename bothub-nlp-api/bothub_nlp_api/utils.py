@@ -45,12 +45,12 @@ class AuthorizationRequired:
     async def __call__(
         self,
         request: Request,
-        authorization: str = Header(..., description="Bearer your_key"),
+        Authorization: str = Header(..., description="Bearer your_key"),
     ):
         if request.method == "OPTIONS":
             return True
 
-        repository_authorization = get_repository_authorization(authorization)
+        repository_authorization = get_repository_authorization(Authorization)
         if not repository_authorization:
             raise HTTPException(status_code=401, detail="Authorization is required")
         return True
