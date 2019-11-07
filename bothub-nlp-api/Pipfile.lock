@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3c1bd7d84285563f448da79c8ba585d260502199efedb0f049ec8a7955532c1d"
+            "sha256": "24d641b2e683b7c66de0a646edc1a3eb046c2029bf615a98a4a261f5cc45d25b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -32,7 +32,7 @@
         },
         "bothub-backend": {
             "git": "https://github.com/Ilhasoft/bothub-backend",
-            "ref": "df8c2fff038a7ae1fd203152bc746a1ed59fbba3"
+            "ref": "7580ade0844186e7ddea033f41ec357170f50a5f"
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
@@ -178,6 +178,7 @@
             "hashes": [
                 "sha256:e00cbd7ba01ff748e494248183abc6e153f49181169d8a3d41bb49132ca01dfc"
             ],
+            "markers": "sys_platform != 'win32' and sys_platform != 'cygwin' and platform_python_implementation != 'pypy'",
             "version": "==0.0.13"
         },
         "idna": {
@@ -283,6 +284,7 @@
                 "sha256:b5c5a51b09ef6e787faadb5bcbd88d117c5136a162c40629a0d98707ae05dc6b",
                 "sha256:c0f69bc2e750b5370010c48c9825c6785487d60fa26025df6206f33b5027fc56"
             ],
+            "markers": "sys_platform != 'win32' and sys_platform != 'cygwin' and platform_python_implementation != 'pypy'",
             "version": "==0.14.0rc2"
         },
         "vine": {
