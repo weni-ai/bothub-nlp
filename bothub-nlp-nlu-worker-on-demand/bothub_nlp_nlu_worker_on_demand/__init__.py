@@ -71,7 +71,7 @@ class MyUpWorker(UpWorker):
                     "celery",
                     "worker",
                     "--autoscale",
-                    "50,10",
+                    "5,3",
                     "-O",
                     "fair",
                     "--workdir",
