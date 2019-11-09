@@ -2,11 +2,11 @@ import json
 from tempfile import mkdtemp
 from collections import defaultdict
 
-from rasa_nlu.model import Trainer
-from rasa_nlu.training_data import Message, TrainingData
-from rasa_nlu.components import ComponentBuilder
-from rasa_nlu.training_data.formats.readerwriter import TrainingDataWriter
-from rasa_nlu.utils import json_to_string
+from rasa.nlu.model import Trainer
+from rasa.nlu.training_data import Message, TrainingData
+from rasa.nlu.components import ComponentBuilder
+from rasa.nlu.training_data.formats.readerwriter import TrainingDataWriter
+from rasa.nlu.utils import json_to_string
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
@@ -61,10 +61,63 @@ class BothubTrainingData(TrainingData):
         return BothubWriter().dumps(self)
 
 
+def get_examples_request(update_id, repository_authorization):
+    start_examples = backend().request_backend_get_examples(
+        update_id, False, None, repository_authorization
+    )
+
+    examples = start_examples.get('results')
+
+    page = start_examples.get('next')
+
+    if page:
+        while True:
+            request_examples_page = backend().request_backend_get_examples(
+                update_id, True, page, repository_authorization
+            )
+
+            if request_examples_page.get('next') is None:
+                break
+
+            examples += request_examples_page.get('results')
+
+            page = request_examples_page.get('next')
+
+    return examples
+
+
+def get_examples_label_request(update_id, repository_authorization):
+    start_examples = backend().request_backend_get_examples_labels(
+        update_id, False, None, repository_authorization
+    )
+
+    examples_label = start_examples.get('results')
+
+    page = start_examples.get('next')
+
+    if page:
+        while True:
+            request_examples_page = backend().request_backend_get_examples_labels(
+                update_id, True, page, repository_authorization
+            )
+
+            if request_examples_page.get('next') is None:
+                break
+
+            examples_label += request_examples_page.get('results')
+            page = request_examples_page.get('next')
+
+    return examples_label
+
+
 def train_update(update, by, repository_authorization):
     update_request = backend().request_backend_start_training_nlu(
         update, by, repository_authorization
     )
+
+    examples_list = get_examples_request(update, repository_authorization)
+    examples_label_list = get_examples_label_request(update, repository_authorization)
+
     with PokeLogging() as pl:
         try:
             examples = []
@@ -73,7 +126,11 @@ def train_update(update, by, repository_authorization):
             get_examples = backend().request_backend_get_entities_and_labels_nlu(
                 update,
                 update_request.get("language"),
-                json.dumps(update_request),
+                json.dumps({
+                    'examples': examples_list,
+                    'label_examples_query': examples_label_list,
+                    'update_id': update
+                }),
                 repository_authorization,
             )
 
@@ -106,7 +163,6 @@ def train_update(update, by, repository_authorization):
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                project_name=str(update_request.get("repository_uuid")),
                 fixed_model_name=str(update_request.get("update_id")),
             )
         except Exception as e:

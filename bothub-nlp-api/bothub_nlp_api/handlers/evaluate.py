@@ -1,9 +1,8 @@
-from flask import jsonify, request
-
-from .. import settings
 from bothub_nlp_celery.actions import ACTION_EVALUATE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
+
+from .. import settings
 from ..utils import AuthorizationIsRequired
 from ..utils import NEXT_LANGS
 from ..utils import ValidationError, get_repository_authorization
@@ -13,14 +12,14 @@ EVALUATE_STATUS_EVALUATED = "evaluated"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def evaluate_handler(language):
+def evaluate_handler(authorization, language):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in NEXT_LANGS.keys()
     ):
         raise ValidationError("Language '{}' not supported by now.".format(language))
 
-    repository_authorization = get_repository_authorization()
+    repository_authorization = get_repository_authorization(authorization)
     if not repository_authorization:
         raise AuthorizationIsRequired()
 
@@ -54,12 +53,10 @@ def evaluate_handler(language):
             "evaluate_version": evaluate.get("version"),
         }
     except Exception as e:
-        from .. import logger
+        # from .. import logger
 
-        logger.exception(e)
+        # logger.exception(e)
 
         evaluate_report = {"status": EVALUATE_STATUS_FAILED, "error": str(e)}
 
-    resp = jsonify(evaluate_report)
-    resp.status_code = 200
-    return resp
+    return evaluate_report

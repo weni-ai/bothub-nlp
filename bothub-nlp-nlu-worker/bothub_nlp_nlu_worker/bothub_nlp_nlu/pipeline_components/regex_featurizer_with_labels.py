@@ -1,17 +1,17 @@
 import os
 
-from rasa_nlu import utils
-from rasa_nlu.featurizers.regex_featurizer import RegexFeaturizer as RasaRegexFeaturizer
-from rasa_nlu.featurizers.regex_featurizer import REGEX_FEATURIZER_FILE_NAME
+from rasa.nlu import utils
+from rasa.nlu.featurizers.regex_featurizer import RegexFeaturizer as RasaRegexFeaturizer
 
 
 class RegexFeaturizer(RasaRegexFeaturizer):
     name = "intent_entity_featurizer_regex"
 
     @classmethod
-    def load(cls, model_dir=None, model_metadata=None, cached_component=None, **kwargs):
-        meta = model_metadata.for_component(cls.name)
-        file_name = meta.get("regex_file", REGEX_FEATURIZER_FILE_NAME)
+    def load(
+        cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs
+    ):
+        file_name = meta.get("file")
         regex_file = os.path.join(model_dir, file_name)
 
         if os.path.exists(regex_file):
@@ -22,6 +22,8 @@ class RegexFeaturizer(RasaRegexFeaturizer):
 
     def train(self, training_data, config, **kwargs):
         self.known_patterns = training_data.regex_features
+        self._add_lookup_table_regexes(training_data.lookup_tables)
+
         for example in training_data.training_examples:
             updated = self._text_features_with_regex(example)
             example.set("text_features", updated)

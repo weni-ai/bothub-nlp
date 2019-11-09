@@ -2,54 +2,41 @@ import json
 import logging
 import uuid
 
-from rasa_nlu.training_data import Message
-from rasa_nlu.training_data import TrainingData
-from rasa_nlu.evaluate import (
+from rasa.nlu.test import get_entity_extractors, plot_attribute_confidences
+from rasa.nlu.test import get_evaluation_metrics
+from rasa.nlu.test import (
     merge_labels,
-    align_all_entity_predictions,
-    substitute_labels,
-    get_evaluation_metrics,
-    is_intent_classifier_present,
-    get_entity_targets,
-    get_entity_extractors,
-    get_intent_targets,
-    plot_intent_confidences,
-    plot_confusion_matrix,
-    get_intent_predictions,
-    get_entity_predictions,
     _targets_predictions_from,
+    remove_empty_intent_examples,
+    get_eval_data,
+    align_all_entity_predictions,
 )
+from rasa.nlu.test import plot_confusion_matrix
+from rasa.nlu.test import substitute_labels
+from rasa.nlu.training_data import Message
+from rasa.nlu.training_data import TrainingData
 
-from .utils import update_interpreters
 from .utils import backend
+from .utils import update_interpreters
 
 logger = logging.getLogger(__name__)
 
 excluded_itens = ["micro avg", "macro avg", "weighted avg", "no_entity", "no predicted"]
 
 
-def remove_empty_intent_examples(intent_results):
-    filtered = []
-    for r in intent_results:
-        if r.prediction is None:
-            r = r._replace(prediction="no predicted")
-
-        if r.target != "" and r.target is not None:
-            filtered.append(r)
-
-    return filtered
-
-
 def collect_nlu_successes(intent_results):
     successes = [
         {
             "text": r.message,
-            "intent": r.target,
-            "intent_prediction": {"name": r.prediction, "confidence": r.confidence},
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
             "status": "success",
         }
         for r in intent_results
-        if r.target == r.prediction
+        if r.intent_target == r.intent_prediction
     ]
     return successes
 
@@ -58,20 +45,24 @@ def collect_nlu_errors(intent_results):
     errors = [
         {
             "text": r.message,
-            "intent": r.target,
-            "intent_prediction": {"name": r.prediction, "confidence": r.confidence},
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
             "status": "error",
         }
         for r in intent_results
-        if r.target != r.prediction
+        if r.intent_target != r.intent_prediction
     ]
     return errors
 
 
-def evaluate_entities(targets, predictions, tokens, extractors):  # pragma: no cover
-    aligned_predictions = align_all_entity_predictions(
-        targets, predictions, tokens, extractors
-    )
+def evaluate_entities(entity_results, extractors):  # pragma: no cover
+    """Creates summary statistics for each entity extractor.
+    Logs precision, recall, and F1 per entity type for each extractor."""
+
+    aligned_predictions = align_all_entity_predictions(entity_results, extractors)
     merged_targets = merge_labels(aligned_predictions)
     merged_targets = substitute_labels(merged_targets, "O", "no_entity")
 
@@ -80,8 +71,12 @@ def evaluate_entities(targets, predictions, tokens, extractors):  # pragma: no c
     for extractor in extractors:
         merged_predictions = merge_labels(aligned_predictions, extractor)
         merged_predictions = substitute_labels(merged_predictions, "O", "no_entity")
+
         report, precision, f1, accuracy = get_evaluation_metrics(
-            merged_targets, merged_predictions, output_dict=True
+            merged_targets,
+            merged_predictions,
+            output_dict=True,
+            exclude_label="no_entity",
         )
 
         result = {
@@ -95,11 +90,26 @@ def evaluate_entities(targets, predictions, tokens, extractors):  # pragma: no c
 
 
 def evaluate_intents(intent_results):  # pragma: no cover
+    """Creates a confusion matrix and summary statistics for intent predictions.
+
+    Log samples which could not be classified correctly and save them to file.
+    Creates a confidence histogram which is saved to file.
+    Wrong and correct prediction confidences will be
+    plotted in separate bars of the same histogram plot.
+    Only considers those examples with a set intent.
+    Others are filtered out. Returns a dictionary of containing the
+    evaluation result.
+    """
+
+    # remove empty intent targets
     intent_results = remove_empty_intent_examples(intent_results)
-    targets, predictions = _targets_predictions_from(intent_results)
+
+    target_intents, predicted_intents = _targets_predictions_from(
+        intent_results, "intent_target", "intent_prediction"
+    )
 
     report, precision, f1, accuracy = get_evaluation_metrics(
-        targets, predictions, output_dict=True
+        target_intents, predicted_intents, output_dict=True
     )
 
     log = collect_nlu_errors(intent_results) + collect_nlu_successes(intent_results)
@@ -107,8 +117,8 @@ def evaluate_intents(intent_results):  # pragma: no cover
     predictions = [
         {
             "text": res.message,
-            "intent": res.target,
-            "predicted": res.prediction,
+            "intent": res.intent_target,
+            "predicted": res.intent_prediction,
             "confidence": res.confidence,
         }
         for res in intent_results
@@ -152,7 +162,9 @@ def plot_and_save_charts(update, intent_results):
         )
 
         intent_results = remove_empty_intent_examples(intent_results)
-        targets, predictions = _targets_predictions_from(intent_results)
+        targets, predictions = _targets_predictions_from(
+            intent_results, "intent_target", "intent_prediction"
+        )
 
         cnf_matrix = confusion_matrix(targets, predictions)
         labels = unique_labels(targets, predictions)
@@ -185,7 +197,9 @@ def plot_and_save_charts(update, intent_results):
         except ClientError as e:
             logger.error(e)
 
-        plot_intent_confidences(intent_results, None)
+        plot_attribute_confidences(
+            intent_results, None, "intent_target", "intent_prediction"
+        )
         chart = io.BytesIO()
         fig = plt.gcf()
         fig.set_size_inches(10, 10)
@@ -236,22 +250,23 @@ def evaluate_update(update, by, repository_authorization):
     interpreter = update_interpreters.get(
         update, repository_authorization, use_cache=False
     )
-    extractor = get_entity_extractors(interpreter)
-    entity_predictions, tokens = get_entity_predictions(interpreter, test_data)
 
-    result = {"intent_evaluation": None, "entity_evaluation": None}
+    result = {
+        "intent_evaluation": None,
+        "entity_evaluation": None,
+        "response_selection_evaluation": None,
+    }
 
-    if is_intent_classifier_present(interpreter):
-        intent_targets = get_intent_targets(test_data)
-        intent_results = get_intent_predictions(intent_targets, interpreter, test_data)
+    intent_results, response_selection_results, entity_results, = get_eval_data(
+        interpreter, test_data
+    )
 
+    if intent_results:
         result["intent_evaluation"] = evaluate_intents(intent_results)
 
-    if extractor:
-        entity_targets = get_entity_targets(test_data)
-        result["entity_evaluation"] = evaluate_entities(
-            entity_targets, entity_predictions, tokens, extractor
-        )
+    if entity_results:
+        extractors = get_entity_extractors(interpreter)
+        result["entity_evaluation"] = evaluate_entities(entity_results, extractors)
 
     intent_evaluation = result.get("intent_evaluation")
     entity_evaluation = result.get("entity_evaluation")

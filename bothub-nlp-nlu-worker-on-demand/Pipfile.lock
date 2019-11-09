@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "062cb758bb465111bc29961f0de7e7f2d3d53c47ebf34e12ec783674827d4c49"
+            "sha256": "93afa3998498f0430f1500bb7149e8030d39a6119a21fdd582a9219f7c14b25a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,7 +18,7 @@
     "default": {
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "55eb533589da093a9868322d6c012fce8f0a7291"
+            "ref": "b99429b54bb5739e07d0e962cf402b141d876e88"
         },
         "celery-worker-on-demand": {
             "git": "https://github.com/Ilhasoft/celery-worker-on-demand",

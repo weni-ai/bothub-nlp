@@ -9,16 +9,19 @@ lint = "flake8"
 [packages]
 raven = "*"
 requests = "==2.20.1"
-bothub_backend = {ref = "master",git = "https://github.com/Ilhasoft/bothub-backend"}
+bothub_backend = {ref = "1.0.2",git = "https://github.com/Ilhasoft/bothub-backend"}
 celery = "==4.3.0"
-flask = "*"
 gunicorn = "*"
 gevent = "*"
-bothub_nlp_celery = {ref = "0.1.4-fix",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "0.1.5",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "*"
-flask-cors = "*"
 redis = "*"
 kombu = "==4.5.0"
+fastapi = "==0.42.0"
+uvicorn = "*"
+python-multipart = "*"
+email-validator = "*"
+dataclasses = "==0.6"
 
 [dev-packages]
 "psycopg2-binary" = "*"
