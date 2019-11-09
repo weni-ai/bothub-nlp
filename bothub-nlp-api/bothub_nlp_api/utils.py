@@ -1,59 +1,56 @@
-from tornado.web import HTTPError
-from rest_framework import status
-from bothub.common import languages
+import bothub_backend
+from fastapi import HTTPException, Header
+from starlette.requests import Request
+
+import bothub_nlp_api.settings
+
+
+def backend():
+    return bothub_backend.get_backend(
+        "bothub_backend.bothub.BothubBackend", bothub_nlp_api.settings.BOTHUB_ENGINE_URL
+    )
 
 
 NEXT_LANGS = {
-    'english': [
-        languages.LANGUAGE_EN,
-    ],
-    'portuguese': [
-        languages.LANGUAGE_PT,
-        languages.LANGUAGE_PT_BR,
-    ],
-    languages.LANGUAGE_PT: [
-        languages.LANGUAGE_PT_BR,
-    ],
-    'pt-br': [
-        languages.LANGUAGE_PT_BR,
-    ],
-    'br': [
-        languages.LANGUAGE_PT_BR,
-    ],
+    "english": ["en"],
+    "portuguese": ["pt", "pt_br"],
+    "pt": ["pt_br"],
+    "pt-br": ["pt_br"],
+    "br": ["pt_br"],
 }
 
 
-class ApiError(HTTPError):
-    def __init__(self, msg, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.msg = msg
+class AuthorizationIsRequired(HTTPException):
+    def __init__(self):
+        self.status_code = 401
+        self.detail = "Authorization is required"
 
 
-class ValidationError(ApiError):
-    def __init__(self, *args, field=None, status_code=None, **kwargs):
-        super().__init__(
-            *args,
-            status_code=status.HTTP_400_BAD_REQUEST,
-            **kwargs)
-        self.field = field
+class ValidationError(HTTPException):
+    def __init__(self, message):
+        self.status_code = 400
+        self.detail = message
 
 
-class AuthorizationIsRequired(ApiError):
-    def __init__(self, *args, **kwargs):
-        super().__init__(
-            'Authorization is required',
-            *args,
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            **kwargs)
+def get_repository_authorization(authorization_header_value):
+    authorization_uuid = authorization_header_value and authorization_header_value[7:]
+
+    if not authorization_uuid:
+        return False
+
+    return authorization_uuid
 
 
-def authorization_required(f):
-    def check(handler, *args, **kwargs):
-        repository_authorization = handler.repository_authorization()
+class AuthorizationRequired:
+    async def __call__(
+        self,
+        request: Request,
+        Authorization: str = Header(..., description="Bearer your_key"),
+    ):
+        if request.method == "OPTIONS":
+            return True
+
+        repository_authorization = get_repository_authorization(Authorization)
         if not repository_authorization:
-            raise AuthorizationIsRequired()
-        return f(handler, *args, **kwargs)
-
-    check.__doc__ = f.__doc__
-    check.__name__ = f.__name__
-    return check
+            raise HTTPException(status_code=401, detail="Authorization is required")
+        return True

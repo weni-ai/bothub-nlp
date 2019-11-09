@@ -13,49 +13,25 @@ from celery_worker_on_demand import APIHandler
 from . import settings
 
 
-LABEL_KEY = 'bothub-nlp-wod.name'
-EMPTY = 'empty-value'
+LABEL_KEY = "bothub-nlp-wod.name"
+EMPTY = "empty-value"
 ENV_LIST = [
-    '{}={}'.format(var, config(var, default=EMPTY))
+    "{}={}".format(var, config(var, default=EMPTY))
     for var in [
-        'SECRET_KEY',
-        'DEBUG',
-        'DEVELOPMENT_MODE',
-        'ALLOWED_HOSTS',
-        'DEFAULT_DATABASE',
-        'LANGUAGE_CODE',
-        'TIME_ZONE',
-        'EMAIL_HOST',
-        'EMAIL_PORT',
-        'DEFAULT_FROM_EMAIL',
-        'SERVER_EMAIL',
-        'EMAIL_HOST_USER',
-        'EMAIL_HOST_PASSWORD',
-        'EMAIL_USE_SSL',
-        'EMAIL_USE_TLS',
-        'ADMINS',
-        'CSRF_COOKIE_DOMAIN',
-        'CSRF_COOKIE_SECURE',
-        'BOTHUB_WEBAPP_BASE_URL',
-        'BOTHUB_NLP_BASE_URL',
-        'CHECK_ACCESSIBLE_API_URL',
-        'SEND_EMAILS',
-        'SUPPORTED_LANGUAGES',
-        'LOGGER_FORMAT',
-        'LOGGER_LEVEL',
-        'NLP_SENTRY_CLIENT',
-        'BOTHUB_NLP_CELERY_BROKER_URL',
-        'BOTHUB_NLP_CELERY_BACKEND_URL',
-        'BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE',
-        'BOTHUB_NLP_AWS_S3_BUCKET_NAME',
-        'BOTHUB_NLP_AWS_ACCESS_KEY_ID',
-        'BOTHUB_NLP_AWS_SECRET_ACCESS_KEY',
+        "SUPPORTED_LANGUAGES",
+        "BOTHUB_ENGINE_URL",
+        "NLP_SENTRY_CLIENT",
+        "BOTHUB_NLP_CELERY_BROKER_URL",
+        "BOTHUB_NLP_CELERY_BACKEND_URL",
+        "BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE",
+        "BOTHUB_NLP_AWS_S3_BUCKET_NAME",
+        "BOTHUB_NLP_AWS_ACCESS_KEY_ID",
+        "BOTHUB_NLP_AWS_SECRET_ACCESS_KEY",
+        "BOTHUB_NLP_AWS_REGION_NAME",
     ]
 ]
 
-docker_client = docker.DockerClient(
-    base_url=settings.BOTHUB_NLP_DOCKER_CLIENT_BASE_URL,
-)
+docker_client = docker.DockerClient(base_url=settings.BOTHUB_NLP_DOCKER_CLIENT_BASE_URL)
 running_services = {}
 last_services_lookup = 0
 
@@ -67,7 +43,7 @@ def services_lookup():
         return False
     running_services = {}
     for service in docker_client.services.list():
-        service_labels = service.attrs.get('Spec', {}).get('Labels')
+        service_labels = service.attrs.get("Spec", {}).get("Labels")
         if LABEL_KEY in service_labels:
             queue_name = service_labels.get(LABEL_KEY)
             running_services[queue_name] = service
@@ -81,36 +57,41 @@ class MyUpWorker(UpWorker):
         services_lookup()
         service = running_services.get(self.queue.name)
         if not service:
-            queue_language = self.queue.name.split(':')[1] \
-                if ':' in self.queue.name else self.queue.name
+            queue_language = (
+                self.queue.name.split(":")[1]
+                if ":" in self.queue.name
+                else self.queue.name
+            )
             constraints = []
             if settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_RUN_IN_WORKER_NODE:
-                constraints.append('node.role == worker')
+                constraints.append("node.role == worker")
             docker_client.services.create(
-                settings.BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME +
-                f':{queue_language}',
+                settings.BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME + f":{queue_language}",
                 [
-                    'celery',
-                    'worker',
-                    '-A',
-                    'bothub_nlp_nlu_worker.celery_app',
-                    '-c',
-                    '1',
-                    '-l',
-                    'INFO',
-                    '-E',
-                    '-Q',
+                    "celery",
+                    "worker",
+                    "--autoscale",
+                    "5,3",
+                    "-O",
+                    "fair",
+                    "--workdir",
+                    "bothub_nlp_nlu_worker",
+                    "-A",
+                    "celery_app",
+                    "-c",
+                    "1",
+                    "-l",
+                    "INFO",
+                    "-E",
+                    "-Q",
                     self.queue.name,
                 ],
                 env=list(
-                    filter(
-                        lambda v: not v.endswith(EMPTY),
-                        ENV_LIST,
-                    )
+                    list(filter(lambda v: not v.endswith(EMPTY), ENV_LIST)) +
+                    list([f'BOTHUB_NLP_LANGUAGE_QUEUE={self.queue.name}']) +
+                    list(['BOTHUB_NLP_SERVICE_WORKER=true'])
                 ),
-                labels={
-                    LABEL_KEY: self.queue.name,
-                },
+                labels={LABEL_KEY: self.queue.name},
                 networks=settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_NETWORKS,
                 constraints=constraints,
             )
@@ -130,7 +111,7 @@ class MyDownWorker(DownWorker):
 class MyAgent(Agent):
     def flag_down(self, queue):
         global running_services
-        ignore_list = self.cwod.config.get('worker-down', 'ignore').split(',')
+        ignore_list = self.cwod.config.get("worker-down", "ignore").split(",")
         if queue.name in ignore_list:
             return False
         if queue.size > 0:
@@ -164,27 +145,24 @@ class MyAgent(Agent):
 
 class MyAPIHandler(APIHandler):
     def post_data(self):
-        content_type = self.headers.get('content-type')
+        content_type = self.headers.get("content-type")
         if not content_type:
             return {}
         ctype, pdict = cgi.parse_header(content_type)
-        if not ctype == 'multipart/form-data':
+        if not ctype == "multipart/form-data":
             return {}
-        pdict['boundary'] = bytes(pdict.get('boundary', ''), 'utf-8')
+        pdict["boundary"] = bytes(pdict.get("boundary", ""), "utf-8")
         parsed = cgi.parse_multipart(self.rfile, pdict)
         return dict(
             map(
                 lambda x: (
                     x[0],
-                    list(
-                        map(
-                            lambda x: x.decode(),
-                            x[1],
-                        ),
-                    ) if len(x[1]) > 1 else x[1][0].decode(),
+                    list(map(lambda x: x.decode(), x[1]))
+                    if len(x[1]) > 1
+                    else x[1][0].decode(),
                 ),
                 parsed.items(),
-            ),
+            )
         )
 
     def do_POST(self):
@@ -192,11 +170,9 @@ class MyAPIHandler(APIHandler):
             return
         post_data = self.post_data()
         for key, value in post_data.items():
-            section, option = key.split('.', 1)
+            section, option = key.split(".", 1)
             self.cwod.config.set(
-                section,
-                option,
-                ','.join(value) if isinstance(value, list) else value,
+                section, option, ",".join(value) if isinstance(value, list) else value
             )
         self.cwod.write_config()
         self.do_GET()
@@ -211,24 +187,15 @@ class MyDemand(CeleryWorkerOnDemand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = configparser.ConfigParser()
-        self.config.read_dict({
-            'worker-down': {
-                'ignore': [],
-            },
-        })
+        self.config.read_dict({"worker-down": {"ignore": []}})
         self.config.read(settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE)
 
     def write_config(self):
         self.config.write(
-            open(
-                settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE,
-                'w+',
-            ),
+            open(settings.BOTHUB_NLP_NLU_WORKER_ON_DEMAND_CONFIG_FILE, "w+")
         )
 
     def serializer(self):
         data = super().serializer()
-        data.update({
-            'config': self.config._sections,
-        })
+        data.update({"config": self.config._sections})
         return data

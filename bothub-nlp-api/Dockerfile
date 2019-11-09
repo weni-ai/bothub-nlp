@@ -5,10 +5,7 @@ ENV BOTHUB_NLP_API_PORT 2657
 
 WORKDIR $WORKDIR
 
-COPY bothub-nlp ../bothub-nlp
-COPY bothub-nlp-celery ../bothub-nlp-celery
-COPY bothub-nlp-api/Pipfile .
-COPY bothub-nlp-api/Pipfile.lock .
+COPY bothub-nlp-api .
 
 RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \
@@ -21,6 +18,6 @@ RUN apk update \
     && apk del .build-dependencies \
     && rm -rf /var/cache/apk/*
 
-COPY bothub-nlp-api .
+RUN chmod +x ./entrypoint.sh
 
-ENTRYPOINT [ "python", "-m", "bothub_nlp_api" ]
+ENTRYPOINT [ "./entrypoint.sh" ]
