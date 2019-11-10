@@ -66,8 +66,8 @@ class InfoResponse(BaseModel):
     categories_list: List[str]
     created_at: str
     description: str
-    entities: List[str]
-    entities_list: List[str]
+    entities: Any
+    entities_list: Any
     evaluate_languages_count: Dict[str, int]
     examples__count: int
     intents: List[str]
