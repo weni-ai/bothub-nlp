@@ -6,6 +6,7 @@ install_development_requirements:
 	@git clone --branch master --depth 1 --single-branch https://github.com/Ilhasoft/spacy-lang-models spacy-langs
 	@python scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/
 	@python scripts/link_lang_spacy.py mn ./spacy-langs/mn/
+	@python scripts/link_lang_spacy.py ha ./spacy-langs/ha/
 	@python bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/download_spacy_models.py en:en_core_web_md
 	@echo "${SUCCESS}✔${NC} Development requirements installed"
 

@@ -45,6 +45,7 @@ RUN git clone --branch master --depth 1 --single-branch \
     spacy-langs \
     && python3.6 scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
     && python3.6 scripts/link_lang_spacy.py mn ./spacy-langs/mn/
+    && python3.6 scripts/link_lang_spacy.py ha ./spacy-langs/ha/
 
 ARG DOWNLOAD_SPACY_MODELS
 
