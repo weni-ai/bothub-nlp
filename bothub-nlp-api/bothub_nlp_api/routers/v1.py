@@ -50,7 +50,8 @@ async def train_options():
     return {}
 
 
-@router.get(r"/info/?", response_model=InfoResponse)
+# @router.get(r"/info/?", response_model=InfoResponse)
+@router.get(r"/info/?")
 async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
