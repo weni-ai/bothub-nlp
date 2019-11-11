@@ -16,19 +16,19 @@ from bothub_nlp_api.utils import get_repository_authorization
 router = APIRouter(redirect_slashes=False)
 
 
-# @router.post(r"/parse/?", response_model=ParseResponse)
-# async def parsepost_handler(
-#     item: ParseRequest,
-#     request: Request = Depends(AuthorizationRequired()),
-#     Authorization: str = Header(..., description="Bearer your_key"),
-# ):
-#
-#     return parse._parse(Authorization, item.text, item.language, item.rasa_format)
-#
-#
-# @router.options(r"/parse/?", status_code=204, include_in_schema=False)
-# async def parse_options():
-#     return {}
+@router.post(r"/parse/?", response_model=ParseResponse)
+async def parsepost_handler(
+    item: ParseRequest,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
+
+    return parse._parse(Authorization, item.text, item.language, item.rasa_format)
+
+
+@router.options(r"/parse/?", status_code=204, include_in_schema=False)
+async def parse_options():
+    return {}
 
 
 @router.post(r"/train/?", response_model=TrainResponse)
