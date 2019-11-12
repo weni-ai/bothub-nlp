@@ -83,7 +83,13 @@ def get_rasa_nlu_config_from_update(update):
                     }
                 )
             else:
-                pipeline.append({"name": "CountVectorsFeaturizer"})
+                # pipeline.append({"name": "CountVectorsFeaturizer"})
+                pipeline.append(
+                    {
+                        "name": "bothub_nlp_nlu.pipeline_components.count_vectors_featurizer_no_lemmatize."
+                                "CountVectorsFeaturizerCustom"
+                    }
+                )
         # intent classifier
         pipeline.append(
             {
