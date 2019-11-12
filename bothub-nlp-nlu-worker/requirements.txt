@@ -13,3 +13,5 @@ black==19.3b0
 kombu==4.5.0
 rasa==1.4.3
 spacy==2.1.9
+pymorphy2==0.8
+pythainlp

@@ -29,6 +29,18 @@ async def parse_handler(
     return parse._parse(Authorization, text, language, rasa_format)
 
 
+@router.get(r"/parse/?", response_model=ParseResponse, deprecated=True)
+async def parse_handler(
+    text: str,
+    language: str = None,
+    rasa_format: Optional[str] = False,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
+
+    return parse._parse(Authorization, text, language, rasa_format)
+
+
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
 async def parse_options():
     return {}
@@ -50,7 +62,8 @@ async def train_options():
     return {}
 
 
-@router.get(r"/info/?", response_model=InfoResponse)
+# @router.get(r"/info/?", response_model=InfoResponse)
+@router.get(r"/info/?")
 async def info_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
