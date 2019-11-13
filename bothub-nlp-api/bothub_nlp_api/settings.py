@@ -17,7 +17,10 @@ env = environ.Env(
     BOTHUB_NLP_API_LOG_LEVEL=(str, "info"),
     BOTHUB_NLP_API_KEEPALIVE=(int, 120),
     BOTHUB_NLP_SENTRY_CLIENT=(bool, None),
-    SUPPORTED_LANGUAGES=(cast_supported_languages, "en|pt"),
+    SUPPORTED_LANGUAGES=(
+        environ.json.loads,
+        '{"pt":{"install_from_pip":false,"package_name":"","url_model":""},"en":{"install_from_pip":false,'
+        '"package_name":"","url_model":""}}'),
     BOTHUB_ENGINE_URL=(str, "https://api.bothub.it"),
 )
 
@@ -30,8 +33,8 @@ BOTHUB_NLP_API_KEEPALIVE = env.int("BOTHUB_NLP_API_KEEPALIVE")
 
 BOTHUB_NLP_SENTRY_CLIENT = env.bool("BOTHUB_NLP_SENTRY_CLIENT")
 
-SUPPORTED_LANGUAGES = env.get_value(
-    "SUPPORTED_LANGUAGES", cast_supported_languages, "en|pt", True
+SUPPORTED_LANGUAGES = env.json(
+    "SUPPORTED_LANGUAGES", "{}"
 )
 
 BOTHUB_ENGINE_URL = env.str("BOTHUB_ENGINE_URL")
