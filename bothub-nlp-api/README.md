@@ -8,7 +8,8 @@ This is a Python Web service.
 |--|--|--|--|
 | BOTHUB_NLP_API_HOST | `str` | `0.0.0.0` | Web service ip |
 | BOTHUB_NLP_API_PORT | `int` | `2657` | Web service port |
-| BOTHUB_NLP_SENTRY_CLIENT | `bool` | `None` | Sentry Client |
+| BOTHUB_NLP_SENTRY_CLIENT | `bool` | `None` | Enable Sentry Client |
+| BOTHUB_NLP_SENTRY | `str` | `None` | Sentry Client URL |
 | SUPPORTED_LANGUAGES | `str` | `en|pt` | Set supported languages. Separe languages using |. You can set location follow the format: [LANGUAGE_CODE]:[LANGUAGE_LOCATION]. |
 | BOTHUB_ENGINE_URL | `str` | `https://api.bothub.it` | Web service url |
 | BOTHUB_NLP_CELERY_BROKER_URL | `str` | `redis://localhost:6379/0	` | `Celery Broker URL, check usage instructions in Celery Docs` |
