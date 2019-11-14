@@ -32,11 +32,9 @@ class SpacyNLP(RasaNLUSpacyNLP):
 
     def train(self, training_data, config, **kwargs):
         for example in training_data.training_examples:
-            # print()
             example.set("spacy_doc", self.doc_for_text(strip_accents_unicode(example.text)))
         if training_data.label_training_examples:
             for example in training_data.label_training_examples:
-                # print(strip_accents_unicode(example.text))
                 example.set("spacy_doc", self.doc_for_text(strip_accents_unicode(example.text)))
 
     def process(self, message, **kwargs):
