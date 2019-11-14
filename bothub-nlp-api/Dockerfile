@@ -10,6 +10,7 @@ COPY bothub-nlp-api .
 RUN apk update \
     && apk add --virtual .build-dependencies --no-cache \
         alpine-sdk \
+        libc-dev \
         git \
         python3-dev \
     && apk add --no-cache postgresql-dev \
