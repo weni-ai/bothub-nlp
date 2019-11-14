@@ -8,7 +8,7 @@ celery==4.3.0
 git+https://github.com/Ilhasoft/bothub-backend.git@1.0.3
 redis
 flake8
-git+https://github.com/Ilhasoft/bothub-nlp-celery.git@0.1.5
+git+https://github.com/Ilhasoft/bothub-nlp-celery.git@0.1.7
 black==19.3b0
 kombu==4.5.0
 rasa==1.4.3

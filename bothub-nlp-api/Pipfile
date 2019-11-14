@@ -13,7 +13,7 @@ bothub_backend = {ref = "1.0.3",git = "https://github.com/Ilhasoft/bothub-backen
 celery = "==4.3.0"
 gunicorn = "==19.9.0"
 gevent = "*"
-bothub_nlp_celery = {ref = "0.1.5",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "0.1.7",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 django-environ = "*"
 redis = "*"
 kombu = "==4.5.0"
