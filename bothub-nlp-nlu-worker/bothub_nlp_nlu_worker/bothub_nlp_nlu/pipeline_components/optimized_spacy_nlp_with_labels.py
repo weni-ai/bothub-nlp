@@ -1,6 +1,7 @@
 from bothub_nlp_celery.app import nlp_language
-from rasa.nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
 from rasa.nlu.config import override_defaults
+from rasa.nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
+from sklearn.feature_extraction.text import strip_accents_unicode
 
 
 class SpacyNLP(RasaNLUSpacyNLP):
@@ -31,7 +32,13 @@ class SpacyNLP(RasaNLUSpacyNLP):
 
     def train(self, training_data, config, **kwargs):
         for example in training_data.training_examples:
-            example.set("spacy_doc", self.doc_for_text(example.text))
+            # print()
+            example.set("spacy_doc", self.doc_for_text(strip_accents_unicode(example.text)))
         if training_data.label_training_examples:
             for example in training_data.label_training_examples:
-                example.set("spacy_doc", self.doc_for_text(example.text))
+                # print(strip_accents_unicode(example.text))
+                example.set("spacy_doc", self.doc_for_text(strip_accents_unicode(example.text)))
+
+    def process(self, message, **kwargs):
+        message.text = strip_accents_unicode(message.text)
+        super().process(message=message, **kwargs)
