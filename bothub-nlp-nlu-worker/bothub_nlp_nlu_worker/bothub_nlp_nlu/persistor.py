@@ -2,6 +2,7 @@ import base64
 import bothub_backend
 from tempfile import NamedTemporaryFile
 
+import requests
 from rasa.nlu.persistor import Persistor
 from decouple import config
 
@@ -28,13 +29,21 @@ class BothubPersistor(Persistor):
     def retrieve(self, model_name, target_path):
         tar_name = self._tar_name(model_name)
 
-        tar_data = base64.b64decode(
-            self.backend()
-            .request_backend_parse_nlu_persistor(
-                self.update, self.repository_authorization
-            )
-            .get("bot_data")
+        train = self.backend().request_backend_parse_nlu_persistor(
+            self.update, self.repository_authorization
         )
+
+        if train.get("from_aws"):
+            tar_data = requests.get(train.get("bot_data")).content
+        else:
+            tar_data = base64.b64decode(
+                self.backend()
+                .request_backend_parse_nlu_persistor(
+                    self.update, self.repository_authorization
+                )
+                .get("bot_data")
+            )
+
         tar_file = NamedTemporaryFile(suffix=tar_name, delete=False)
         tar_file.write(tar_data)
         tar_file.close()

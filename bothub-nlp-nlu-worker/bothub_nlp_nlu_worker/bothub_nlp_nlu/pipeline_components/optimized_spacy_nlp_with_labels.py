@@ -1,6 +1,6 @@
 from bothub_nlp_celery.app import nlp_language
-from rasa.nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
 from rasa.nlu.config import override_defaults
+from rasa.nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
 
 
 class SpacyNLP(RasaNLUSpacyNLP):

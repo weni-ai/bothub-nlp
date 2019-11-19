@@ -66,9 +66,9 @@ def get_examples_request(update_id, repository_authorization):
         update_id, False, None, repository_authorization
     )
 
-    examples = start_examples.get('results')
+    examples = start_examples.get("results")
 
-    page = start_examples.get('next')
+    page = start_examples.get("next")
 
     if page:
         while True:
@@ -76,12 +76,12 @@ def get_examples_request(update_id, repository_authorization):
                 update_id, True, page, repository_authorization
             )
 
-            if request_examples_page.get('next') is None:
+            if request_examples_page.get("next") is None:
                 break
 
-            examples += request_examples_page.get('results')
+            examples += request_examples_page.get("results")
 
-            page = request_examples_page.get('next')
+            page = request_examples_page.get("next")
 
     return examples
 
@@ -91,9 +91,9 @@ def get_examples_label_request(update_id, repository_authorization):
         update_id, False, None, repository_authorization
     )
 
-    examples_label = start_examples.get('results')
+    examples_label = start_examples.get("results")
 
-    page = start_examples.get('next')
+    page = start_examples.get("next")
 
     if page:
         while True:
@@ -101,11 +101,11 @@ def get_examples_label_request(update_id, repository_authorization):
                 update_id, True, page, repository_authorization
             )
 
-            if request_examples_page.get('next') is None:
+            if request_examples_page.get("next") is None:
                 break
 
-            examples_label += request_examples_page.get('results')
-            page = request_examples_page.get('next')
+            examples_label += request_examples_page.get("results")
+            page = request_examples_page.get("next")
 
     return examples_label
 
@@ -126,11 +126,13 @@ def train_update(update, by, repository_authorization):
             get_examples = backend().request_backend_get_entities_and_labels_nlu(
                 update,
                 update_request.get("language"),
-                json.dumps({
-                    'examples': examples_list,
-                    'label_examples_query': examples_label_list,
-                    'update_id': update
-                }),
+                json.dumps(
+                    {
+                        "examples": examples_list,
+                        "label_examples_query": examples_label_list,
+                        "update_id": update,
+                    }
+                ),
                 repository_authorization,
             )
 
