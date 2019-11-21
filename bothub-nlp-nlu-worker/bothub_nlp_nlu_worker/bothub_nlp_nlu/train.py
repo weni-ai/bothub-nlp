@@ -76,10 +76,10 @@ def get_examples_request(update_id, repository_authorization):
                 update_id, True, page, repository_authorization
             )
 
+            examples += request_examples_page.get("results")
+
             if request_examples_page.get("next") is None:
                 break
-
-            examples += request_examples_page.get("results")
 
             page = request_examples_page.get("next")
 
@@ -101,10 +101,11 @@ def get_examples_label_request(update_id, repository_authorization):
                 update_id, True, page, repository_authorization
             )
 
+            examples_label += request_examples_page.get("results")
+
             if request_examples_page.get("next") is None:
                 break
 
-            examples_label += request_examples_page.get("results")
             page = request_examples_page.get("next")
 
     return examples_label
