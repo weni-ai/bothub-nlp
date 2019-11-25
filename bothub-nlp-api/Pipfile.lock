@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "73bad86c56aa8fb0800e526ad185ee49da5305a921d152a70c6f0255b58ff425"
+            "sha256": "dcb08d2f8647d4b2c2d24f7f557d1b9b98fe044bdb10a13cd8d8e9d1fed5f0de"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -36,7 +36,7 @@
         },
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "ae2cd34f4998b11592ada59c5abb41c3bf6a3b00"
+            "ref": "ca80371f20f689bcbc6ab745a3f39d0a8dc80b2d"
         },
         "celery": {
             "hashes": [
@@ -246,11 +246,11 @@
         },
         "sentry-sdk": {
             "hashes": [
-                "sha256:ca2723556c102a1fabdf461b9a038d1d8631608c4d10085a7c06a0b590e79ad4",
-                "sha256:ced85a48171b3421d71f14f1682168f8008581411893e42359469c397fdf6285"
+                "sha256:09e1e8f00f22ea580348f83bbbd880adf40b29f1dec494a8e4b33e22f77184fb",
+                "sha256:ff1fa7fb85703ae9414c8b427ee73f8363232767c9cd19158f08f6e4f0b58fc7"
             ],
             "index": "pypi",
-            "version": "==0.7.10"
+            "version": "==0.13.2"
         },
         "six": {
             "hashes": [
