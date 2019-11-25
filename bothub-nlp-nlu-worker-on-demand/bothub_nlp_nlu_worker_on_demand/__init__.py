@@ -18,6 +18,7 @@ EMPTY = "empty-value"
 ENV_LIST = [
     "{}={}".format(var, config(var, default=EMPTY))
     for var in [
+        "ENVIRONMENT",
         "SUPPORTED_LANGUAGES",
         "BOTHUB_ENGINE_URL",
         "BOTHUB_NLP_CELERY_SENTRY_CLIENT",
