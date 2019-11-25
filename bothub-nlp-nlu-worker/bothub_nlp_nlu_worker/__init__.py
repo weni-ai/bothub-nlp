@@ -1,4 +1,5 @@
 import logging
 
-
-logger = logging.getLogger("bothub_nlp_api")
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+)

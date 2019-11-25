@@ -6,6 +6,7 @@ This is a Python Web service.
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
+| ENVIRONMENT | `str` | `production` |  |
 | BOTHUB_NLP_API_HOST | `str` | `0.0.0.0` | Web service ip |
 | BOTHUB_NLP_API_PORT | `int` | `2657` | Web service port |
 | BOTHUB_NLP_SENTRY_CLIENT | `bool` | `None` | Enable Sentry Client |
