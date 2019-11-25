@@ -10,7 +10,7 @@ from .pipeline_components.optimized_spacy_nlp_with_labels import SpacyNLP
 from .pipeline_components.tokenizer_spacy_with_labels import SpacyTokenizer
 
 
-logger = logging.getLogger("bothub_nlp_nlu")
+logger = logging.getLogger("bothub_nlp_nlu_worker")
 
 registry.component_classes = registry.component_classes + [
     CRFLabelAsEntityExtractor,
