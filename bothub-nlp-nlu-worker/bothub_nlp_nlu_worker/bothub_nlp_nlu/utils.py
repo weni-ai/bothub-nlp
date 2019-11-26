@@ -80,13 +80,15 @@ def get_rasa_nlu_config_from_update(update):
                         "analyzer": "char",
                         "min_ngram": 3,
                         "max_ngram": 3,
+                        "token_pattern": "(?u)\\b\\w+\\b"
                     }
                 )
             else:
                 pipeline.append(
                     {
                         "name": "bothub_nlp_nlu.pipeline_components.count_vectors_featurizer_no_lemmatize."
-                        "CountVectorsFeaturizerCustom"
+                        "CountVectorsFeaturizerCustom",
+                        "token_pattern": "(?u)\\b\\w+\\b"
                     }
                 )
         # intent classifier
