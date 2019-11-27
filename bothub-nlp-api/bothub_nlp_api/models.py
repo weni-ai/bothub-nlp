@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class ParseRequest(BaseModel):
     text: str
     language: str = None
+    update_id: int = None
     rasa_format: bool = False
 
 

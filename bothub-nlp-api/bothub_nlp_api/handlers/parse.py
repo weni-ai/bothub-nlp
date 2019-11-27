@@ -9,7 +9,7 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _parse(authorization, text, language, rasa_format=False):
+def _parse(authorization, text, language, update_id, rasa_format=False):
     from ..utils import NEXT_LANGS
 
     if language and (
@@ -24,7 +24,7 @@ def _parse(authorization, text, language, rasa_format=False):
 
     try:
         update = backend().request_backend_parse(
-            "parse", repository_authorization, language
+            "parse", repository_authorization, language, update_id
         )
     except Exception:
         update = {}

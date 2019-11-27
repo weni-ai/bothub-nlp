@@ -22,11 +22,12 @@ async def parse_handler(
     text: str = Form(...),
     language: str = Form(default=None),
     rasa_format: Optional[str] = Form(default=False),
+    update_id: Optional[int] = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
 
-    return parse._parse(Authorization, text, language, rasa_format)
+    return parse._parse(Authorization, text, language, update_id, rasa_format)
 
 
 @router.get(r"/parse/?", response_model=ParseResponse, deprecated=True)
@@ -70,6 +71,8 @@ async def info_handler(
 ):
     repository_authorization = get_repository_authorization(Authorization)
     info = backend().request_backend_parse("info", repository_authorization)
+    if info.get('detail'):
+        raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
     info.pop("intents_list")
     return info
