@@ -10,6 +10,10 @@ class ParseRequest(BaseModel):
     repository_version: int = None
 
 
+class TrainRequest(BaseModel):
+    repository_version: int = None
+
+
 class EvaluateRequest(BaseModel):
     language: str = None
 

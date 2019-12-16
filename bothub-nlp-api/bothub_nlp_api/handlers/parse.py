@@ -40,7 +40,7 @@ def _parse(authorization, text, language, rasa_format=False, repository_version=
 
     if not update.get("version"):
         raise ValidationError("This repository has never been trained")
-    
+
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],

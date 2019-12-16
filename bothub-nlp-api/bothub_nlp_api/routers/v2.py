@@ -4,7 +4,7 @@ from starlette.requests import Request
 from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import train
-from bothub_nlp_api.models import ParseRequest
+from bothub_nlp_api.models import ParseRequest, TrainRequest
 from bothub_nlp_api.models import EvaluateRequest
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import TrainResponse
@@ -33,10 +33,11 @@ async def parse_options():
 
 @router.post(r"/train/?", response_model=TrainResponse)
 async def train_handler(
+    item: TrainRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = train.train_handler(Authorization)
+    result = train.train_handler(Authorization, item.repository_version)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
