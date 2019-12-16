@@ -231,9 +231,9 @@ def entity_rasa_nlu_data(entity, evaluate):
     }
 
 
-def evaluate_update(update, by, repository_authorization):
+def evaluate_update(repository_version, by, repository_authorization):
     evaluations = backend().request_backend_start_evaluation(
-        update, repository_authorization
+        repository_version, repository_authorization
     )
     training_examples = []
 
@@ -248,7 +248,7 @@ def evaluate_update(update, by, repository_authorization):
 
     test_data = TrainingData(training_examples=training_examples)
     interpreter = update_interpreters.get(
-        update, repository_authorization, use_cache=False
+        repository_version, repository_authorization, use_cache=False
     )
 
     result = {
@@ -271,11 +271,11 @@ def evaluate_update(update, by, repository_authorization):
     intent_evaluation = result.get("intent_evaluation")
     entity_evaluation = result.get("entity_evaluation")
 
-    charts = plot_and_save_charts(update, intent_results)
+    charts = plot_and_save_charts(repository_version, intent_results)
 
     evaluate_result = backend().request_backend_create_evaluate_results(
         {
-            "repository_version": update,
+            "repository_version": repository_version,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
             "log": json.dumps(intent_evaluation.get("log")),
@@ -315,7 +315,7 @@ def evaluate_update(update, by, repository_authorization):
             backend().request_backend_create_evaluate_results_score(
                 {
                     "evaluate_id": evaluate_result.get("evaluate_id"),
-                    "repository_version": update,
+                    "repository_version": repository_version,
                     "precision": entity.get("precision"),
                     "recall": entity.get("recall"),
                     "f1_score": entity.get("f1-score"),

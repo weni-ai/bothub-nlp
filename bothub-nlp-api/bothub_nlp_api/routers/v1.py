@@ -87,10 +87,11 @@ async def info_options():
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
 async def evaluate_handler(
     language: str = Form(default=None),
+    repository_version: Optional[int] = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = evaluate.evaluate_handler(Authorization, language)
+    result = evaluate.evaluate_handler(Authorization, language, repository_version)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result

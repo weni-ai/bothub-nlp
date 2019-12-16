@@ -16,6 +16,7 @@ class TrainRequest(BaseModel):
 
 class EvaluateRequest(BaseModel):
     language: str = None
+    repository_version: int = None
 
 
 class IntentResponse(BaseModel):
@@ -100,6 +101,6 @@ class InfoResponse(BaseModel):
 class EvaluateResponse(BaseModel):
     language: str
     status: str
-    update_id: int
+    repository_version: int
     evaluate_id: int
     evaluate_version: int

@@ -74,7 +74,7 @@ async def evaluate_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = evaluate.evaluate_handler(Authorization, item.language)
+    result = evaluate.evaluate_handler(Authorization, item.language, item.repository_version)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
