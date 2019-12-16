@@ -7,6 +7,7 @@ class ParseRequest(BaseModel):
     text: str
     language: str = None
     rasa_format: bool = False
+    repository_version: int = None
 
 
 class EvaluateRequest(BaseModel):
@@ -30,7 +31,7 @@ class ParseResponse(BaseModel):
     entities_list: List[str]
     entities: Dict[str, List[Dict[str, Any]]]
     text: str
-    update_id: int
+    repository_version: int
     language: str
 
 

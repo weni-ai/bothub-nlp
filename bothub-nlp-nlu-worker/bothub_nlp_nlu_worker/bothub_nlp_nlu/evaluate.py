@@ -275,7 +275,7 @@ def evaluate_update(update, by, repository_authorization):
 
     evaluate_result = backend().request_backend_create_evaluate_results(
         {
-            "update_id": update,
+            "repository_version": update,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
             "log": json.dumps(intent_evaluation.get("log")),
@@ -315,7 +315,7 @@ def evaluate_update(update, by, repository_authorization):
             backend().request_backend_create_evaluate_results_score(
                 {
                     "evaluate_id": evaluate_result.get("evaluate_id"),
-                    "update_id": update,
+                    "repository_version": update,
                     "precision": entity.get("precision"),
                     "recall": entity.get("recall"),
                     "f1_score": entity.get("f1-score"),

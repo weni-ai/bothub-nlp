@@ -23,7 +23,7 @@ async def parsepost_handler(
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
 
-    return parse._parse(Authorization, item.text, item.language, item.rasa_format)
+    return parse._parse(Authorization, item.text, item.language, item.rasa_format, item.repository_version)
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
@@ -55,6 +55,8 @@ async def info_handler(
 ):
     repository_authorization = get_repository_authorization(Authorization)
     info = backend().request_backend_parse("info", repository_authorization)
+    if info.get('detail'):
+        raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
     info.pop("intents_list")
     return info

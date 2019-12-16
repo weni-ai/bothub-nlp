@@ -120,21 +120,21 @@ def get_rasa_nlu_config_from_update(update):
 class UpdateInterpreters:
     interpreters = {}
 
-    def get(self, update, repository_authorization, use_cache=True):
+    def get(self, repository_version, repository_authorization, use_cache=True):
         update_request = backend().request_backend_parse_nlu(
-            update, repository_authorization
+            repository_version, repository_authorization
         )
 
-        interpreter = self.interpreters.get(update_request.get("update_id"))
+        interpreter = self.interpreters.get(update_request.get("version_id"))
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(update, repository_authorization)
+        persistor = BothubPersistor(repository_version, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
-        self.interpreters[update_request.get("update_id")] = BothubInterpreter.load(
+        self.interpreters[update_request.get("version_id")] = BothubInterpreter.load(
             model_directory, components.ComponentBuilder(use_cache=False)
         )
-        return self.get(update, repository_authorization)
+        return self.get(repository_version, repository_authorization)
 
 
 class PokeLoggingHandler(logging.StreamHandler):
