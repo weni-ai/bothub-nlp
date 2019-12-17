@@ -9,7 +9,7 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _parse(authorization, text, language, rasa_format=False):
+def _parse(authorization, text, language, rasa_format=False, repository_version=None):
     from ..utils import NEXT_LANGS
 
     if language and (
@@ -24,26 +24,26 @@ def _parse(authorization, text, language, rasa_format=False):
 
     try:
         update = backend().request_backend_parse(
-            "parse", repository_authorization, language
+            "parse", repository_authorization, language, repository_version
         )
     except Exception:
         update = {}
 
-    if not update.get("update"):
+    if not update.get("version"):
         next_languages = NEXT_LANGS.get(language, [])
         for next_language in next_languages:
             update = backend().request_backend_parse(
-                "parse", repository_authorization, next_language
+                "parse", repository_authorization, next_language, repository_version
             )
-            if update.get("update"):
+            if update.get("version"):
                 break
 
-    if not update.get("update"):
+    if not update.get("version"):
         raise ValidationError("This repository has never been trained")
 
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
-        args=[update.get("update_id"), repository_authorization, text],
+        args=[update.get("repository_version"), repository_authorization, text],
         kwargs={"rasa_format": rasa_format},
         queue=queue_name(ACTION_PARSE, update.get("language")),
     )
@@ -53,7 +53,7 @@ def _parse(authorization, text, language, rasa_format=False):
     answer.update(
         {
             "text": text,
-            "update_id": update.get("update_id"),
+            "repository_version": update.get("repository_version"),
             "language": update.get("language"),
         }
     )

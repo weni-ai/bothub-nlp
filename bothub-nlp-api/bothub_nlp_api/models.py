@@ -7,10 +7,16 @@ class ParseRequest(BaseModel):
     text: str
     language: str = None
     rasa_format: bool = False
+    repository_version: int = None
+
+
+class TrainRequest(BaseModel):
+    repository_version: int = None
 
 
 class EvaluateRequest(BaseModel):
     language: str = None
+    repository_version: int = None
 
 
 class IntentResponse(BaseModel):
@@ -30,7 +36,7 @@ class ParseResponse(BaseModel):
     entities_list: List[str]
     entities: Dict[str, List[Dict[str, Any]]]
     text: str
-    update_id: int
+    repository_version: int
     language: str
 
 
@@ -95,6 +101,6 @@ class InfoResponse(BaseModel):
 class EvaluateResponse(BaseModel):
     language: str
     status: str
-    update_id: int
+    repository_version: int
     evaluate_id: int
     evaluate_version: int

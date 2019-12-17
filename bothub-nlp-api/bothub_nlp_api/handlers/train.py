@@ -11,7 +11,7 @@ TRAIN_STATUS_FAILED = "failed"
 TRAIN_STATUS_NOT_READY_FOR_TRAIN = "not_ready_for_train"
 
 
-def train_handler(authorization):
+def train_handler(authorization, repository_version=None):
     repository_authorization = get_repository_authorization(authorization)
 
     languages_report = {}
@@ -19,7 +19,7 @@ def train_handler(authorization):
     for language in settings.SUPPORTED_LANGUAGES.keys():
 
         current_update = backend().request_backend_parse(
-            "train", repository_authorization, language
+            "train", repository_authorization, language, repository_version
         )
 
         if not current_update.get("ready_for_train"):
@@ -30,7 +30,7 @@ def train_handler(authorization):
             train_task = celery_app.send_task(
                 TASK_NLU_TRAIN_UPDATE,
                 args=[
-                    current_update.get("current_update_id"),
+                    current_update.get("current_version_id"),
                     current_update.get("repository_authorization_user_id"),
                     repository_authorization,
                 ],
@@ -39,16 +39,11 @@ def train_handler(authorization):
             train_task.wait()
             languages_report[language] = {"status": TRAIN_STATUS_TRAINED}
         except Exception as e:
-            # from .. import logger
-            # logger.exception(e)
-
-            # if settings.BOTHUB_NLP_SENTRY_CLIENT:
-            #     yield Task(self.captureException, exc_info=True)
-
             languages_report[language] = {
                 "status": TRAIN_STATUS_FAILED,
                 "error": str(e),
             }
+            raise e
 
     resp = {
         "SUPPORTED_LANGUAGES": list(settings.SUPPORTED_LANGUAGES.keys()),

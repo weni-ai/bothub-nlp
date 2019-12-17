@@ -111,13 +111,13 @@ def get_examples_label_request(update_id, repository_authorization):
     return examples_label
 
 
-def train_update(update, by, repository_authorization):
+def train_update(repository_version, by, repository_authorization):
     update_request = backend().request_backend_start_training_nlu(
-        update, by, repository_authorization
+        repository_version, by, repository_authorization
     )
 
-    examples_list = get_examples_request(update, repository_authorization)
-    examples_label_list = get_examples_label_request(update, repository_authorization)
+    examples_list = get_examples_request(repository_version, repository_authorization)
+    examples_label_list = get_examples_label_request(repository_version, repository_authorization)
 
     with PokeLogging() as pl:
         try:
@@ -125,13 +125,13 @@ def train_update(update, by, repository_authorization):
             label_examples = []
 
             get_examples = backend().request_backend_get_entities_and_labels_nlu(
-                update,
+                repository_version,
                 update_request.get("language"),
                 json.dumps(
                     {
                         "examples": examples_list,
                         "label_examples_query": examples_label_list,
-                        "update_id": update,
+                        "repository_version": repository_version,
                     }
                 ),
                 repository_authorization,
@@ -162,17 +162,17 @@ def train_update(update, by, repository_authorization):
 
             trainer.train(training_data)
 
-            persistor = BothubPersistor(update, repository_authorization)
+            persistor = BothubPersistor(repository_version, repository_authorization)
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                fixed_model_name=str(update_request.get("update_id")),
+                fixed_model_name=str(update_request.get("repository_version")),
             )
         except Exception as e:
             logger.exception(e)
-            backend().request_backend_trainfail_nlu(update, repository_authorization)
+            backend().request_backend_trainfail_nlu(repository_version, repository_authorization)
             raise e
         finally:
             backend().request_backend_traininglog_nlu(
-                update, pl.getvalue(), repository_authorization
+                repository_version, pl.getvalue(), repository_authorization
             )
