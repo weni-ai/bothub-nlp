@@ -1,3 +1,5 @@
+import json
+
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
@@ -9,7 +11,14 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _parse(authorization, text, language, rasa_format=False, repository_version=None):
+def _parse(
+    authorization,
+    text,
+    language,
+    rasa_format=False,
+    repository_version=None,
+    user_agent=None,
+):
     from ..utils import NEXT_LANGS
 
     if language and (
@@ -55,6 +64,26 @@ def _parse(authorization, text, language, rasa_format=False, repository_version=
             "text": text,
             "repository_version": update.get("repository_version"),
             "language": update.get("language"),
+        }
+    )
+
+    intents = [
+        {
+            "intent": result["name"],
+            "is_default": True if result["name"] == answer["intent"]["name"] else False,
+            "confidence": result["confidence"],
+        }
+        for result in answer["intent_ranking"]
+    ]
+
+    backend().send_log_nlp_parse(
+        data={
+            "text": text,
+            "user_agent": user_agent,
+            "user": str(get_repository_authorization(authorization)),
+            "repository_version_language": int(update.get("repository_version")),
+            "nlp_log": json.dumps(answer),
+            "log_intent": intents,
         }
     )
 
