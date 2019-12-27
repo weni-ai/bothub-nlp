@@ -68,15 +68,6 @@ def _parse(
         }
     )
 
-    intents = [
-        {
-            "intent": result["name"],
-            "is_default": True if result["name"] == answer["intent"]["name"] else False,
-            "confidence": result["confidence"],
-        }
-        for result in answer["intent_ranking"]
-    ]
-
     log = threading.Thread(
         target=backend().send_log_nlp_parse,
         kwargs={
@@ -86,7 +77,16 @@ def _parse(
                 "user": str(get_repository_authorization(authorization)),
                 "repository_version_language": int(update.get("repository_version")),
                 "nlp_log": json.dumps(answer),
-                "log_intent": intents,
+                "log_intent": [
+                    {
+                        "intent": result["name"],
+                        "is_default": True
+                        if result["name"] == answer["intent"]["name"]
+                        else False,
+                        "confidence": result["confidence"],
+                    }
+                    for result in answer["intent_ranking"]
+                ],
             }
         },
     )
