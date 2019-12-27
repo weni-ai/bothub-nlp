@@ -1,4 +1,5 @@
 import json
+import threading
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
@@ -76,15 +77,19 @@ def _parse(
         for result in answer["intent_ranking"]
     ]
 
-    backend().send_log_nlp_parse(
-        data={
-            "text": text,
-            "user_agent": user_agent,
-            "user": str(get_repository_authorization(authorization)),
-            "repository_version_language": int(update.get("repository_version")),
-            "nlp_log": json.dumps(answer),
-            "log_intent": intents,
+    log = threading.Thread(
+        target=backend().send_log_nlp_parse,
+        kwargs={
+            "data": {
+                "text": text,
+                "user_agent": user_agent,
+                "user": str(get_repository_authorization(authorization)),
+                "repository_version_language": int(update.get("repository_version")),
+                "nlp_log": json.dumps(answer),
+                "log_intent": intents,
+            }
         }
     )
+    log.start()
 
     return answer
