@@ -88,7 +88,7 @@ def _parse(
                 "nlp_log": json.dumps(answer),
                 "log_intent": intents,
             }
-        }
+        },
     )
     log.start()
 
