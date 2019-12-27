@@ -21,9 +21,17 @@ async def parsepost_handler(
     item: ParseRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
+    user_agent: str = Header(None),
 ):
 
-    return parse._parse(Authorization, item.text, item.language, item.rasa_format, item.repository_version)
+    return parse._parse(
+        Authorization,
+        item.text,
+        item.language,
+        item.rasa_format,
+        item.repository_version,
+        user_agent=user_agent,
+    )
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
@@ -56,7 +64,7 @@ async def info_handler(
 ):
     repository_authorization = get_repository_authorization(Authorization)
     info = backend().request_backend_parse("info", repository_authorization)
-    if info.get('detail'):
+    if info.get("detail"):
         raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
     info.pop("intents_list")
@@ -74,7 +82,9 @@ async def evaluate_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = evaluate.evaluate_handler(Authorization, item.language, item.repository_version)
+    result = evaluate.evaluate_handler(
+        Authorization, item.language, item.repository_version
+    )
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
