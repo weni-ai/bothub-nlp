@@ -8,6 +8,7 @@ class ParseRequest(BaseModel):
     language: str = None
     rasa_format: bool = False
     repository_version: int = None
+    is_debug: bool = False
 
 
 class TrainRequest(BaseModel):

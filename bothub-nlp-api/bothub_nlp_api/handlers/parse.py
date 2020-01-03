@@ -17,6 +17,7 @@ def _parse(
     text,
     language,
     rasa_format=False,
+    is_debug=False,
     repository_version=None,
     user_agent=None,
 ):
@@ -54,42 +55,56 @@ def _parse(
     answer_task = celery_app.send_task(
         TASK_NLU_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
-        kwargs={"rasa_format": rasa_format},
+        kwargs={"rasa_format": rasa_format, "is_debug": is_debug},
         queue=queue_name(ACTION_PARSE, update.get("language")),
     )
     answer_task.wait()
-
     answer = answer_task.result
-    answer.update(
-        {
-            "text": text,
-            "repository_version": update.get("repository_version"),
-            "language": update.get("language"),
-        }
-    )
-
-    log = threading.Thread(
-        target=backend().send_log_nlp_parse,
-        kwargs={
-            "data": {
+    if is_debug:
+        answer.update(
+            {
                 "text": text,
-                "user_agent": user_agent,
-                "user": str(get_repository_authorization(authorization)),
-                "repository_version_language": int(update.get("repository_version")),
-                "nlp_log": json.dumps(answer),
-                "log_intent": [
-                    {
-                        "intent": result["name"],
-                        "is_default": True
-                        if result["name"] == answer["intent"]["name"]
-                        else False,
-                        "confidence": result["confidence"],
-                    }
-                    for result in answer["intent_ranking"]
-                ],
+                "repository_version": update.get("repository_version"),
+                "language": update.get("language"),
             }
-        },
-    )
-    log.start()
+        )
 
+        log = threading.Thread(
+            target=backend().send_log_nlp_parse,
+            kwargs={
+                "data": json.dumps(answer)
+            }
+        )
+    else:
+        answer.update(
+            {
+                "text": text,
+                "repository_version": update.get("repository_version"),
+                "language": update.get("language"),
+            }
+        )
+
+        log = threading.Thread(
+            target=backend().send_log_nlp_parse,
+            kwargs={
+                "data": {
+                    "text": text,
+                    "user_agent": user_agent,
+                    "user": str(get_repository_authorization(authorization)),
+                    "repository_version_language": int(update.get("repository_version")),
+                    "nlp_log": json.dumps(answer),
+                    "log_intent": [
+                        {
+                            "intent": result["name"],
+                            "is_default": True
+                            if result["name"] == answer["intent"]["name"]
+                            else False,
+                            "confidence": result["confidence"],
+                        }
+                        for result in answer["intent_ranking"]
+                    ],
+                }
+            },
+        )
+    log.start()
     return answer

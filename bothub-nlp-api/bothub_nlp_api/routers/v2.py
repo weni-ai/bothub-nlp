@@ -29,6 +29,7 @@ async def parsepost_handler(
         item.text,
         item.language,
         item.rasa_format,
+        item.is_debug,
         item.repository_version,
         user_agent=user_agent,
     )
