@@ -3,7 +3,7 @@ import threading
 
 from bothub_nlp_celery.actions import ACTION_PARSE, queue_name
 from bothub_nlp_celery.app import celery_app
-from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
+from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
 
 from bothub_nlp_api import settings
 from bothub_nlp_api.utils import AuthorizationIsRequired
@@ -12,11 +12,10 @@ from bothub_nlp_api.utils import backend
 from bothub_nlp_api.utils import get_repository_authorization
 
 
-def _parse(
+def _debug_parse(
     authorization,
     text,
     language,
-    rasa_format=False,
     repository_version=None,
     user_agent=None,
 ):
@@ -52,9 +51,8 @@ def _parse(
         raise ValidationError("This repository has never been trained")
 
     answer_task = celery_app.send_task(
-        TASK_NLU_PARSE_TEXT,
+        TASK_NLU_DEBUG_PARSE_TEXT,
         args=[update.get("repository_version"), repository_authorization, text],
-        kwargs={"rasa_format": rasa_format},
         queue=queue_name(ACTION_PARSE, update.get("language")),
     )
     answer_task.wait()
@@ -66,28 +64,4 @@ def _parse(
             "language": update.get("language"),
         }
     )
-
-    log = threading.Thread(
-        target=backend().send_log_nlp_parse,
-        kwargs={
-            "data": {
-                "text": text,
-                "user_agent": user_agent,
-                "user": str(get_repository_authorization(authorization)),
-                "repository_version_language": int(update.get("repository_version")),
-                "nlp_log": json.dumps(answer),
-                "log_intent": [
-                    {
-                        "intent": result["name"],
-                        "is_default": True
-                        if result["name"] == answer["intent"]["name"]
-                        else False,
-                        "confidence": result["confidence"],
-                    }
-                    for result in answer["intent_ranking"]
-                ],
-            }
-        },
-    )
-    log.start()
     return answer

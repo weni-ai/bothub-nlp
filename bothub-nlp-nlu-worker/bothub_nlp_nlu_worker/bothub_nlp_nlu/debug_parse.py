@@ -1,6 +1,10 @@
+from collections import OrderedDict
 from rasa.nlu.test import remove_pretrained_extractors
 from lime.lime_text import LimeTextExplainer
+from .utils import update_interpreters
+from .utils import backend
 import numpy as np
+import json
 
 
 class DebugSentenceLime:
@@ -76,7 +80,6 @@ class DebugSentenceLime:
         result_array = result_list[0]
         for i in range(1, len(result_list)):
             result_array = np.vstack([result_array, result_list[i]])
-        self.Q.put(result_array)
         return result_array
 
     def get_result_per_word(self, text, num_samples):
@@ -92,6 +95,7 @@ class DebugSentenceLime:
                 result_per_word[j[0]].append({'intent': self.intention_names[i], 'relevance': j[1] * 100})
         for word in result_per_word:
             result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
+        print(json.dumps(result_per_word, indent=2))
         return result_per_word
 
     def get_result_per_intent(self, text, num_samples):
@@ -111,3 +115,35 @@ class DebugSentenceLime:
             result_per_intent[intent] = sorted(result_per_intent[intent], key=lambda k: k['relevance'], reverse=True)
 
         return result_per_intent
+
+
+def get_intention_list(repository_authorization):
+    info = backend().request_backend_parse("info", repository_authorization)
+    if not info.get('detail'):
+        return info["intents_list"]
+
+
+def format_debug_parse_output(result_per_word, r):
+    out = OrderedDict(
+        [
+            ("intent", r.get("intent", None)),
+            ("words", result_per_word),
+        ]
+    )
+    return out
+
+
+def debug_parse_text(
+    repository_version, repository_authorization, text, use_cache=True
+):
+    interpreter = update_interpreters.get(
+        repository_version, repository_authorization, use_cache=use_cache
+    )
+    r = interpreter.parse(text)
+
+    intention_names = get_intention_list(repository_authorization)
+
+    result_per_word = DebugSentenceLime(interpreter, intention_names).get_result_per_word(text, 200)
+
+    return format_debug_parse_output(result_per_word, r)
+

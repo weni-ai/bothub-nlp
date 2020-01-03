@@ -99,15 +99,10 @@ def parse_text(
     interpreter = update_interpreters.get(
         repository_version, repository_authorization, use_cache=use_cache
     )
-    if is_debug:
-        intention_names = get_intention_list(repository_authorization)
+    r = interpreter.parse(text)
 
-        return DebugSentenceLime(interpreter, intention_names).get_result_per_word(text, 200)
-    else:
-        r = interpreter.parse(text)
+    if rasa_format:
+        return r
 
-        if rasa_format:
-            return r
-
-        return format_parse_output(repository_version, r, repository_authorization)
+    return format_parse_output(repository_version, r, repository_authorization)
 

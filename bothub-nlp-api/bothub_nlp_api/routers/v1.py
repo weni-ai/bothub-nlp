@@ -22,7 +22,6 @@ async def parse_handler(
     text: str = Form(...),
     language: str = Form(default=None),
     rasa_format: Optional[str] = Form(default=False),
-    is_debug: Optional[str] = Form(default=False),
     repository_version: Optional[int] = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
@@ -30,7 +29,7 @@ async def parse_handler(
 ):
 
     return parse._parse(
-        Authorization, text, language, rasa_format, is_debug, repository_version, user_agent
+        Authorization, text, language, rasa_format, repository_version, user_agent
     )
 
 
@@ -39,18 +38,51 @@ async def parse_handler(
     text: str,
     language: str = None,
     rasa_format: Optional[str] = False,
-    is_debug: Optional[str] = False,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
     user_agent: str = Header(None),
 ):
 
     return parse._parse(
-        Authorization, text, language, rasa_format, is_debug, user_agent=user_agent
+        Authorization, text, language, rasa_format, user_agent=user_agent
     )
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
+async def parse_options():
+    return {}
+
+
+@router.post(r"/debug_parse/?", response_model=ParseResponse)
+async def parse_handler(
+    text: str = Form(...),
+    language: str = Form(default=None),
+    repository_version: Optional[int] = Form(default=None),
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+    user_agent: str = Header(None),
+):
+
+    return parse._parse(
+        Authorization, text, language, repository_version, user_agent
+    )
+
+
+@router.get(r"/debug_parse/?", response_model=ParseResponse, deprecated=True)
+async def parse_handler(
+    text: str,
+    language: str = None,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+    user_agent: str = Header(None),
+):
+
+    return parse._parse(
+        Authorization, text, language, user_agent=user_agent
+    )
+
+
+@router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)
 async def parse_options():
     return {}
 
