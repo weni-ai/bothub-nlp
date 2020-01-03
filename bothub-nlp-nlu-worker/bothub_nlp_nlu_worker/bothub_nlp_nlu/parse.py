@@ -1,5 +1,5 @@
 from collections import OrderedDict
-
+from .debug_parse import DebugSentenceLime
 from .utils import update_interpreters
 from .utils import backend
 
@@ -87,15 +87,27 @@ def format_parse_output(repository_version, r, repository_authorization):
     return out
 
 
+def get_intention_list(repository_authorization):
+    info = backend().request_backend_parse("info", repository_authorization)
+    if not info.get('detail'):
+        return info["intents_list"]
+
+
 def parse_text(
-    repository_version, repository_authorization, text, rasa_format=False, use_cache=True
+    repository_version, repository_authorization, text, rasa_format=False, use_cache=True, is_debug=False
 ):
     interpreter = update_interpreters.get(
         repository_version, repository_authorization, use_cache=use_cache
     )
-    r = interpreter.parse(text)
+    if is_debug:
+        intention_names = get_intention_list(repository_authorization)
 
-    if rasa_format:
-        return r
+        return DebugSentenceLime(interpreter, intention_names).get_result_per_word(text, 200)
+    else:
+        r = interpreter.parse(text)
 
-    return format_parse_output(repository_version, r, repository_authorization)
+        if rasa_format:
+            return r
+
+        return format_parse_output(repository_version, r, repository_authorization)
+
