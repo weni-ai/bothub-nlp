@@ -94,7 +94,7 @@ def get_intention_list(repository_authorization):
 
 
 def parse_text(
-    repository_version, repository_authorization, text, rasa_format=False, use_cache=True, is_debug=False
+    repository_version, repository_authorization, text, rasa_format=False, use_cache=True
 ):
     interpreter = update_interpreters.get(
         repository_version, repository_authorization, use_cache=use_cache
