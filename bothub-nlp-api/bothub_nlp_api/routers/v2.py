@@ -45,7 +45,6 @@ async def debug_parsepost_handler(
     item: DebugParseRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
-    user_agent: str = Header(None),
 ):
 
     return debug_parse._debug_parse(
@@ -53,7 +52,6 @@ async def debug_parsepost_handler(
         item.text,
         item.language,
         item.repository_version,
-        user_agent=user_agent,
     )
 
 

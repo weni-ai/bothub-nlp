@@ -5,6 +5,7 @@ from starlette.requests import Request
 
 from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
+from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import train
 from bothub_nlp_api.models import EvaluateResponse
 from bothub_nlp_api.models import InfoResponse
@@ -60,25 +61,10 @@ async def parse_handler(
     repository_version: Optional[int] = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
-    user_agent: str = Header(None),
 ):
 
-    return parse._parse(
-        Authorization, text, language, repository_version, user_agent
-    )
-
-
-@router.get(r"/debug_parse/?", response_model=ParseResponse, deprecated=True)
-async def parse_handler(
-    text: str,
-    language: str = None,
-    request: Request = Depends(AuthorizationRequired()),
-    Authorization: str = Header(..., description="Bearer your_key"),
-    user_agent: str = Header(None),
-):
-
-    return parse._parse(
-        Authorization, text, language, user_agent=user_agent
+    return debug_parse._debug_parse(
+        Authorization, text, language, repository_version
     )
 
 

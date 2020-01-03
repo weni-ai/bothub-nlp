@@ -17,7 +17,6 @@ def _debug_parse(
     text,
     language,
     repository_version=None,
-    user_agent=None,
 ):
     from ..utils import NEXT_LANGS
 

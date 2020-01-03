@@ -1,10 +1,10 @@
+import numpy as np
+import json
 from collections import OrderedDict
 from rasa.nlu.test import remove_pretrained_extractors
 from lime.lime_text import LimeTextExplainer
 from .utils import update_interpreters
 from .utils import backend
-import numpy as np
-import json
 
 
 class DebugSentenceLime:
@@ -12,48 +12,6 @@ class DebugSentenceLime:
         self.interpreter = interpreter
         self.interpreter.pipeline = remove_pretrained_extractors(self.interpreter.pipeline)
         self.intention_names = intention_names
-
-    def show_results(self, text, result_per_word, result_per_intent, elapsed_time, is_detailed):
-        response_json = self.interpreter.parse(text)
-        print('\n\nText: ', text, '\n')
-        print('Model Prediction: ', self.interpreter.parse(text)['intent']['name'])
-        for intent in response_json['intent_ranking']:
-            print('    intent: ', intent['name'], 'confidence: ', round(float(intent['confidence']), 2))
-
-        print('LIME DEBUG')
-        print('\nGeneral Debug(results per word):')
-        for word in result_per_word:
-            word_str = '{:<10}'.format(word)
-            if len(result_per_word[word]) > 0:
-                intent_str = '{:<15}'.format(result_per_word[word][0]['intent'])
-                relevance_str = '{:<10}'.format(round(result_per_word[word][0]['relevance'], 3))
-                print('     \'word\':', word_str, ' \'intent\':', intent_str, ' \'relevance\': ', relevance_str)
-            else:
-                print('     \'word\':', word_str, ' \'intent\': none          \'relevance\': none')
-        print()
-        if is_detailed:
-            print('Detailed Debug 1(results per word):')
-            for word in result_per_word:
-                print('    word: ', word)
-                for word_result in result_per_word[word]:
-                    intent_str = '{:<15}'.format(word_result['intent'])
-                    relevance_str = '{:<15}'.format(round(word_result['relevance'], 2))
-                    print('        \'intent\':', intent_str, ' \'relevance\':', relevance_str)
-                print()
-
-            print('Detailed Debug 2(results per intention):')
-            for intent in result_per_intent:
-                print('    intention: ', intent)
-                for intent_result in result_per_intent[intent]:
-                    if 'word' in intent_result:
-                        intent_str = '{:<15}'.format(intent_result['word'])
-                        relevance_str = '{:<15}'.format(round(intent_result['relevance'], 3))
-                        print('        \'word\':', intent_str, ' \'relevance\':', relevance_str)
-                    else:
-                        print('        \'sum\':', intent_result['sum'])
-                print()
-
-        print('Elapsed Time: ', str(elapsed_time), '\n')
 
     def parse(self, text_list):
         result_list = []
@@ -89,7 +47,6 @@ class DebugSentenceLime:
         result_per_word = {}
         for i in labels:
             for j in exp.as_list(label=i):
-                # j = (word, relevance)
                 if j[0] not in result_per_word:
                     result_per_word[j[0]] = []
                 result_per_word[j[0]].append({'intent': self.intention_names[i], 'relevance': j[1] * 100})
