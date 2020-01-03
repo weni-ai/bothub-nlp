@@ -22,11 +22,15 @@ async def parse_handler(
     text: str = Form(...),
     language: str = Form(default=None),
     rasa_format: Optional[str] = Form(default=False),
+    repository_version: Optional[int] = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
+    user_agent: str = Header(None),
 ):
 
-    return parse._parse(Authorization, text, language, rasa_format)
+    return parse._parse(
+        Authorization, text, language, rasa_format, repository_version, user_agent
+    )
 
 
 @router.get(r"/parse/?", response_model=ParseResponse, deprecated=True)
@@ -36,9 +40,12 @@ async def parse_handler(
     rasa_format: Optional[str] = False,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
+    user_agent: str = Header(None),
 ):
 
-    return parse._parse(Authorization, text, language, rasa_format)
+    return parse._parse(
+        Authorization, text, language, rasa_format, user_agent=user_agent
+    )
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
@@ -49,9 +56,10 @@ async def parse_options():
 @router.post(r"/train/?", response_model=TrainResponse)
 async def train_handler(
     request: Request = Depends(AuthorizationRequired()),
+    repository_version: Optional[int] = Form(default=None),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = train.train_handler(Authorization)
+    result = train.train_handler(Authorization, repository_version)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
@@ -70,6 +78,8 @@ async def info_handler(
 ):
     repository_authorization = get_repository_authorization(Authorization)
     info = backend().request_backend_parse("info", repository_authorization)
+    if info.get("detail"):
+        raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
     info.pop("intents_list")
     return info
@@ -83,10 +93,11 @@ async def info_options():
 @router.post(r"/evaluate/?", response_model=EvaluateResponse)
 async def evaluate_handler(
     language: str = Form(default=None),
+    repository_version: Optional[int] = Form(default=None),
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = evaluate.evaluate_handler(Authorization, language)
+    result = evaluate.evaluate_handler(Authorization, language, repository_version)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result

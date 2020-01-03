@@ -12,7 +12,7 @@ EVALUATE_STATUS_EVALUATED = "evaluated"
 EVALUATE_STATUS_FAILED = "failed"
 
 
-def evaluate_handler(authorization, language):
+def evaluate_handler(authorization, language, repository_version=None):
     if language and (
         language not in settings.SUPPORTED_LANGUAGES.keys()
         and language not in NEXT_LANGS.keys()
@@ -25,7 +25,7 @@ def evaluate_handler(authorization, language):
 
     try:
         update = backend().request_backend_parse(
-            "evaluate", repository_authorization, language
+            "evaluate", repository_authorization, language, repository_version
         )
     except Exception:
         update = {}
@@ -37,7 +37,7 @@ def evaluate_handler(authorization, language):
         evaluate_task = celery_app.send_task(
             TASK_NLU_EVALUATE_UPDATE,
             args=[
-                update.get("update_id"),
+                update.get("repository_version"),
                 update.get("user_id"),
                 repository_authorization,
             ],
@@ -48,15 +48,11 @@ def evaluate_handler(authorization, language):
         evaluate_report = {
             "language": language,
             "status": EVALUATE_STATUS_EVALUATED,
-            "update_id": update.get("update_id"),
+            "repository_version": update.get("repository_version"),
             "evaluate_id": evaluate.get("id"),
             "evaluate_version": evaluate.get("version"),
         }
     except Exception as e:
-        # from .. import logger
-
-        # logger.exception(e)
-
         evaluate_report = {"status": EVALUATE_STATUS_FAILED, "error": str(e)}
 
     return evaluate_report

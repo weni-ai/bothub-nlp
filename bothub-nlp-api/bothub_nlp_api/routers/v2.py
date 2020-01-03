@@ -4,7 +4,7 @@ from starlette.requests import Request
 from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
 from bothub_nlp_api.handlers import train
-from bothub_nlp_api.models import ParseRequest
+from bothub_nlp_api.models import ParseRequest, TrainRequest
 from bothub_nlp_api.models import EvaluateRequest
 from bothub_nlp_api.models import ParseResponse
 from bothub_nlp_api.models import TrainResponse
@@ -21,9 +21,17 @@ async def parsepost_handler(
     item: ParseRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
+    user_agent: str = Header(None),
 ):
 
-    return parse._parse(Authorization, item.text, item.language, item.rasa_format)
+    return parse._parse(
+        Authorization,
+        item.text,
+        item.language,
+        item.rasa_format,
+        item.repository_version,
+        user_agent=user_agent,
+    )
 
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
@@ -33,10 +41,11 @@ async def parse_options():
 
 @router.post(r"/train/?", response_model=TrainResponse)
 async def train_handler(
+    item: TrainRequest,
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = train.train_handler(Authorization)
+    result = train.train_handler(Authorization, item.repository_version)
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result
@@ -55,6 +64,8 @@ async def info_handler(
 ):
     repository_authorization = get_repository_authorization(Authorization)
     info = backend().request_backend_parse("info", repository_authorization)
+    if info.get("detail"):
+        raise HTTPException(status_code=400, detail=info)
     info["intents"] = info["intents_list"]
     info.pop("intents_list")
     return info
@@ -71,7 +82,9 @@ async def evaluate_handler(
     request: Request = Depends(AuthorizationRequired()),
     Authorization: str = Header(..., description="Bearer your_key"),
 ):
-    result = evaluate.evaluate_handler(Authorization, item.language)
+    result = evaluate.evaluate_handler(
+        Authorization, item.language, item.repository_version
+    )
     if result.get("status") and result.get("error"):
         raise HTTPException(status_code=400, detail=result)
     return result

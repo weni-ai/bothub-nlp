@@ -10,6 +10,7 @@ environ.Env.read_env(env_file=(environ.Path(__file__) - 2)(".env"))
 
 env = environ.Env(
     # set casting, default value
+    ENVIRONMENT=(str, "production"),
     BOTHUB_NLP_API_HOST=(str, "0.0.0.0"),
     BOTHUB_NLP_API_PORT=(int, 2657),
     BOTHUB_NLP_API_WEB_CONCURRENCY=(int, None),
@@ -22,6 +23,7 @@ env = environ.Env(
     BOTHUB_ENGINE_URL=(str, "https://api.bothub.it"),
 )
 
+ENVIRONMENT = env.str("ENVIRONMENT")
 BOTHUB_NLP_API_HOST = env.str("BOTHUB_NLP_API_HOST")
 BOTHUB_NLP_API_PORT = env.int("BOTHUB_NLP_API_PORT")
 BOTHUB_NLP_API_WEB_CONCURRENCY = env.int("BOTHUB_NLP_API_WEB_CONCURRENCY")
@@ -32,7 +34,7 @@ BOTHUB_NLP_API_KEEPALIVE = env.int("BOTHUB_NLP_API_KEEPALIVE")
 # Sentry
 
 BOTHUB_NLP_SENTRY_CLIENT = env.bool("BOTHUB_NLP_SENTRY_CLIENT")
-BOTHUB_NLP_SENTRY = env.str("BOTHUB_NLP_SENTRY_CLIENT")
+BOTHUB_NLP_SENTRY = env.str("BOTHUB_NLP_SENTRY")
 
 SUPPORTED_LANGUAGES = env.get_value(
     "SUPPORTED_LANGUAGES", cast_supported_languages, "en|pt", True

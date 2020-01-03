@@ -66,9 +66,9 @@ def get_examples_request(update_id, repository_authorization):
         update_id, False, None, repository_authorization
     )
 
-    examples = start_examples.get('results')
+    examples = start_examples.get("results")
 
-    page = start_examples.get('next')
+    page = start_examples.get("next")
 
     if page:
         while True:
@@ -76,12 +76,12 @@ def get_examples_request(update_id, repository_authorization):
                 update_id, True, page, repository_authorization
             )
 
-            if request_examples_page.get('next') is None:
+            examples += request_examples_page.get("results")
+
+            if request_examples_page.get("next") is None:
                 break
 
-            examples += request_examples_page.get('results')
-
-            page = request_examples_page.get('next')
+            page = request_examples_page.get("next")
 
     return examples
 
@@ -91,9 +91,9 @@ def get_examples_label_request(update_id, repository_authorization):
         update_id, False, None, repository_authorization
     )
 
-    examples_label = start_examples.get('results')
+    examples_label = start_examples.get("results")
 
-    page = start_examples.get('next')
+    page = start_examples.get("next")
 
     if page:
         while True:
@@ -101,22 +101,23 @@ def get_examples_label_request(update_id, repository_authorization):
                 update_id, True, page, repository_authorization
             )
 
-            if request_examples_page.get('next') is None:
+            examples_label += request_examples_page.get("results")
+
+            if request_examples_page.get("next") is None:
                 break
 
-            examples_label += request_examples_page.get('results')
-            page = request_examples_page.get('next')
+            page = request_examples_page.get("next")
 
     return examples_label
 
 
-def train_update(update, by, repository_authorization):
+def train_update(repository_version, by, repository_authorization):
     update_request = backend().request_backend_start_training_nlu(
-        update, by, repository_authorization
+        repository_version, by, repository_authorization
     )
 
-    examples_list = get_examples_request(update, repository_authorization)
-    examples_label_list = get_examples_label_request(update, repository_authorization)
+    examples_list = get_examples_request(repository_version, repository_authorization)
+    examples_label_list = get_examples_label_request(repository_version, repository_authorization)
 
     with PokeLogging() as pl:
         try:
@@ -124,13 +125,15 @@ def train_update(update, by, repository_authorization):
             label_examples = []
 
             get_examples = backend().request_backend_get_entities_and_labels_nlu(
-                update,
+                repository_version,
                 update_request.get("language"),
-                json.dumps({
-                    'examples': examples_list,
-                    'label_examples_query': examples_label_list,
-                    'update_id': update
-                }),
+                json.dumps(
+                    {
+                        "examples": examples_list,
+                        "label_examples_query": examples_label_list,
+                        "repository_version": repository_version,
+                    }
+                ),
                 repository_authorization,
             )
 
@@ -159,17 +162,17 @@ def train_update(update, by, repository_authorization):
 
             trainer.train(training_data)
 
-            persistor = BothubPersistor(update, repository_authorization)
+            persistor = BothubPersistor(repository_version, repository_authorization)
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                fixed_model_name=str(update_request.get("update_id")),
+                fixed_model_name=str(update_request.get("repository_version")),
             )
         except Exception as e:
             logger.exception(e)
-            backend().request_backend_trainfail_nlu(update, repository_authorization)
+            backend().request_backend_trainfail_nlu(repository_version, repository_authorization)
             raise e
         finally:
             backend().request_backend_traininglog_nlu(
-                update, pl.getvalue(), repository_authorization
+                repository_version, pl.getvalue(), repository_authorization
             )

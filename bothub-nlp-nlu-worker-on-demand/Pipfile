@@ -12,7 +12,7 @@ python-decouple = "==3.1"
 celery-worker-on-demand = {ref = "0.2.2",git = "https://github.com/Ilhasoft/celery-worker-on-demand"}
 requests = "==2.20.1"
 docker = "==3.7.0"
-bothub_nlp_celery = {ref = "0.1.5",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+bothub_nlp_celery = {ref = "0.1.7-sentry",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
 redis = "*"
 
 [dev-packages]

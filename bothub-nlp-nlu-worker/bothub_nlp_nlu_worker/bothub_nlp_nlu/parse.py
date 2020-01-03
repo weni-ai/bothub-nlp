@@ -33,7 +33,7 @@ def position_match(a, b):
     return True
 
 
-def format_parse_output(update, r, repository_authorization):
+def format_parse_output(repository_version, r, repository_authorization):
     intent = r.get("intent", None)
     intent_ranking = r.get("intent_ranking")
     labels_as_entity = r.get("labels_as_entity")
@@ -60,7 +60,7 @@ def format_parse_output(update, r, repository_authorization):
             label_value = entity.get("entity")
         else:
             repository_entity = backend().request_backend_repository_entity_nlu_parse(
-                update, repository_authorization, entity.get("entity")
+                repository_version, repository_authorization, entity.get("entity")
             )
             if repository_entity.get("label"):
                 label_value = repository_entity.get("label_value")
@@ -88,14 +88,14 @@ def format_parse_output(update, r, repository_authorization):
 
 
 def parse_text(
-    update, repository_authorization, text, rasa_format=False, use_cache=True
+    repository_version, repository_authorization, text, rasa_format=False, use_cache=True
 ):
     interpreter = update_interpreters.get(
-        update, repository_authorization, use_cache=use_cache
+        repository_version, repository_authorization, use_cache=use_cache
     )
     r = interpreter.parse(text)
 
     if rasa_format:
         return r
 
-    return format_parse_output(update, r, repository_authorization)
+    return format_parse_output(repository_version, r, repository_authorization)

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "93afa3998498f0430f1500bb7149e8030d39a6119a21fdd582a9219f7c14b25a"
+            "sha256": "a19730b37b904a3c9bc851ccfa77bb72da576574146f2226e4b6284a01f594b8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,7 +18,7 @@
     "default": {
         "bothub-nlp-celery": {
             "git": "https://github.com/Ilhasoft/bothub-nlp-celery",
-            "ref": "b99429b54bb5739e07d0e962cf402b141d876e88"
+            "ref": "ca80371f20f689bcbc6ab745a3f39d0a8dc80b2d"
         },
         "celery-worker-on-demand": {
             "git": "https://github.com/Ilhasoft/celery-worker-on-demand",
@@ -85,10 +85,10 @@
         },
         "six": {
             "hashes": [
-                "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c",
-                "sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"
+                "sha256:1f1b7d42e254082a9db6279deae68afb421ceba6158efa6131de7b3003ee93fd",
+                "sha256:30f610279e8b2578cab6db20741130331735c781b56053c59c4076da27f06b66"
             ],
-            "version": "==1.12.0"
+            "version": "==1.13.0"
         },
         "urllib3": {
             "hashes": [
