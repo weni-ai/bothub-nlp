@@ -52,7 +52,6 @@ class DebugSentenceLime:
                 result_per_word[j[0]].append({'intent': self.intention_names[i], 'relevance': j[1] * 100})
         for word in result_per_word:
             result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
-        print(json.dumps(result_per_word, indent=2))
         return result_per_word
 
     def get_result_per_intent(self, text, num_samples):
