@@ -3,10 +3,11 @@ from starlette.requests import Request
 
 from bothub_nlp_api.handlers import evaluate
 from bothub_nlp_api.handlers import parse
+from bothub_nlp_api.handlers import debug_parse
 from bothub_nlp_api.handlers import train
-from bothub_nlp_api.models import ParseRequest, TrainRequest
-from bothub_nlp_api.models import EvaluateRequest
+from bothub_nlp_api.models import ParseRequest, DebugParseRequest, TrainRequest, EvaluateRequest
 from bothub_nlp_api.models import ParseResponse
+from bothub_nlp_api.models import DebugParseResponse
 from bothub_nlp_api.models import TrainResponse
 from bothub_nlp_api.models import InfoResponse
 from bothub_nlp_api.models import EvaluateResponse
@@ -36,6 +37,26 @@ async def parsepost_handler(
 
 @router.options(r"/parse/?", status_code=204, include_in_schema=False)
 async def parse_options():
+    return {}
+
+
+@router.post(r"/debug_parse/?", response_model=DebugParseResponse)
+async def debug_parsepost_handler(
+    item: DebugParseRequest,
+    request: Request = Depends(AuthorizationRequired()),
+    Authorization: str = Header(..., description="Bearer your_key"),
+):
+
+    return debug_parse._debug_parse(
+        Authorization,
+        item.text,
+        item.language,
+        item.repository_version,
+    )
+
+
+@router.options(r"/debug_parse/?", status_code=204, include_in_schema=False)
+async def debug_parse_options():
     return {}
 
 

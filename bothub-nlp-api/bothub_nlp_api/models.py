@@ -10,6 +10,12 @@ class ParseRequest(BaseModel):
     repository_version: int = None
 
 
+class DebugParseRequest(BaseModel):
+    text: str
+    language: str = None
+    repository_version: int = None
+
+
 class TrainRequest(BaseModel):
     repository_version: int = None
 
@@ -35,6 +41,14 @@ class ParseResponse(BaseModel):
     labels_list: List[str]
     entities_list: List[str]
     entities: Dict[str, List[Dict[str, Any]]]
+    text: str
+    repository_version: int
+    language: str
+
+
+class DebugParseResponse(BaseModel):
+    intent: IntentResponse
+    words: Dict[str, Any]
     text: str
     repository_version: int
     language: str
