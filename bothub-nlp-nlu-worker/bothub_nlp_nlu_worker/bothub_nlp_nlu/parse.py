@@ -87,12 +87,6 @@ def format_parse_output(repository_version, r, repository_authorization):
     return out
 
 
-def get_intention_list(repository_authorization):
-    info = backend().request_backend_parse("info", repository_authorization)
-    if not info.get('detail'):
-        return info["intents_list"]
-
-
 def parse_text(
     repository_version, repository_authorization, text, rasa_format=False, use_cache=True
 ):
@@ -105,4 +99,3 @@ def parse_text(
         return r
 
     return format_parse_output(repository_version, r, repository_authorization)
-

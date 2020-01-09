@@ -25,11 +25,11 @@ class DebugSentenceLime:
 
             intent_list = [0] * len(self.intention_names)
             intent_name_list = [''] * len(self.intention_names)
-            size = len(result_json['intent_ranking'])
+            size = len(result_json.get('intent_ranking'))
             for i in range(size):
-                intent_name = result_json['intent_ranking'][i]['name']
-                intent_list[idx_dict[intent_name]] = result_json['intent_ranking'][i]['confidence']
-                intent_name_list[idx_dict[intent_name]] = result_json['intent_ranking'][i]['name']
+                intent_name = result_json.get('intent_ranking')[i].get('name')
+                intent_list[idx_dict[intent_name]] = result_json.get('intent_ranking')[i].get('confidence')
+                intent_name_list[idx_dict[intent_name]] = result_json.get('intent_ranking')[i].get('name')
 
             prob_array = np.array(intent_list)
             prob_array = prob_array.reshape((1, len(intent_list)))
@@ -41,18 +41,19 @@ class DebugSentenceLime:
         return result_array
 
     def get_result_per_word(self, text, num_samples):
+        if not self.intention_names:
+            return {}
         explainer = LimeTextExplainer(class_names=self.intention_names)
         labels = list(range(len(self.intention_names)))  # List
         exp = explainer.explain_instance(text, self.parse, num_features=6, labels=labels, num_samples=num_samples)
         result_per_word = {}
-        for i in labels:
-            for j in exp.as_list(label=i):
+        for label in labels:
+            for j in exp.as_list(label=label):
                 if j[0] not in result_per_word:
                     result_per_word[j[0]] = []
-                result_per_word[j[0]].append({'intent': self.intention_names[i], 'relevance': j[1] * 100})
+                result_per_word[j[0]].append({'intent': self.intention_names[label], 'relevance': j[1] * 100})
         for word in result_per_word:
-            result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
-        print(json.dumps(result_per_word, indent=2))
+            result_per_word[word] = sorted(result_per_word[word], key=lambda k: k.get('relevance'), reverse=True)
         return result_per_word
 
     def get_result_per_intent(self, text, num_samples):
@@ -69,7 +70,7 @@ class DebugSentenceLime:
                 intent_sum += j[1]
             result_per_intent[self.intention_names[i]].append({'sum': intent_sum, 'relevance': -1})
         for intent in result_per_intent:
-            result_per_intent[intent] = sorted(result_per_intent[intent], key=lambda k: k['relevance'], reverse=True)
+            result_per_intent[intent] = sorted(result_per_intent[intent], key=lambda k: k.get('relevance'), reverse=True)
 
         return result_per_intent
 
@@ -77,7 +78,8 @@ class DebugSentenceLime:
 def get_intention_list(repository_authorization):
     info = backend().request_backend_parse("info", repository_authorization)
     if not info.get('detail'):
-        return info["intents_list"]
+        return info.get("intents_list")
+    return []
 
 
 def format_debug_parse_output(result_per_word, r):
@@ -103,4 +105,3 @@ def debug_parse_text(
     result_per_word = DebugSentenceLime(interpreter, intention_names).get_result_per_word(text, 200)
 
     return format_debug_parse_output(result_per_word, r)
-
