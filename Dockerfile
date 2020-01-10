@@ -22,7 +22,7 @@ RUN apt-get install -y ttf-mscorefonts-installer \
 
 RUN bash -c "ln -s /usr/bin/python3 /usr/bin/python; ln -s /usr/bin/pip3 /usr/bin/pip"
 
-COPY bothub-nlp-nlu-worker/requirements.txt .
+COPY requirements.txt .
 
 FROM base as builder
 
