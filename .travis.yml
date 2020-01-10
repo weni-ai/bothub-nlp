@@ -14,5 +14,3 @@ before_script:
   - python bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/download_spacy_models.py en:en_core_web_md
 script:
   - flake8
-after_success:
-  - coveralls
