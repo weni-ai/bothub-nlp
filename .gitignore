@@ -117,4 +117,4 @@ dmypy.json
 .DS_Store
 .idea/
 .env
-/spacy-langs/
+spacy-langs/
