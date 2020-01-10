@@ -1,10 +1,11 @@
-import numpy as np
-import json
 from collections import OrderedDict
-from rasa.nlu.test import remove_pretrained_extractors
+
+import numpy as np
 from lime.lime_text import LimeTextExplainer
-from .utils import update_interpreters
+from rasa.nlu.test import remove_pretrained_extractors
+
 from .utils import backend
+from .utils import update_interpreters
 
 
 class DebugSentenceLime:
@@ -105,4 +106,3 @@ def debug_parse_text(
     result_per_word = DebugSentenceLime(interpreter, intention_names).get_result_per_word(text, 200)
 
     return format_debug_parse_output(result_per_word, r)
-

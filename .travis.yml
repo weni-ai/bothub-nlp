@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.6"
+services:
+  - docker
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+env:
+  global:
+    - SECRET_KEY=SK
+    - SUPPORTED_LANGUAGES="en|pt"
+before_script:
+  - python bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/download_spacy_models.py en:en_core_web_md
+script:
+  - flake8
+  - travis_wait coverage run manage.py test
+after_success:
+  - coveralls

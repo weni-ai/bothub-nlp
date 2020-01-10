@@ -1,7 +1,7 @@
 from collections import OrderedDict
-from .debug_parse import DebugSentenceLime
-from .utils import update_interpreters
+
 from .utils import backend
+from .utils import update_interpreters
 
 
 def order_by_confidence(l):

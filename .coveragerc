@@ -1,0 +1,11 @@
+[run]
+source =
+    ./bothub_nlp_nlu_worker/bothub_nlp_nlu
+
+omit =
+    ./bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/*
+    ./bothub_nlp_nlu_worker/bothub_nlp_nlu/tests/*
+    ./bothub_nlp_nlu_worker/bothub_nlp_nlu/pipeline_components/*
+
+[report]
+fail_under = 90
