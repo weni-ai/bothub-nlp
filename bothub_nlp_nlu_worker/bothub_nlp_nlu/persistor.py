@@ -8,7 +8,9 @@ from decouple import config
 
 
 class BothubPersistor(Persistor):
-    def __init__(self, repository_version=None, repository_authorization=None, *args, **kwargs):
+    def __init__(
+        self, repository_version=None, repository_authorization=None, *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.repository_version = repository_version
         self.repository_authorization = repository_authorization
@@ -36,13 +38,7 @@ class BothubPersistor(Persistor):
         if train.get("from_aws"):
             tar_data = requests.get(train.get("bot_data")).content
         else:
-            tar_data = base64.b64decode(
-                self.backend()
-                .request_backend_parse_nlu_persistor(
-                    self.repository_version, self.repository_authorization
-                )
-                .get("bot_data")
-            )
+            tar_data = base64.b64decode(train.get("bot_data"))  # pragma: no cover
 
         tar_file = NamedTemporaryFile(suffix=tar_name, delete=False)
         tar_file.write(tar_data)

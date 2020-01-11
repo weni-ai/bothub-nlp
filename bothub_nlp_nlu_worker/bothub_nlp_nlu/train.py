@@ -16,7 +16,7 @@ from . import logger
 
 
 class BothubWriter(TrainingDataWriter):
-    def dumps(self, training_data, **kwargs):
+    def dumps(self, training_data, **kwargs):  # pragma: no cover
         js_entity_synonyms = defaultdict(list)
         for k, v in training_data.entity_synonyms.items():
             if k != v:
@@ -48,7 +48,7 @@ class BothubWriter(TrainingDataWriter):
 
 
 class BothubTrainingData(TrainingData):
-    def __init__(self, label_training_examples=None, **kwargs):
+    def __init__(self, label_training_examples=None, **kwargs):  # pragma: no cover
         if label_training_examples:
             self.label_training_examples = self.sanitize_examples(
                 label_training_examples
@@ -58,10 +58,10 @@ class BothubTrainingData(TrainingData):
         super().__init__(**kwargs)
 
     def as_json(self, **kwargs):
-        return BothubWriter().dumps(self)
+        return BothubWriter().dumps(self)  # pragma: no cover
 
 
-def get_examples_request(update_id, repository_authorization):
+def get_examples_request(update_id, repository_authorization):  # pragma: no cover
     start_examples = backend().request_backend_get_examples(
         update_id, False, None, repository_authorization
     )
@@ -86,7 +86,7 @@ def get_examples_request(update_id, repository_authorization):
     return examples
 
 
-def get_examples_label_request(update_id, repository_authorization):
+def get_examples_label_request(update_id, repository_authorization):  # pragma: no cover
     start_examples = backend().request_backend_get_examples_labels(
         update_id, False, None, repository_authorization
     )
@@ -111,13 +111,15 @@ def get_examples_label_request(update_id, repository_authorization):
     return examples_label
 
 
-def train_update(repository_version, by, repository_authorization):
+def train_update(repository_version, by, repository_authorization):  # pragma: no cover
     update_request = backend().request_backend_start_training_nlu(
         repository_version, by, repository_authorization
     )
 
     examples_list = get_examples_request(repository_version, repository_authorization)
-    examples_label_list = get_examples_label_request(repository_version, repository_authorization)
+    examples_label_list = get_examples_label_request(
+        repository_version, repository_authorization
+    )
 
     with PokeLogging() as pl:
         try:
@@ -170,7 +172,9 @@ def train_update(repository_version, by, repository_authorization):
             )
         except Exception as e:
             logger.exception(e)
-            backend().request_backend_trainfail_nlu(repository_version, repository_authorization)
+            backend().request_backend_trainfail_nlu(
+                repository_version, repository_authorization
+            )
             raise e
         finally:
             backend().request_backend_traininglog_nlu(
