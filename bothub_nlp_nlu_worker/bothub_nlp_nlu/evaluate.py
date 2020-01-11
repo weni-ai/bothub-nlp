@@ -21,7 +21,14 @@ from .utils import update_interpreters
 
 logger = logging.getLogger(__name__)
 
-excluded_itens = ["micro avg", "macro avg", "weighted avg", "no_entity", "no predicted"]
+excluded_itens = [
+    "micro avg",
+    "macro avg",
+    "weighted avg",
+    "no_entity",
+    "no predicted",
+    "accuracy",
+]
 
 
 def collect_nlu_successes(intent_results):
@@ -134,7 +141,7 @@ def evaluate_intents(intent_results):  # pragma: no cover
     }
 
 
-def plot_and_save_charts(update, intent_results):
+def plot_and_save_charts(update, intent_results):  # pragma: no cover
     import io
     import boto3
     import matplotlib as mpl
@@ -222,7 +229,7 @@ def plot_and_save_charts(update, intent_results):
     return {"matrix_chart": confmat_url, "confidence_chart": intent_hist_url}
 
 
-def entity_rasa_nlu_data(entity, evaluate):
+def entity_rasa_nlu_data(entity, evaluate):  # pragma: no cover
     return {
         "start": entity.start,
         "end": entity.end,
@@ -309,7 +316,7 @@ def evaluate_update(repository_version, by, repository_authorization):
             )
 
     for entity_key in entity_reports.keys():
-        if entity_key and entity_key not in excluded_itens:
+        if entity_key and entity_key not in excluded_itens:  # pragma: no cover
             entity = entity_reports.get(entity_key)
 
             backend().request_backend_create_evaluate_results_score(
