@@ -8,4 +8,4 @@ omit =
     ./bothub_nlp_nlu_worker/bothub_nlp_nlu/pipeline_components/*
 
 [report]
-fail_under = 90
+fail_under = 70
