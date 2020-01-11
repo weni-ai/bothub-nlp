@@ -5,3 +5,5 @@ services:
   - docker
 install:
   - pip install -r bothub-nlp-nlu-worker/requirements.txt
+script:
+  - echo "test"
