@@ -38,7 +38,7 @@ COPY --from=builder ${PYTHON_WHEELS_PATH} ${PYTHON_WHEELS_PATH}
 
 RUN pip install --no-index --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
-COPY bothub-nlp-nlu-worker .
+COPY . .
 
 RUN git clone --branch master --depth 1 --single-branch \
     https://github.com/Ilhasoft/spacy-lang-models \
