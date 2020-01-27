@@ -3,12 +3,12 @@ from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
-from bothub_nlp_nlu.parse import parse_text as parse_text_core
-from bothub_nlp_nlu.debug_parse import (
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.parse import parse_text as parse_text_core
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.debug_parse import (
     debug_parse_text as debug_parse_text_core,
 )
-from bothub_nlp_nlu.train import train_update as train_update_core
-from bothub_nlp_nlu.evaluate import (
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.train import train_update as train_update_core
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.evaluate import (
     evaluate_update as evaluate_update_core,
 )
 
