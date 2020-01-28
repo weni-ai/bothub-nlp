@@ -3,7 +3,7 @@ import uuid
 from unittest.mock import patch
 
 from bothub_nlp_nlu_worker.bothub_nlp_nlu.utils import backend
-from bothub_nlp_nlu_worker.celery_app import train_update, parse_text
+from bothub_nlp_nlu_worker.tests.celery_app import train_update, parse_text
 
 
 class TestParseTask(unittest.TestCase):
