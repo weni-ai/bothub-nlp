@@ -33,13 +33,13 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     if update.get("algorithm") == update.get("ALGORITHM_STATISTICAL_MODEL"):
         pipeline.append(
             {
-                "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                "name": "bothub_nlp_nlu.pipeline_components."
                 "optimized_spacy_nlp_with_labels.SpacyNLP"
             }
         )
         pipeline.append(
             {
-                "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                "name": "bothub_nlp_nlu.pipeline_components."
                 "tokenizer_spacy_with_labels.SpacyTokenizer"
             }
         )
@@ -51,7 +51,7 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
             pipeline.append({"name": "SpacyEntityExtractor"})
         pipeline.append(
             {
-                "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                "name": "bothub_nlp_nlu.pipeline_components."
                 "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
             }
         )
@@ -63,14 +63,14 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
         # load spacy
         pipeline.append(
             {
-                "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                "name": "bothub_nlp_nlu.pipeline_components."
                 "optimized_spacy_nlp_with_labels.SpacyNLP"
             }
         )
         # tokenizer
         pipeline.append(
             {
-                "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                "name": "bothub_nlp_nlu.pipeline_components."
                 "tokenizer_spacy_with_labels.SpacyTokenizer"
             }
         )
@@ -91,7 +91,7 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
             else:
                 pipeline.append(
                     {
-                        "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                        "name": "bothub_nlp_nlu.pipeline_components."
                         "count_vectors_featurizer_no_lemmatize.CountVectorsFeaturizerCustom",
                         "token_pattern": "(?u)\\b\\w+\\b",
                     }
@@ -114,7 +114,7 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
         # label extractor
         pipeline.append(
             {
-                "name": "bothub_nlp_nlu_worker.bothub_nlp_nlu.pipeline_components."
+                "name": "bothub_nlp_nlu.pipeline_components."
                 "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
             }
         )
