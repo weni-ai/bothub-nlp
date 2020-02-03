@@ -27,6 +27,11 @@ def debug_parse_text(repository_version, repository_authorization, *args, **kwar
     )
 
 
+@celery_app.task(name=TASK_NLU_SENTENCE_SUGGESTION_TEXT)
+def sentence_suggestion_text(*args, **kwargs):
+    return sentence_suggestion_text_core(*args, **kwargs)
+
+
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
 def train_update(repository_version, by_id, repository_authorization):
     return train_update_core(repository_version, by_id, repository_authorization)
@@ -35,3 +40,10 @@ def train_update(repository_version, by_id, repository_authorization):
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def evaluate_update(repository_version, by_id, repository_authorization):
     return evaluate_update_core(repository_version, by_id, repository_authorization)
+
+
+@celery_app.task(name=TASK_NLU_WORDS_DISTRIBUTION)
+def words_distribution(repository_version, language, repository_authorization):
+    return words_distribution_core(
+        repository_version, language, repository_authorization
+    )
