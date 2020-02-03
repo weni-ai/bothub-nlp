@@ -9,10 +9,10 @@ from bothub_nlp_nlu_worker.bothub_nlp_nlu.parse import parse_text as parse_text_
 from bothub_nlp_nlu_worker.bothub_nlp_nlu.debug_parse import (
     debug_parse_text as debug_parse_text_core,
 )
-from bothub_nlp_nlu.sentence_suggestion import (
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.sentence_suggestion import (
     sentence_suggestion_text as sentence_suggestion_text_core,
 )
-from bothub_nlp_nlu.words_distribution import (
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.words_distribution import (
     words_distribution_text as words_distribution_core,
 )
 from bothub_nlp_nlu_worker.bothub_nlp_nlu.train import train_update as train_update_core
