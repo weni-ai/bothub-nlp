@@ -50,8 +50,8 @@ def words_distribution_text(repository_version, language, repository_authorizati
                 frequencies[intent][word] = (
                     frequencies[intent][word] / all_frequencies[word] * 100
                 )
-            except ZeroDivisionError:
-                continue
+            except ZeroDivisionError:  # pragma: no cover
+                continue  # pragma: no cover
 
     ordered_frequencies = {}
 
