@@ -11,6 +11,8 @@ from rasa.nlu.utils import json_to_string
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
 from .utils import backend
+from .utils import get_examples_request
+from .utils import get_examples_label_request
 from .persistor import BothubPersistor
 from . import logger
 
@@ -59,56 +61,6 @@ class BothubTrainingData(TrainingData):
 
     def as_json(self, **kwargs):
         return BothubWriter().dumps(self)  # pragma: no cover
-
-
-def get_examples_request(update_id, repository_authorization):  # pragma: no cover
-    start_examples = backend().request_backend_get_examples(
-        update_id, False, None, repository_authorization
-    )
-
-    examples = start_examples.get("results")
-
-    page = start_examples.get("next")
-
-    if page:
-        while True:
-            request_examples_page = backend().request_backend_get_examples(
-                update_id, True, page, repository_authorization
-            )
-
-            examples += request_examples_page.get("results")
-
-            if request_examples_page.get("next") is None:
-                break
-
-            page = request_examples_page.get("next")
-
-    return examples
-
-
-def get_examples_label_request(update_id, repository_authorization):  # pragma: no cover
-    start_examples = backend().request_backend_get_examples_labels(
-        update_id, False, None, repository_authorization
-    )
-
-    examples_label = start_examples.get("results")
-
-    page = start_examples.get("next")
-
-    if page:
-        while True:
-            request_examples_page = backend().request_backend_get_examples_labels(
-                update_id, True, page, repository_authorization
-            )
-
-            examples_label += request_examples_page.get("results")
-
-            if request_examples_page.get("next") is None:
-                break
-
-            page = request_examples_page.get("next")
-
-    return examples_label
 
 
 def train_update(repository_version, by, repository_authorization):  # pragma: no cover
