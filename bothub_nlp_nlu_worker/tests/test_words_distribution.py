@@ -769,7 +769,7 @@ class TestWordDistributionTask(unittest.TestCase):
         result = words_distribution(
             self.current_update.get("current_version_id"),
             "pt_br",
-            self.repository_authorization
+            self.repository_authorization,
         )
 
-        self.assertEqual(len(result.get('words')), 4)
+        self.assertEqual(len(result.get("words")), 4)

@@ -1,7 +1,7 @@
 from collections import OrderedDict
-from thinc.neural.util import get_array_module
 from bothub_nlp_celery.app import nlp_language
 import random
+import numpy as np
 
 
 class SentenceSuggestion:
@@ -11,15 +11,68 @@ class SentenceSuggestion:
         self.n_highest = 50
         self.row2key = {row: key for key, row in self.nlp.vocab.vectors.key2row.items()}
 
-    def get_words_to_replace_idx(self, similar_words_json, word_list, percentage_to_replace):
+    def most_similar(self, input_word, *, batch_size=1024, topn=1, sort=True):
+        input_vector = self.nlp(input_word).vector.reshape(
+            1, self.nlp.vocab.vectors.shape[1]
+        )
+        best_rows = np.zeros((1, self.n_highest), dtype="i")
+        scores = np.zeros((1, self.n_highest), dtype="f")
+
+        # Work in batches, to avoid memory problems.
+        for i in range(0, input_vector.shape[0], batch_size):
+            batch = input_vector[i : i + batch_size]
+            batch_norms = np.linalg.norm(batch, axis=1, keepdims=True)
+            batch_norms[batch_norms == 0] = 1
+            batch /= batch_norms
+            sims = np.dot(batch, self.nlp.vocab.vectors.data.T)
+            best_rows[i : i + batch_size] = np.argpartition(
+                sims, -self.n_highest, axis=1
+            )[
+                :, -self.n_highest :
+            ]  # get n_highest scores rows in O(n)
+            scores[i : i + batch_size] = np.partition(sims, -self.n_highest, axis=1)[
+                :, -self.n_highest :
+            ]  # get n_highest scores in O(n)
+
+            # sort the n_highest scores and best_rows
+            if sort and topn >= 2:
+                sorted_index = (
+                    np.arange(scores.shape[0])[:, None][i : i + batch_size],
+                    np.argsort(scores[i : i + batch_size], axis=1)[:, ::-1],
+                )
+                scores[i : i + batch_size] = scores[sorted_index]
+                best_rows[i : i + batch_size] = best_rows[sorted_index]
+
+        scores = np.around(scores, decimals=4, out=scores)
+        scores = np.clip(scores, a_min=-1, a_max=1, out=scores)
+
+        # get similar list of tuple (word, score) only if both input and candidate word is lower or large case
+        similar_list = []
+        for i in range(self.n_highest):
+            row = best_rows[0][i]
+            score = scores[0][i]
+            candidate_word_vocab = self.nlp.vocab[self.row2key[row]]
+            candidate_word = candidate_word_vocab.text
+            if (
+                candidate_word_vocab.is_lower == input_word.islower()
+                and candidate_word != input_word
+            ):
+                similar_list.append((candidate_word, score))
+            if len(similar_list) >= topn:
+                break
+
+        return similar_list
+
+    @staticmethod  # get the indexes of the replaceable words
+    def get_words_to_replace_idx(similar_words_json, word_list, percentage_to_replace):
+        percentage_to_replace = np.clip(percentage_to_replace, 0, 1)
         word_list_size = len(word_list)
         for idx in list(similar_words_json):
-            if len(similar_words_json[idx]["similar_words"]) == 0:
+            if len(similar_words_json[idx].get("similar_words")) == 0:
                 del similar_words_json[idx]
         words_to_replace_idx = []
-        n_words_to_replace = int(
-            word_list_size * percentage_to_replace
-        )  # number of words to replace
+        # number of words to replace
+        n_words_to_replace = int(word_list_size * percentage_to_replace)
         replaceable_idx_list = list(similar_words_json)
         if n_words_to_replace < len(replaceable_idx_list):
             to_replace_idx_list = random.sample(
@@ -47,13 +100,16 @@ class SentenceSuggestion:
                     similar_words_size = len(similar_words)
                     for j in range(similar_words_size):
                         nlp_similar = self.nlp(similar_words[j][0])
-                        if len(nlp_similar) > 0 and nlp_similar[0].pos_ == nlp_sentence[i].pos_:
+                        if (
+                            len(nlp_similar) > 0
+                            and nlp_similar[0].pos_ == nlp_sentence[i].pos_
+                        ):
                             similar_json = {
                                 "word": str(similar_words[j][0]),
                                 "type": str(nlp_similar[0].pos_),
                                 "relevance": str(similar_words[j][1]),
                             }
-                            word_json["similar_words"].append(similar_json)
+                            word_json.get("similar_words").append(similar_json)
                 similar_words_json[i] = word_json
             except KeyError:
                 pass
@@ -69,71 +125,22 @@ class SentenceSuggestion:
             )
             for replace_idx in words_to_replace_idx:
                 similar_words_len = len(
-                    similar_words_json[replace_idx]["similar_words"]
+                    similar_words_json[replace_idx].get("similar_words")
                 )
-                word_list[replace_idx] = similar_words_json[replace_idx][
-                    "similar_words"
-                ][random.randint(0, similar_words_len - 1)]["word"]
+                word_list[replace_idx] = (
+                    similar_words_json[replace_idx]
+                    .get("similar_words")[random.randint(0, similar_words_len - 1)]
+                    .get("word")
+                )
             suggested_sentences.append(" ".join(word_list))
         suggested_sentences = list(set(suggested_sentences))  # Remove duplicates
         return suggested_sentences
 
-    def words_to_vecs(self, xp, words):
-        if isinstance(words, str):
-            return self.nlp(words).vector.reshape(1, self.nlp.vocab.vectors.shape[1])
-        queries = []
-        for word in words:
-            queries.append(self.nlp(word).vector)
-        return xp.array(queries)
-
-    def idx_to_word(self, idx):
-        return self.nlp.vocab[self.row2key[idx]].text
-
-    def most_similar(self, input_word, *, batch_size=1024, topn=1, sort=True):
-        xp = get_array_module(self.nlp.vocab.vectors.data)
-        input_vector = self.nlp(input_word).vector.reshape(1, self.nlp.vocab.vectors.shape[1])
-        best_rows = xp.zeros((1, self.n_highest), dtype='i')
-        scores = xp.zeros((1, self.n_highest), dtype='f')
-
-        # Work in batches, to avoid memory problems.
-        for i in range(0, input_vector.shape[0], batch_size):
-            batch = input_vector[i: i + batch_size]
-            batch_norms = xp.linalg.norm(batch, axis=1, keepdims=True)
-            batch_norms[batch_norms == 0] = 1
-            batch /= batch_norms
-            sims = xp.dot(batch, self.nlp.vocab.vectors.data.T)
-            best_rows[i:i + batch_size] = xp.argpartition(sims, -self.n_highest, axis=1)[:, -self.n_highest:]  # get n_highest scores rows in O(n)
-            scores[i:i + batch_size] = xp.partition(sims, -self.n_highest, axis=1)[:, -self.n_highest:]  # get n_highest scores in O(n)
-
-        # sort the n_highest scores and best_rows
-        if sort and topn >= 2:
-            sorted_index = xp.arange(scores.shape[0])[:, None][i:i + batch_size], xp.argsort(scores[i:i + batch_size],
-                                                                                             axis=1)[:, ::-1]
-            scores[i:i + batch_size] = scores[sorted_index]
-            best_rows[i:i + batch_size] = best_rows[sorted_index]
-        scores = xp.around(scores, decimals=4, out=scores)
-        scores = xp.clip(scores, a_min=-1, a_max=1, out=scores)
-
-        # get similar list of tuple (word, score) only if both input and candidate word is lower or large case
-        similar_list = []
-        for i in range(self.n_highest):
-            row = best_rows[0][i]
-            score = scores[0][i]
-            candidate_word_vocab = self.nlp.vocab[self.row2key[row]]
-            candidate_word = candidate_word_vocab.text
-            if (
-                candidate_word_vocab.is_lower == input_word.islower()
-                and candidate_word != input_word
-            ):
-                similar_list.append((candidate_word, score))
-            if len(similar_list) >= topn:
-                break
-
-        return similar_list
-
 
 def sentence_suggestion_text(text, n, percentage_to_replace):
     if nlp_language.vocab.vectors_length == 0:
-        return 'language not supported for this feature'
-    similar_sentences = SentenceSuggestion().get_suggestions(text, percentage_to_replace, n)
+        return "language not supported for this feature"
+    similar_sentences = SentenceSuggestion().get_suggestions(
+        text, percentage_to_replace, n
+    )
     return OrderedDict([("text", text), ("suggested_sentences", similar_sentences)])
