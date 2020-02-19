@@ -43,7 +43,7 @@ class SentenceSuggestion:
                     "similar_words": [],
                 }
                 if nlp_sentence[i].pos_ in self.to_replace_tags:
-                    similar_words = self.most_similar(nlp_sentence[i].text, topn=6)
+                    similar_words = self.most_similar(nlp_sentence[i].text, topn=10)
                     similar_words_size = len(similar_words)
                     for j in range(similar_words_size):
                         nlp_similar = self.nlp(similar_words[j][0])
@@ -94,6 +94,7 @@ class SentenceSuggestion:
         input_vector = self.nlp(input_word).vector.reshape(1, self.nlp.vocab.vectors.shape[1])
         best_rows = xp.zeros((1, self.n_highest), dtype='i')
         scores = xp.zeros((1, self.n_highest), dtype='f')
+
         # Work in batches, to avoid memory problems.
         for i in range(0, input_vector.shape[0], batch_size):
             batch = input_vector[i: i + batch_size]
@@ -101,18 +102,19 @@ class SentenceSuggestion:
             batch_norms[batch_norms == 0] = 1
             batch /= batch_norms
             sims = xp.dot(batch, self.nlp.vocab.vectors.data.T)
-            best_rows[i:i + batch_size] = xp.argpartition(sims, -self.n_highest, axis=1)[:, -self.n_highest:]
-            scores[i:i + batch_size] = xp.partition(sims, -self.n_highest, axis=1)[:, -self.n_highest:]
+            best_rows[i:i + batch_size] = xp.argpartition(sims, -self.n_highest, axis=1)[:, -self.n_highest:]  # get n_highest scores rows in O(n)
+            scores[i:i + batch_size] = xp.partition(sims, -self.n_highest, axis=1)[:, -self.n_highest:]  # get n_highest scores in O(n)
 
+        # sort the n_highest scores and best_rows
         if sort and topn >= 2:
             sorted_index = xp.arange(scores.shape[0])[:, None][i:i + batch_size], xp.argsort(scores[i:i + batch_size],
                                                                                              axis=1)[:, ::-1]
             scores[i:i + batch_size] = scores[sorted_index]
             best_rows[i:i + batch_size] = best_rows[sorted_index]
-
         scores = xp.around(scores, decimals=4, out=scores)
         scores = xp.clip(scores, a_min=-1, a_max=1, out=scores)
 
+        # get similar list of tuple (word, score) only if both input and candidate word is lower or large case
         similar_list = []
         for i in range(self.n_highest):
             row = best_rows[0][i]
@@ -130,8 +132,8 @@ class SentenceSuggestion:
         return similar_list
 
 
-def sentence_suggestion_text(text):
+def sentence_suggestion_text(text, n, percentage_to_replace):
     if nlp_language.vocab.vectors_length == 0:
         return 'language not supported for this feature'
-    similar_sentences = SentenceSuggestion().get_suggestions(text, 0.3, 10)
+    similar_sentences = SentenceSuggestion().get_suggestions(text, percentage_to_replace, n)
     return OrderedDict([("text", text), ("suggested_sentences", similar_sentences)])
