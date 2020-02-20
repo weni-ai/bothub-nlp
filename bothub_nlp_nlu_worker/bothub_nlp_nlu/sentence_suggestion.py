@@ -85,31 +85,29 @@ class SentenceSuggestion:
         return words_to_replace_idx
 
     def similar_words_json(self, sentence):
-        nlp_sentence = self.nlp(sentence)
         similar_words_json = {}
-        sentence_size = len(nlp_sentence)
+        word_list = sentence.split(' ')
+        sentence_size = len(word_list)
         for i in range(sentence_size):
             try:
+                word_pos = self.nlp(word_list[i])[0].pos_
                 word_json = {
-                    "word": nlp_sentence[i].text,
-                    "type": nlp_sentence[i].pos_,
+                    "word": word_list[i],
+                    "type": word_pos,
                     "similar_words": [],
                 }
-                if nlp_sentence[i].pos_ in self.to_replace_tags:
-                    similar_words = self.most_similar(nlp_sentence[i].text, topn=10)
+                if word_pos in self.to_replace_tags:
+                    similar_words = self.most_similar(word_list[i], topn=6)
                     similar_words_size = len(similar_words)
                     for j in range(similar_words_size):
                         nlp_similar = self.nlp(similar_words[j][0])
-                        if (
-                            len(nlp_similar) > 0
-                            and nlp_similar[0].pos_ == nlp_sentence[i].pos_
-                        ):
+                        if len(nlp_similar) > 0 and nlp_similar[0].pos_ == word_pos:
                             similar_json = {
                                 "word": str(similar_words[j][0]),
                                 "type": str(nlp_similar[0].pos_),
                                 "relevance": str(similar_words[j][1]),
                             }
-                            word_json.get("similar_words").append(similar_json)
+                            word_json["similar_words"].append(similar_json)
                 similar_words_json[i] = word_json
             except KeyError:
                 pass
@@ -137,7 +135,7 @@ class SentenceSuggestion:
         return suggested_sentences
 
 
-def sentence_suggestion_text(text, n, percentage_to_replace):
+def sentence_suggestion_text(text, percentage_to_replace, n):
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
     similar_sentences = SentenceSuggestion().get_suggestions(
