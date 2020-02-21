@@ -6,15 +6,17 @@ from random import Random
 
 class TestSentenceSuggestionTask(unittest.TestCase):
     def setUp(self, *args):
-        self.sentences = ['eu quero andar na rua com tranquilidade',
-                          'meu marido bateu em mim e não sei se falo com meus pais',
-                          'gostaria de retirar um boleto na agencia mais proxima',
-                          'aonde eu consigo mais informações sobre o serviço de voces?',
-                          'como posso acessar o portal da empresa?',
-                          'meu marido bateu em mim e não sei se falo com meus pais',
-                          'asdij askdjasd jjzxkcj sakdjiodas asdas',
-                          'carro']
-        self.seed = 'my bothub test'
+        self.sentences = [
+            "eu quero andar na rua com tranquilidade",
+            "meu marido bateu em mim e não sei se falo com meus pais",
+            "gostaria de retirar um boleto na agencia mais proxima",
+            "aonde eu consigo mais informações sobre o serviço de voces?",
+            "como posso acessar o portal da empresa?",
+            "meu marido bateu em mim e não sei se falo com meus pais",
+            "asdij askdjasd jjzxkcj sakdjiodas asdas",
+            "carro",
+        ]
+        self.seed = "my bothub test"
         self.n = 10
 
     def test_sentence_suggestion(self, *args):
@@ -31,7 +33,7 @@ class TestSentenceSuggestionTask(unittest.TestCase):
             sentence_suggestion = SentenceSuggestion()
             similar_words_json = sentence_suggestion.similar_words_json(sentence)
             self.assertEqual(
-                list(similar_words_json), list(range(len(sentence.split(' '))))
+                list(similar_words_json), list(range(len(sentence.split(" "))))
             )
             for idx in similar_words_json:
                 if len(similar_words_json[idx].get("similar_words")) != 0:
@@ -41,7 +43,8 @@ class TestSentenceSuggestionTask(unittest.TestCase):
                             sentence_suggestion.to_replace_tags,
                         )
                         self.assertEqual(
-                            similar_word.get("type"), similar_words_json[idx].get("type")
+                            similar_word.get("type"),
+                            similar_words_json[idx].get("type"),
                         )
 
     def test_get_words_to_replace_idx(self, *args):
@@ -128,6 +131,5 @@ class TestSentenceSuggestionTask(unittest.TestCase):
         random = Random(self.seed)
         sentence_suggestion = SentenceSuggestion()
         for sentence in self.sentences:
-            for word in sentence.split(' '):
+            for word in sentence.split(" "):
                 sentence_suggestion.most_similar(word, topn=random.randint(1, 20))
-

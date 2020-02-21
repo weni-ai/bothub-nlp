@@ -86,7 +86,7 @@ class SentenceSuggestion:
 
     def similar_words_json(self, sentence):
         similar_words_json = {}
-        word_list = sentence.split(' ')
+        word_list = sentence.split(" ")
         sentence_size = len(word_list)
         for i in range(sentence_size):
             try:
