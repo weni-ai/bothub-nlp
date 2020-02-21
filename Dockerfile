@@ -1,4 +1,4 @@
-FROM ubuntu:18.10 as base
+FROM ubuntu:18.04 as base
 
 ENV WORKDIR /home/root/app
 ENV LC_ALL C.UTF-8
