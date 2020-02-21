@@ -1,31 +1,51 @@
 import unittest
 from bothub_nlp_nlu_worker.tests.celery_app import sentence_suggestion_text
 from bothub_nlp_nlu_worker.bothub_nlp_nlu.sentence_suggestion import SentenceSuggestion
+from random import Random
 
 
 class TestSentenceSuggestionTask(unittest.TestCase):
+    def setUp(self, *args):
+        self.sentences = [
+            "eu quero andar na rua com tranquilidade",
+            "meu marido bateu em mim e não sei se falo com meus pais",
+            "gostaria de retirar um boleto na agencia mais proxima",
+            "aonde eu consigo mais informações sobre o serviço de voces?",
+            "como posso acessar o portal da empresa?",
+            "meu marido bateu em mim e não sei se falo com meus pais",
+            "asdij askdjasd jjzxkcj sakdjiodas asdas",
+            "carro",
+        ]
+        self.seed = "my bothub test"
+        self.n = 10
+
     def test_sentence_suggestion(self, *args):
-        text = "eu quero andar na rua com tranquilidade"
-        result = sentence_suggestion_text(text)
-        self.assertEqual(len(result.get("suggested_sentences")), 10)
+        for i in range(self.n):
+            random = Random((self.seed, i))
+            for sentence in self.sentences:
+                n = random.randint(1, 20)
+                percentage_to_replace = random.random()
+                result = sentence_suggestion_text(sentence, percentage_to_replace, n)
+                self.assertLessEqual(len(result.get("suggested_sentences")), n)
 
     def test_similar_words_json(self, *args):
-        text = "meu marido bateu em mim e não sei se falo com meus pais"
-        sentence_suggestion = SentenceSuggestion(0.3)
-        similar_words_json = sentence_suggestion.similar_words_json(text)
-        self.assertEqual(
-            list(similar_words_json), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        )
-        for idx in similar_words_json:
-            if len(similar_words_json[idx].get("similar_words")) != 0:
-                for similar_word in similar_words_json[idx].get("similar_words"):
-                    self.assertIn(
-                        similar_words_json[idx].get("type"),
-                        sentence_suggestion.to_replace_tags,
-                    )
-                    self.assertEqual(
-                        similar_word.get("type"), similar_words_json[idx].get("type")
-                    )
+        for sentence in self.sentences:
+            sentence_suggestion = SentenceSuggestion()
+            similar_words_json = sentence_suggestion.similar_words_json(sentence)
+            self.assertEqual(
+                list(similar_words_json), list(range(len(sentence.split(" "))))
+            )
+            for idx in similar_words_json:
+                if len(similar_words_json[idx].get("similar_words")) != 0:
+                    for similar_word in similar_words_json[idx].get("similar_words"):
+                        self.assertIn(
+                            similar_words_json[idx].get("type"),
+                            sentence_suggestion.to_replace_tags,
+                        )
+                        self.assertEqual(
+                            similar_word.get("type"),
+                            similar_words_json[idx].get("type"),
+                        )
 
     def test_get_words_to_replace_idx(self, *args):
         similar_words_json_mock = {
@@ -101,8 +121,15 @@ class TestSentenceSuggestionTask(unittest.TestCase):
             "12": {"word": "pais", "type": "SYM", "similar_words": []},
         }
         text = "meu marido bateu em mim e não sei se falo com meus pais"
-        sentence_suggestion = SentenceSuggestion(1)
+        sentence_suggestion = SentenceSuggestion()
         words_to_replace_idx = sentence_suggestion.get_words_to_replace_idx(
-            similar_words_json_mock, text.split(" ")
+            similar_words_json_mock, text.split(" "), 1
         )
         self.assertEqual(["1", "2", "4", "6", "7", "9"], words_to_replace_idx)
+
+    def test_most_similar(self, *args):
+        random = Random(self.seed)
+        sentence_suggestion = SentenceSuggestion()
+        for sentence in self.sentences:
+            for word in sentence.split(" "):
+                sentence_suggestion.most_similar(word, topn=random.randint(1, 20))

@@ -2,5 +2,7 @@
 max-line-length = 119
 ignore = E501,W503,E203
 exclude =
+  ./spacy-langs
   ./env
   ./venv
+  ./scripts
