@@ -36,7 +36,9 @@ class SentenceSuggestion:
                 )[
                     :, -self.n_highest :
                 ]  # get n_highest scores rows in O(n)
-                scores[i : i + batch_size] = np.partition(sims, -self.n_highest, axis=1)[
+                scores[i : i + batch_size] = np.partition(
+                    sims, -self.n_highest, axis=1
+                )[
                     :, -self.n_highest :
                 ]  # get n_highest scores in O(n)
 
