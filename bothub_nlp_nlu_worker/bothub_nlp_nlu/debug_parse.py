@@ -30,7 +30,7 @@ class DebugSentenceLime:
 
             intent_list = [0] * len(self.intention_names)
             intent_name_list = [""] * len(self.intention_names)
-            size = len(result_json.get("intent_ranking"))
+            size = len(result_json.get("intent_ranking", []))
             for i in range(size):
                 intent_name = result_json.get("intent_ranking")[i].get("name")
                 intent_list[idx_dict[intent_name]] = result_json.get("intent_ranking")[
@@ -54,9 +54,12 @@ class DebugSentenceLime:
             return {}
         explainer = LimeTextExplainer(class_names=self.intention_names)
         labels = list(range(len(self.intention_names)))  # List
-        exp = explainer.explain_instance(
-            text, self.parse, num_features=6, labels=labels, num_samples=num_samples
-        )
+        try:
+            exp = explainer.explain_instance(
+                text, self.parse, num_features=6, labels=labels, num_samples=num_samples
+            )
+        except ValueError:
+            labels = []
         result_per_word = {}
         for label in labels:
             for j in exp.as_list(label=label):
