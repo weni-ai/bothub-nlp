@@ -11,57 +11,67 @@ class SentenceSuggestion:
         self.n_highest = 50
         self.row2key = {row: key for key, row in self.nlp.vocab.vectors.key2row.items()}
 
-    def most_similar(self, input_word, *, batch_size=1024, topn=1, sort=True):
-        input_vector = self.nlp(input_word).vector.reshape(
-            1, self.nlp.vocab.vectors.shape[1]
-        )
-        best_rows = np.zeros((1, self.n_highest), dtype="i")
-        scores = np.zeros((1, self.n_highest), dtype="f")
-
-        # Work in batches, to avoid memory problems.
-        for i in range(0, input_vector.shape[0], batch_size):
-            batch = input_vector[i : i + batch_size]
-            batch_norms = np.linalg.norm(batch, axis=1, keepdims=True)
-            batch_norms[batch_norms == 0] = 1
-            batch /= batch_norms
-            sims = np.dot(batch, self.nlp.vocab.vectors.data.T)
-            best_rows[i : i + batch_size] = np.argpartition(
-                sims, -self.n_highest, axis=1
-            )[
-                :, -self.n_highest :
-            ]  # get n_highest scores rows in O(n)
-            scores[i : i + batch_size] = np.partition(sims, -self.n_highest, axis=1)[
-                :, -self.n_highest :
-            ]  # get n_highest scores in O(n)
-
-            # sort the n_highest scores and best_rows
-            if sort and topn >= 2:
-                sorted_index = (
-                    np.arange(scores.shape[0])[:, None][i : i + batch_size],
-                    np.argsort(scores[i : i + batch_size], axis=1)[:, ::-1],
-                )
-                scores[i : i + batch_size] = scores[sorted_index]
-                best_rows[i : i + batch_size] = best_rows[sorted_index]
-
-        scores = np.around(scores, decimals=4, out=scores)
-        scores = np.clip(scores, a_min=-1, a_max=1, out=scores)
-
-        # get similar list of tuple (word, score) only if both input and candidate word is lower or large case
+    def most_similar(self, input_words, *, batch_size=1024, topn=1, sort=True):
+        words_similar_list = []
         similar_list = []
-        for i in range(self.n_highest):
-            row = best_rows[0][i]
-            score = scores[0][i]
-            candidate_word_vocab = self.nlp.vocab[self.row2key[row]]
-            candidate_word = candidate_word_vocab.text
-            if (
-                candidate_word_vocab.is_lower == input_word.islower()
-                and candidate_word != input_word
-            ):
-                similar_list.append((candidate_word, score))
-            if len(similar_list) >= topn:
-                break
+        words = input_words
+        if isinstance(input_words, str):
+            words = [input_words]
+        for word in words:
+            input_vector = self.nlp(word).vector.reshape(
+                1, self.nlp.vocab.vectors.shape[1]
+            )
+            best_rows = np.zeros((1, self.n_highest), dtype="i")
+            scores = np.zeros((1, self.n_highest), dtype="f")
 
-        return similar_list
+            # Work in batches, to avoid memory problems.
+            for i in range(0, input_vector.shape[0], batch_size):
+                batch = input_vector[i : i + batch_size]
+                batch_norms = np.linalg.norm(batch, axis=1, keepdims=True)
+                batch_norms[batch_norms == 0] = 1
+                batch /= batch_norms
+                sims = np.dot(batch, self.nlp.vocab.vectors.data.T)
+                best_rows[i : i + batch_size] = np.argpartition(
+                    sims, -self.n_highest, axis=1
+                )[
+                    :, -self.n_highest :
+                ]  # get n_highest scores rows in O(n)
+                scores[i : i + batch_size] = np.partition(
+                    sims, -self.n_highest, axis=1
+                )[
+                    :, -self.n_highest :
+                ]  # get n_highest scores in O(n)
+
+                # sort the n_highest scores and best_rows
+                if sort and topn >= 2:
+                    sorted_index = (
+                        np.arange(scores.shape[0])[:, None][i : i + batch_size],
+                        np.argsort(scores[i : i + batch_size], axis=1)[:, ::-1],
+                    )
+                    scores[i : i + batch_size] = scores[sorted_index]
+                    best_rows[i : i + batch_size] = best_rows[sorted_index]
+
+            scores = np.around(scores, decimals=4, out=scores)
+            scores = np.clip(scores, a_min=-1, a_max=1, out=scores)
+
+            # get similar list of tuple (word, score) only if both input and candidate word is lower or large case
+            similar_list = []
+            for i in range(self.n_highest):
+                row = best_rows[0][i]
+                score = scores[0][i]
+                candidate_word_vocab = self.nlp.vocab[self.row2key[row]]
+                candidate_word = candidate_word_vocab.text
+                if (
+                    candidate_word_vocab.is_lower == word.islower()
+                    and candidate_word != word
+                ):
+                    similar_list.append((candidate_word, score))
+                if len(similar_list) >= topn:
+                    break
+            words_similar_list.append(similar_list)
+        if isinstance(input_words, str):
+            return similar_list
+        return words_similar_list
 
     @staticmethod  # get the indexes of the replaceable words
     def get_words_to_replace_idx(similar_words_json, word_list, percentage_to_replace):

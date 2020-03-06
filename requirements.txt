@@ -16,3 +16,4 @@ rasa==1.4.3
 spacy==2.1.9
 pymorphy2==0.8
 pythainlp
+matplotlib==3.1.2
