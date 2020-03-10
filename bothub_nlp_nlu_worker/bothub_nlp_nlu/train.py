@@ -117,7 +117,6 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
             trainer.train(training_data)
 
             persistor = BothubPersistor(repository_version, repository_authorization)
-            print(update_request)
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
