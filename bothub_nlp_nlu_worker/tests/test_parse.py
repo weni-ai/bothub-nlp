@@ -33,7 +33,6 @@ class TestParseTask(unittest.TestCase):
             "use_name_entities": False,
             "use_competing_intents": False,
             "use_analyze_char": False,
-            "ALGORITHM_STATISTICAL_MODEL": "statistical_model",
             "ALGORITHM_NEURAL_NETWORK_EXTERNAL": "neural_network_external",
         },
     )
@@ -786,7 +785,6 @@ class TestParseTask(unittest.TestCase):
             "use_name_entities": False,
             "use_competing_intents": False,
             "use_analyze_char": False,
-            "ALGORITHM_STATISTICAL_MODEL": "statistical_model",
             "ALGORITHM_NEURAL_NETWORK_EXTERNAL": "neural_network_external",
         },
     )

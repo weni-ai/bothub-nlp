@@ -30,94 +30,67 @@ def backend():
 
 def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     pipeline = []
-    if update.get("algorithm") == update.get("ALGORITHM_STATISTICAL_MODEL"):
-        pipeline.append(
-            {
-                "name": "bothub_nlp_nlu.pipeline_components."
-                "optimized_spacy_nlp_with_labels.SpacyNLP"
-            }
-        )
-        pipeline.append(
-            {
-                "name": "bothub_nlp_nlu.pipeline_components."
-                "tokenizer_spacy_with_labels.SpacyTokenizer"
-            }
-        )
-        pipeline.append({"name": "RegexFeaturizer"})
+    use_spacy = update.get("algorithm") == update.get(
+        "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
+    )
+    # load spacy
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components."
+            "optimized_spacy_nlp_with_labels.SpacyNLP"
+        }
+    )
+    # tokenizer
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components."
+            "tokenizer_spacy_with_labels.SpacyTokenizer"
+        }
+    )
+    # featurizer
+    if use_spacy:
         pipeline.append({"name": "SpacyFeaturizer"})
-        pipeline.append({"name": "CRFEntityExtractor"})
-        # spacy named entity recognition
-        if update.get("use_name_entities"):
-            pipeline.append({"name": "SpacyEntityExtractor"})
-        pipeline.append(
-            {
-                "name": "bothub_nlp_nlu.pipeline_components."
-                "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
-            }
-        )
-        pipeline.append({"name": "SklearnIntentClassifier"})
     else:
-        use_spacy = update.get("algorithm") == update.get(
-            "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
-        )
-        # load spacy
-        pipeline.append(
-            {
-                "name": "bothub_nlp_nlu.pipeline_components."
-                "optimized_spacy_nlp_with_labels.SpacyNLP"
-            }
-        )
-        # tokenizer
-        pipeline.append(
-            {
-                "name": "bothub_nlp_nlu.pipeline_components."
-                "tokenizer_spacy_with_labels.SpacyTokenizer"
-            }
-        )
-        # featurizer
-        if use_spacy:
-            pipeline.append({"name": "SpacyFeaturizer"})
+        if update.get("use_analyze_char"):
+            pipeline.append(
+                {
+                    "name": "CountVectorsFeaturizer",
+                    "analyzer": "char",
+                    "min_ngram": 3,
+                    "max_ngram": 3,
+                    "token_pattern": "(?u)\\b\\w+\\b",
+                }
+            )
         else:
-            if update.get("use_analyze_char"):
-                pipeline.append(
-                    {
-                        "name": "CountVectorsFeaturizer",
-                        "analyzer": "char",
-                        "min_ngram": 3,
-                        "max_ngram": 3,
-                        "token_pattern": "(?u)\\b\\w+\\b",
-                    }
-                )
-            else:
-                pipeline.append(
-                    {
-                        "name": "bothub_nlp_nlu.pipeline_components."
-                        "count_vectors_featurizer_no_lemmatize.CountVectorsFeaturizerCustom",
-                        "token_pattern": "(?u)\\b\\w+\\b",
-                    }
-                )
-        # intent classifier
-        pipeline.append(
-            {
-                "name": "EmbeddingIntentClassifier",
-                "similarity_type": "inner"
-                if update.get("use_competing_intents")
-                else "cosine",
-            }
-        )
+            pipeline.append(
+                {
+                    "name": "bothub_nlp_nlu.pipeline_components."
+                    "count_vectors_featurizer_no_lemmatize.CountVectorsFeaturizerCustom",
+                    "token_pattern": "(?u)\\b\\w+\\b",
+                }
+            )
+    # intent classifier
+    pipeline.append(
+        {
+            "name": "EmbeddingIntentClassifier",
+            "similarity_type": "inner"
+            if update.get("use_competing_intents")
+            else "cosine",
+        }
+    )
 
-        # entity extractor
-        pipeline.append({"name": "CRFEntityExtractor"})
-        # spacy named entity recognition
-        if update.get("use_name_entities"):
-            pipeline.append({"name": "SpacyEntityExtractor"})
-        # label extractor
-        pipeline.append(
-            {
-                "name": "bothub_nlp_nlu.pipeline_components."
-                "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
-            }
-        )
+    # entity extractor
+    pipeline.append({"name": "CRFEntityExtractor"})
+    # spacy named entity recognition
+    if update.get("use_name_entities"):
+        pipeline.append({"name": "SpacyEntityExtractor"})
+    # label extractor
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components."
+            "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
+        }
+    )
     return RasaNLUModelConfig(
         {"language": update.get("language"), "pipeline": pipeline}
     )
@@ -131,13 +104,20 @@ class UpdateInterpreters:
             repository_version, repository_authorization
         )
 
-        interpreter = self.interpreters.get(update_request.get("version_id"))
+        repository_name = (
+            f"{update_request.get('version_id')}_"
+            f"{update_request.get('total_training_end')}_"
+            f"{update_request.get('language')}"
+        )
+
+        interpreter = self.interpreters.get(repository_name)
+
         if interpreter and use_cache:
             return interpreter
         persistor = BothubPersistor(repository_version, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
-        self.interpreters[update_request.get("version_id")] = BothubInterpreter.load(
+        self.interpreters[repository_name] = BothubInterpreter.load(
             model_directory, components.ComponentBuilder(use_cache=False)
         )
         return self.get(repository_version, repository_authorization)
