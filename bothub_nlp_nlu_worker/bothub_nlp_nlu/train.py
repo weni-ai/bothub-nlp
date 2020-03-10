@@ -45,7 +45,7 @@ class BothubWriter(TrainingDataWriter):
                     "entity_synonyms": formatted_synonyms,
                 }
             },
-            **kwargs
+            **kwargs,
         )
 
 
@@ -117,10 +117,13 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
             trainer.train(training_data)
 
             persistor = BothubPersistor(repository_version, repository_authorization)
+            print(update_request)
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
-                fixed_model_name=str(update_request.get("repository_version")),
+                fixed_model_name=f"{update_request.get('repository_version')}_"
+                f"{update_request.get('total_training_end')+1}_"
+                f"{update_request.get('language')}",
             )
         except Exception as e:
             logger.exception(e)

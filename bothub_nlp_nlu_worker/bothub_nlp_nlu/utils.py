@@ -131,13 +131,21 @@ class UpdateInterpreters:
             repository_version, repository_authorization
         )
 
-        interpreter = self.interpreters.get(update_request.get("version_id"))
+        repository_name = (
+            f"{update_request.get('version_id')}_"
+            f"{update_request.get('total_training_end')}_"
+            f"{update_request.get('language')}"
+        )
+
+        interpreter = self.interpreters.get(repository_name)
+
         if interpreter and use_cache:
             return interpreter
         persistor = BothubPersistor(repository_version, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
-        self.interpreters[update_request.get("version_id")] = BothubInterpreter.load(
+        print(update_request)
+        self.interpreters[repository_name] = BothubInterpreter.load(
             model_directory, components.ComponentBuilder(use_cache=False)
         )
         return self.get(repository_version, repository_authorization)
