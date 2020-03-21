@@ -4,7 +4,17 @@ python:
 services:
   - docker
 install:
-  - pip install -r bothub-nlp-nlu-worker/requirements.txt
+  - pip install -r requirements.txt
+  - pip install coveralls
+env:
+  global:
+    - SUPPORTED_LANGUAGES="en|pt"
+    - BOTHUB_NLP_LANGUAGE_QUEUE="en"
+    - BOTHUB_NLP_SERVICE_WORKER=true
+before_script:
+  - python bothub_nlp_nlu_worker/bothub_nlp_nlu/scripts/download_spacy_models.py en:en_core_web_md
 script:
-  - echo "test"
-  - echo "test2"
+  - flake8
+  - travis_wait coverage run -m unittest discover bothub_nlp_nlu_worker/tests
+after_success:
+  - coveralls
