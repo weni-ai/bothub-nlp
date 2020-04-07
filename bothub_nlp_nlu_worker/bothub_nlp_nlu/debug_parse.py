@@ -111,6 +111,9 @@ def get_intention_list(repository_authorization):
 
 
 def format_debug_parse_output(result_per_word, r):
+    for word in result_per_word:
+        result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
+    result_per_word = OrderedDict(sorted(result_per_word.items(), key=lambda t:t[1][0]["relevance"], reverse=True))
     out = OrderedDict([("intent", r.get("intent", None)), ("words", result_per_word)])
     return out
 
