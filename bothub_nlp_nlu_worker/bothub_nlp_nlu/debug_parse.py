@@ -115,6 +115,11 @@ def format_debug_parse_output(result_per_word, r):
     return out
 
 
+def n_samples_by_sentence_lenght(sentence):
+    word_count = len(sentence.split(' '))
+    return word_count * 200
+
+
 def debug_parse_text(
     repository_version, repository_authorization, text, use_cache=True
 ):
@@ -127,6 +132,6 @@ def debug_parse_text(
 
     result_per_word = DebugSentenceLime(
         interpreter, intention_names
-    ).get_result_per_word(text, 200)
+    ).get_result_per_word(text, n_samples_by_sentence_lenght(text))
 
     return format_debug_parse_output(result_per_word, r)
