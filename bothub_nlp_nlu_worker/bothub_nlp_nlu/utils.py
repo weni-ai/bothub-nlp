@@ -33,6 +33,10 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     use_spacy = update.get("algorithm") == update.get(
         "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
     )
+    # load Preprocessing custom component
+    pipeline.append(
+        {"name": "bothub_nlp_nlu.pipeline_components." "preprocessing.Preprocessing"}
+    )
     # load spacy
     pipeline.append(
         {
