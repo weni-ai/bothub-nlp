@@ -27,7 +27,7 @@ class Preprocessing(Component):
     # This attribute is designed for instance method: `can_handle_language`.
     # Default value is None which means it can handle all languages.
     # This is an important feature for backwards compatibility of components.
-    language_list = ["pt"]
+    language_list = ["pt", "en"]
 
     def __init__(self, component_config: Optional[Dict[Text, Any]] = None) -> None:
         super().__init__(component_config)
