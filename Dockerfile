@@ -36,7 +36,7 @@ FROM base
 
 COPY --from=builder ${PYTHON_WHEELS_PATH} ${PYTHON_WHEELS_PATH}
 
-RUN pip install --no-index --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
+RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
 COPY . .
 
