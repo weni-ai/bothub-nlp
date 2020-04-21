@@ -1,0 +1,30 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+black = "==19.10b0"
+
+[packages]
+lime = "==0.1.1.36"
+numpy = "==1.18.0"
+requests = "==2.23.0"
+contextvars = "==2.3"
+plac = "==0.9.6"
+python-decouple = "==3.1"
+celery = "==4.3.0"
+bothub_backend = {ref = "1.0.7",git = "https://github.com/Ilhasoft/bothub-backend"}
+bothub_nlp_celery = {ref = "0.1.15",git = "https://github.com/Ilhasoft/bothub-nlp-celery"}
+redis = "*"
+kombu = "==4.5.0"
+rasa = "==1.4.3"
+spacy = "==2.1.9"
+pymorphy2 = "==0.8"
+pythainlp = "*"
+matplotlib = "==3.1.2"
+scikit-learn = "==0.20.4"
+
+[requires]
+python_version = "3.6"

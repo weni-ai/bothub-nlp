@@ -5,7 +5,7 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV PYTHON_WHEELS_PATH /wheels
 ENV PYTHON_BUILD_PACKAGES "software-properties-common curl"
-ENV PIP_REQUIREMENTS "-r requirements.txt"
+ENV BUILD_PACKAGES "build-essential"
 
 WORKDIR ${WORKDIR}
 
@@ -22,21 +22,16 @@ RUN apt-get install -y ttf-mscorefonts-installer \
 
 RUN bash -c "ln -s /usr/bin/python3 /usr/bin/python; ln -s /usr/bin/pip3 /usr/bin/pip"
 
-COPY requirements.txt .
-
-FROM base as builder
-
-ENV BUILD_PACKAGES "build-essential"
+COPY Pipfile Pipfile
+COPY Pipfile.lock Pipfile.lock
 
 RUN apt-get update && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
 
-RUN pip wheel --wheel-dir=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
+RUN pip install pipenv
+
+RUN pipenv install --system
 
 FROM base
-
-COPY --from=builder ${PYTHON_WHEELS_PATH} ${PYTHON_WHEELS_PATH}
-
-RUN pip install --no-index --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
 COPY . .
 
