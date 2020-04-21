@@ -46,7 +46,6 @@ RUN git clone --branch master --depth 1 --single-branch \
     && python3.6 scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
     && python3.6 scripts/link_lang_spacy.py mn ./spacy-langs/mn/ \
     && python3.6 scripts/link_lang_spacy.py ha ./spacy-langs/ha/ \
-    && python3.6 scripts/link_lang_spacy.py el ./spacy-langs/el/ \
     && python3.6 scripts/link_lang_spacy.py ka ./spacy-langs/ka/ \
     && python3.6 scripts/link_lang_spacy.py kk ./spacy-langs/kk/ \
     && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/sw/
