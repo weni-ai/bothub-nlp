@@ -1,11 +1,10 @@
 from collections import OrderedDict
-
-import numpy as np
 from lime.lime_text import LimeTextExplainer
 from rasa.nlu.test import remove_pretrained_extractors
-
+from .parse import minimal_entity
 from .utils import backend
 from .utils import update_interpreters
+import numpy as np
 
 
 class DebugSentenceLime:
@@ -111,7 +110,17 @@ def get_intention_list(repository_authorization):
 
 
 def format_debug_parse_output(result_per_word, r):
-    out = OrderedDict([("intent", r.get("intent", None)), ("words", result_per_word)])
+    entities = r.get("entities")
+    formatted_entities = []
+    for entity in entities:
+        formatted_entities.append(minimal_entity(entity))
+    out = OrderedDict(
+        [
+            ("intent", r.get("intent", None)),
+            ("words", result_per_word),
+            ("entities", formatted_entities),
+        ]
+    )
     return out
 
 
