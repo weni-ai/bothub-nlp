@@ -114,14 +114,17 @@ def format_debug_parse_output(result_per_word, r):
     formatted_entities = []
     for entity in entities:
         formatted_entities.append(minimal_entity(entity))
-    out = OrderedDict(
-        [
-            ("intent", r.get("intent", None)),
-            ("words", result_per_word),
-            ("entities", formatted_entities),
-        ]
-    )
+    for word in result_per_word:
+        result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
+    result_per_word = OrderedDict(sorted(result_per_word.items(), key=lambda t:t[1][0]["relevance"], reverse=True))
+    out = OrderedDict([("intent", r.get("intent", None)), ("words", result_per_word),
+            ("entities", formatted_entities)])
     return out
+
+
+def n_samples_by_sentence_lenght(sentence):
+    word_count = len(sentence.split(' '))
+    return word_count * 200
 
 
 def debug_parse_text(
@@ -136,6 +139,6 @@ def debug_parse_text(
 
     result_per_word = DebugSentenceLime(
         interpreter, intention_names
-    ).get_result_per_word(text, 200)
+    ).get_result_per_word(text, n_samples_by_sentence_lenght(text))
 
     return format_debug_parse_output(result_per_word, r)
