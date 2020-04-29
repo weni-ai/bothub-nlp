@@ -115,15 +115,26 @@ def format_debug_parse_output(result_per_word, r):
     for entity in entities:
         formatted_entities.append(minimal_entity(entity))
     for word in result_per_word:
-        result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
-    result_per_word = OrderedDict(sorted(result_per_word.items(), key=lambda t:t[1][0]["relevance"], reverse=True))
-    out = OrderedDict([("intent", r.get("intent", None)), ("words", result_per_word),
-            ("entities", formatted_entities)])
+        result_per_word[word] = sorted(
+            result_per_word[word], key=lambda k: k["relevance"], reverse=True
+        )
+    result_per_word = OrderedDict(
+        sorted(
+            result_per_word.items(), key=lambda t: t[1][0]["relevance"], reverse=True
+        )
+    )
+    out = OrderedDict(
+        [
+            ("intent", r.get("intent", None)),
+            ("words", result_per_word),
+            ("entities", formatted_entities),
+        ]
+    )
     return out
 
 
 def n_samples_by_sentence_lenght(sentence):
-    word_count = len(sentence.split(' '))
+    word_count = len(sentence.split(" "))
     return word_count * 200
 
 
