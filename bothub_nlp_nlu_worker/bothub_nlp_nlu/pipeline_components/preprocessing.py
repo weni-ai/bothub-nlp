@@ -48,10 +48,11 @@ class Preprocessing(Component):
         N_WORD = "nao"
 
         not_repeated_phrases = set()
-        idx_to_remove = []
         size = len(training_data.training_examples)
+        subtract_idx = 0
+
         for idx in range(size):
-            example_text = training_data.training_examples[idx].text
+            example_text = training_data.training_examples[idx - subtract_idx].text
             # removing accent and lowercasing characters
             example_text = unidecode(example_text.lower())
             # replace regex by "sim"
@@ -61,15 +62,11 @@ class Preprocessing(Component):
 
             if example_text in not_repeated_phrases:
                 # remove example at this index from training_examples
-                idx_to_remove.append(idx)
+                training_data.training_examples.pop(idx - subtract_idx)
+                subtract_idx += 1
             else:
                 not_repeated_phrases.add(example_text)
-                training_data.training_examples[idx].text = example_text
-
-        subtract = 0
-        for index in idx_to_remove:
-            training_data.training_examples.pop(index - subtract)
-            subtract += 1
+                training_data.training_examples[idx - subtract_idx].text = example_text
 
 
     def process(self, message: Message, **kwargs: Any) -> None:
