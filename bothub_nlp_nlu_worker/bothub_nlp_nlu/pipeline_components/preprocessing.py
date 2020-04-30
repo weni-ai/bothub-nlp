@@ -41,18 +41,36 @@ class Preprocessing(Component):
         """Train this component"""
 
         # set regex parameters
-        n_regex = r"\b(n|N)\1*\b"
-        s_regex = r"\b(s|S)\1*\b"
+        n_regex = r'\b(n|N)\1*\b'
+        s_regex = r'\b(s|S)\1*\b'
         # set replace words
         S_WORD = "sim"
         N_WORD = "nao"
-        for example in training_data.training_examples:
+
+        not_repeated_phrases = set()
+        idx_to_remove = []
+        size = len(training_data.training_examples)
+        for idx in range(size):
+            example_text = training_data.training_examples[idx].text
             # removing accent and lowercasing characters
-            example.text = unidecode(example.text.lower())
+            example_text = unidecode(example_text.lower())
             # replace regex by "sim"
-            example.text = re.sub(s_regex, S_WORD, example.text)
+            example_text = re.sub(s_regex, S_WORD, example_text)
             # replace regex by "nao"
-            example.text = re.sub(n_regex, N_WORD, example.text)
+            example_text = re.sub(n_regex, N_WORD, example_text)
+
+            if example_text in not_repeated_phrases:
+                # remove example at this index from training_examples
+                idx_to_remove.append(idx)
+            else:
+                not_repeated_phrases.add(example_text)
+                training_data.training_examples[idx].text = example_text
+
+        subtract = 0
+        for index in idx_to_remove:
+            training_data.training_examples.pop(index - subtract)
+            subtract += 1
+
 
     def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
