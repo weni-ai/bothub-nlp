@@ -41,8 +41,8 @@ class Preprocessing(Component):
         """Train this component"""
 
         # set regex parameters
-        n_regex = r'\b(n|N)\1*\b'
-        s_regex = r'\b(s|S)\1*\b'
+        n_regex = r"\b(n|N)\1*\b"
+        s_regex = r"\b(s|S)\1*\b"
         # set replace words
         S_WORD = "sim"
         N_WORD = "nao"
@@ -67,6 +67,7 @@ class Preprocessing(Component):
             else:
                 not_repeated_phrases.add(example_text)
                 training_data.training_examples[idx - subtract_idx].text = example_text
+
 
 
     def process(self, message: Message, **kwargs: Any) -> None:
