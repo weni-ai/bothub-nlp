@@ -1,10 +1,10 @@
+import numpy as np
 from collections import OrderedDict
 from lime.lime_text import LimeTextExplainer
 from rasa.nlu.test import remove_pretrained_extractors
 from .parse import minimal_entity
 from .utils import backend
 from .utils import update_interpreters
-import numpy as np
 
 
 class DebugSentenceLime:
