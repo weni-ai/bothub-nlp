@@ -1,9 +1,8 @@
-from collections import OrderedDict
-
 import numpy as np
+from collections import OrderedDict
 from lime.lime_text import LimeTextExplainer
 from rasa.nlu.test import remove_pretrained_extractors
-
+from .parse import minimal_entity
 from .utils import backend
 from .utils import update_interpreters
 
@@ -111,15 +110,31 @@ def get_intention_list(repository_authorization):
 
 
 def format_debug_parse_output(result_per_word, r):
+    entities = r.get("entities")
+    formatted_entities = []
+    for entity in entities:
+        formatted_entities.append(minimal_entity(entity))
     for word in result_per_word:
-        result_per_word[word] = sorted(result_per_word[word], key=lambda k: k['relevance'], reverse=True)
-    result_per_word = OrderedDict(sorted(result_per_word.items(), key=lambda t:t[1][0]["relevance"], reverse=True))
-    out = OrderedDict([("intent", r.get("intent", None)), ("words", result_per_word)])
+        result_per_word[word] = sorted(
+            result_per_word[word], key=lambda k: k["relevance"], reverse=True
+        )
+    result_per_word = OrderedDict(
+        sorted(
+            result_per_word.items(), key=lambda t: t[1][0]["relevance"], reverse=True
+        )
+    )
+    out = OrderedDict(
+        [
+            ("intent", r.get("intent", None)),
+            ("words", result_per_word),
+            ("entities", formatted_entities),
+        ]
+    )
     return out
 
 
 def n_samples_by_sentence_lenght(sentence):
-    word_count = len(sentence.split(' '))
+    word_count = len(sentence.split(" "))
     return word_count * 200
 
 
