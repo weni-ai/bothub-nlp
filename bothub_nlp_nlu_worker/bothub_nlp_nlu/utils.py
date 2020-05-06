@@ -40,15 +40,13 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     # load spacy
     pipeline.append(
         {
-            "name": "bothub_nlp_nlu.pipeline_components."
-            "optimized_spacy_nlp_with_labels.SpacyNLP"
+            "name": "SpacyNLP"
         }
     )
     # tokenizer
     pipeline.append(
         {
-            "name": "bothub_nlp_nlu.pipeline_components."
-            "tokenizer_spacy_with_labels.SpacyTokenizer"
+            "name": "SpacyTokenizer"
         }
     )
     # featurizer
@@ -68,8 +66,7 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
         else:
             pipeline.append(
                 {
-                    "name": "bothub_nlp_nlu.pipeline_components."
-                    "count_vectors_featurizer_no_lemmatize.CountVectorsFeaturizerCustom",
+                    "name": "CountVectorsFeaturizer",
                     "token_pattern": "(?u)\\b\\w+\\b",
                 }
             )
@@ -88,13 +85,6 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     # spacy named entity recognition
     if update.get("use_name_entities"):
         pipeline.append({"name": "SpacyEntityExtractor"})
-    # label extractor
-    pipeline.append(
-        {
-            "name": "bothub_nlp_nlu.pipeline_components."
-            "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
-        }
-    )
     return RasaNLUModelConfig(
         {"language": update.get("language"), "pipeline": pipeline}
     )
