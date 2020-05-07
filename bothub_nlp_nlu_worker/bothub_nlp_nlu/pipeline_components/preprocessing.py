@@ -38,14 +38,15 @@ class Preprocessing(Component):
         size = len(training_data.training_examples)
         subtract_idx = 0
 
-        APOSTROPHE = "'"
+        APOSTROPHE_OPTIONS = ["'", "`"]
 
         for idx in range(size):
             example_text = training_data.training_examples[idx - subtract_idx].text
             # removing accent and lowercasing characters
             example_text = unidecode(example_text.lower())
             # remove apostrophe from the phrase (important be first than s_regex regex)
-            example_text = example_text.replace(APOSTROPHE, "")
+            for APOSTROPHE in APOSTROPHE_OPTIONS:
+                example_text = example_text.replace(APOSTROPHE, "")
 
             if config.language == "pt_br":
                 # set regex parameters
