@@ -75,12 +75,13 @@ class Preprocessing(Component):
     ) -> None:
         """Process an incoming message."""
 
-        APOSTROPHE = "'"
+        APOSTROPHE_OPTIONS = ["'", "`"]
 
         # removing accent and lowercasing characters
         message.text = unidecode(message.text.lower())
         # remove apostrophe from the phrase (important be first than s_regex regex)
-        message.text = message.text.replace(APOSTROPHE, "")
+        for APOSTROPHE in APOSTROPHE_OPTIONS:
+            message.text = message.text.replace(APOSTROPHE, "")
         if config.language == "pt_br":
             # set regex parameters
             n_regex = r"\b(n|N)\1*\b"
