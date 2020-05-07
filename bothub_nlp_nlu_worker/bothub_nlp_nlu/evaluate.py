@@ -95,7 +95,6 @@ def evaluate_entities(entity_results, extractors):  # pragma: no cover
         ) + collect_successful_entity_predictions(
             entity_results, merged_predictions, merged_targets
         )
-        print(json.dumps(log, indent=2))
 
         result = {
             "report": report,
