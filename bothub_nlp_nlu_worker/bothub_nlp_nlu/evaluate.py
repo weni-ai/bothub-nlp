@@ -2,6 +2,10 @@ import json
 import logging
 import uuid
 
+from rasa.nlu.test import (
+    collect_incorrect_entity_predictions,
+    collect_successful_entity_predictions,
+)
 from rasa.nlu.test import get_entity_extractors, plot_attribute_confidences
 from rasa.nlu.test import get_evaluation_metrics
 from rasa.nlu.test import (
@@ -86,11 +90,19 @@ def evaluate_entities(entity_results, extractors):  # pragma: no cover
             exclude_label="no_entity",
         )
 
+        log = collect_incorrect_entity_predictions(
+            entity_results, merged_predictions, merged_targets
+        ) + collect_successful_entity_predictions(
+            entity_results, merged_predictions, merged_targets
+        )
+        print(json.dumps(log, indent=2))
+
         result = {
             "report": report,
             "precision": precision,
             "f1_score": f1,
             "accuracy": accuracy,
+            "log": log,
         }
 
     return result
@@ -279,13 +291,13 @@ def evaluate_update(repository_version, by, repository_authorization):
     entity_evaluation = result.get("entity_evaluation")
 
     charts = plot_and_save_charts(repository_version, intent_results)
-
     evaluate_result = backend().request_backend_create_evaluate_results(
         {
             "repository_version": repository_version,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
             "log": json.dumps(intent_evaluation.get("log")),
+            "log_entities": json.dumps(entity_evaluation.get("log")),
             "intentprecision": intent_evaluation.get("precision"),
             "intentf1_score": intent_evaluation.get("f1_score"),
             "intentaccuracy": intent_evaluation.get("accuracy"),
