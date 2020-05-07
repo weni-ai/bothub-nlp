@@ -38,10 +38,14 @@ class Preprocessing(Component):
         size = len(training_data.training_examples)
         subtract_idx = 0
 
+        APOSTROPHE = "'"
+
         for idx in range(size):
             example_text = training_data.training_examples[idx - subtract_idx].text
             # removing accent and lowercasing characters
             example_text = unidecode(example_text.lower())
+            # remove apostrophe from the phrase (important be first than s_regex regex)
+            example_text = example_text.replace(APOSTROPHE, "")
 
             if config.language == "pt_br":
                 # set regex parameters
@@ -50,7 +54,6 @@ class Preprocessing(Component):
                 # set replace words
                 S_WORD = "sim"
                 N_WORD = "nao"
-
                 # replace regex by "sim"
                 example_text = re.sub(s_regex, S_WORD, example_text)
                 # replace regex by "nao"
@@ -64,18 +67,29 @@ class Preprocessing(Component):
                 not_repeated_phrases.add(example_text)
                 training_data.training_examples[idx - subtract_idx].text = example_text
 
-    def process(self, message: Message, **kwargs: Any) -> None:
+    def process(
+        self,
+        message: Message,
+        config: Optional[RasaNLUModelConfig] = None,
+        **kwargs: Any,
+    ) -> None:
         """Process an incoming message."""
-        # set regex parameters
-        n_regex = r"\b(n|N)\1*\b"
-        s_regex = r"\b(s|S)\1*\b"
-        # set replace words
-        S_WORD = "sim"
-        N_WORD = "nao"
+
+        APOSTROPHE = "'"
 
         # removing accent and lowercasing characters
         message.text = unidecode(message.text.lower())
-        # replace regex by "sim"
-        message.text = re.sub(s_regex, S_WORD, message.text)
-        # replace regex by "nao"
-        message.text = re.sub(n_regex, N_WORD, message.text)
+        # remove apostrophe from the phrase (important be first than s_regex regex)
+        message.text = message.text.replace(APOSTROPHE, "")
+        if config.language == "pt_br":
+            # set regex parameters
+            n_regex = r"\b(n|N)\1*\b"
+            s_regex = r"\b(s|S)\1*\b"
+            # set replace words
+            S_WORD = "sim"
+            N_WORD = "nao"
+
+            # replace regex by "sim"
+            message.text = re.sub(s_regex, S_WORD, message.text)
+            # replace regex by "nao"
+            message.text = re.sub(n_regex, N_WORD, message.text)
