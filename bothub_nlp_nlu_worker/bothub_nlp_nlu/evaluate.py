@@ -2,10 +2,6 @@ import json
 import logging
 import uuid
 
-from rasa.nlu.test import (
-    collect_incorrect_entity_predictions,
-    collect_successful_entity_predictions,
-)
 from rasa.nlu.test import get_entity_extractors, plot_attribute_confidences
 from rasa.nlu.test import get_evaluation_metrics
 from rasa.nlu.test import (
@@ -35,38 +31,70 @@ excluded_itens = [
 ]
 
 
-def collect_nlu_successes(intent_results):
+def collect_incorrect_entity_predictions(
+    entity_results, merged_predictions, merged_targets
+):
+    errors = []
+    offset = 0
+    for entity_result in entity_results:
+        for i in range(offset, offset + len(entity_result.tokens)):
+            if merged_targets[i] != merged_predictions[i]:
+                errors.append(
+                    {
+                        "text": entity_result.message,
+                        "entities": entity_result.entity_targets,
+                        "predicted_entities": entity_result.entity_predictions,
+                        "status": "error",
+                    }
+                )
+                break
+        offset += len(entity_result.tokens)
+    return errors
+
+
+def is_false_success(sentence_eval):
+    for true_entity in sentence_eval["entities"]:
+        match = False
+        for predicted_entity in sentence_eval["predicted_entities"]:
+            if (
+                true_entity["start"] == predicted_entity["start"]
+                and true_entity["end"] == predicted_entity["end"]
+                and true_entity["value"] == predicted_entity["value"]
+                and true_entity["entity"] == predicted_entity["entity"]
+            ):
+                match = True
+        if match is False:
+            return True
+    return False
+
+
+def collect_successful_entity_predictions(
+    entity_results, merged_predictions, merged_targets
+):
+    successes = []
+    offset = 0
+    for entity_result in entity_results:
+        for i in range(offset, offset + len(entity_result.tokens)):
+            if (
+                merged_targets[i] == merged_predictions[i]
+                and merged_targets[i] != "no_entity"
+            ):
+                successes.append(
+                    {
+                        "text": entity_result.message,
+                        "entities": entity_result.entity_targets,
+                        "predicted_entities": entity_result.entity_predictions,
+                        "status": "success",
+                    }
+                )
+                break
+        offset += len(entity_result.tokens)
     successes = [
-        {
-            "text": r.message,
-            "intent": r.intent_target,
-            "intent_prediction": {
-                "name": r.intent_prediction,
-                "confidence": r.confidence,
-            },
-            "status": "success",
-        }
-        for r in intent_results
-        if r.intent_target == r.intent_prediction
+        sentence_eval
+        for sentence_eval in successes
+        if not is_false_success(sentence_eval)
     ]
     return successes
-
-
-def collect_nlu_errors(intent_results):
-    errors = [
-        {
-            "text": r.message,
-            "intent": r.intent_target,
-            "intent_prediction": {
-                "name": r.intent_prediction,
-                "confidence": r.confidence,
-            },
-            "status": "error",
-        }
-        for r in intent_results
-        if r.intent_target != r.intent_prediction
-    ]
-    return errors
 
 
 def evaluate_entities(entity_results, extractors):  # pragma: no cover
@@ -105,6 +133,40 @@ def evaluate_entities(entity_results, extractors):  # pragma: no cover
         }
 
     return result
+
+
+def collect_nlu_successes(intent_results):
+    successes = [
+        {
+            "text": r.message,
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
+            "status": "success",
+        }
+        for r in intent_results
+        if r.intent_target == r.intent_prediction
+    ]
+    return successes
+
+
+def collect_nlu_errors(intent_results):
+    errors = [
+        {
+            "text": r.message,
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
+            "status": "error",
+        }
+        for r in intent_results
+        if r.intent_target != r.intent_prediction
+    ]
+    return errors
 
 
 def evaluate_intents(intent_results):  # pragma: no cover
