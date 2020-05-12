@@ -28,8 +28,122 @@ def backend():
     )
 
 
+def add_whitespace_tokenizer():
+    return {"name": "WhitespaceTokenizer"}
+
+
+def add_countvectors_featurizer():
+    # if update.get("use_analyze_char"):
+    if True:
+        return {
+            "name": "CountVectorsFeaturizer",
+            "analyzer": "char",
+            "min_ngram": 3,
+            "max_ngram": 3,
+            "token_pattern": "(?u)\\b\\w+\\b",
+        }
+
+    else:
+        return {
+            "name": "CountVectorsFeaturizer",
+            "token_pattern": "(?u)\\b\\w+\\b",
+        }
+
+
+def new_internal_config():
+    pipeline = []
+
+    # Tokenizer
+    pipeline.append(add_whitespace_tokenizer())
+    # Featurizer
+    pipeline.append(add_countvectors_featurizer())
+    # Intent Classifier
+    pipeline.append(
+        {
+            "name": "DIETClassifier",
+            "entity_recognition": "False",
+            "BILOU_flag": "False",
+        }
+    )
+    return pipeline
+
+
+def old_internal_config():
+    pipeline = []
+
+    # Tokenizer
+    pipeline.append(add_whitespace_tokenizer())
+    # Featurizer
+    pipeline.append(add_countvectors_featurizer())
+    # Intent Classifier
+    pipeline.append(
+        {
+            "name": "DIETClassifier",
+            "hidden_layers_sizes":
+                { "text": [256, 128] },
+            "number_of_transformer_layers": 0,
+            "weight_sparsity": 0,
+            "intent_classification": "True",
+            "entity_recognition": "False",
+            "use_masked_language_model": "False",
+            "BILOU_flag": "False"
+        }
+    )
+    return pipeline
+
+
+def new_external_config():
+    pipeline = []
+
+    pipeline.append(
+        {"name": "bothub_nlp_nlu.pipeline_components." "preprocessing.Preprocessing"}
+    )
+    # NLP
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components." "HFTransformerNLP.HFTransformersNLP",
+            "model_name": "bert_portuguese",
+        }
+    )
+    # Tokenizer
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
+            "intent_tokenization_flag": "False",
+            "intent_split_symbol": "_",
+        }
+    )
+    # Featurizer
+    featurizer_component = add_countvectors_featurizer()
+    pipeline.append(featurizer_component)
+
+    # Intent Classifier
+    pipeline.append(
+        {
+            "name": "DIETClassifier",
+            "entity_recognition": "False",
+            "BILOU_flag": "False",
+        }
+    )
+
+    # Entity Extractor
+    pipeline.append({"name": "CRFEntityExtractor"})
+
+    return pipeline
+
 def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     pipeline = []
+
+    if update.get("algorithm") == "EXTERNAL_NEW":
+        pipeline = new_external_config()
+        return pipeline
+    elif update.get("algorithm")  == "INTERNAL_NEW":
+        pipeline = new_internal_config()
+        return pipeline
+    elif update.get("algorithm")  == "INTERNAL_OLD":
+        pipeline = old_internal_config()
+        return pipeline
+
     use_spacy = update.get("algorithm") == update.get(
         "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
     )
