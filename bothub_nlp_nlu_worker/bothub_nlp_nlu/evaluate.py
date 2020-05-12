@@ -44,7 +44,7 @@ def collect_incorrect_entity_predictions(
                         "text": entity_result.message,
                         "entities": entity_result.entity_targets,
                         "predicted_entities": entity_result.entity_predictions,
-                        "status": "error",
+                        "entity_status": "error",
                     }
                 )
                 break
@@ -52,17 +52,23 @@ def collect_incorrect_entity_predictions(
     return errors
 
 
+def is_entity_in_predicted(entity, predicted_entities):
+    for predicted_entity in predicted_entities:
+        if (
+            entity["start"] == predicted_entity["start"]
+            and entity["end"] == predicted_entity["end"]
+            and entity["value"] == predicted_entity["value"]
+            and entity["entity"] == predicted_entity["entity"]
+        ):
+            return predicted_entity
+    return False
+
+
 def is_false_success(sentence_eval):
     for true_entity in sentence_eval["entities"]:
         match = False
-        for predicted_entity in sentence_eval["predicted_entities"]:
-            if (
-                true_entity["start"] == predicted_entity["start"]
-                and true_entity["end"] == predicted_entity["end"]
-                and true_entity["value"] == predicted_entity["value"]
-                and true_entity["entity"] == predicted_entity["entity"]
-            ):
-                match = True
+        if is_entity_in_predicted(true_entity, sentence_eval["predicted_entities"]):
+            match = True
         if match is False:
             return True
     return False
@@ -84,7 +90,7 @@ def collect_successful_entity_predictions(
                         "text": entity_result.message,
                         "entities": entity_result.entity_targets,
                         "predicted_entities": entity_result.entity_predictions,
-                        "status": "success",
+                        "entity_status": "success",
                     }
                 )
                 break
@@ -144,7 +150,7 @@ def collect_nlu_successes(intent_results):
                 "name": r.intent_prediction,
                 "confidence": r.confidence,
             },
-            "status": "success",
+            "intent_status": "success",
         }
         for r in intent_results
         if r.intent_target == r.intent_prediction
@@ -161,7 +167,7 @@ def collect_nlu_errors(intent_results):
                 "name": r.intent_prediction,
                 "confidence": r.confidence,
             },
-            "status": "error",
+            "intent_status": "error",
         }
         for r in intent_results
         if r.intent_target != r.intent_prediction
@@ -311,6 +317,29 @@ def entity_rasa_nlu_data(entity, evaluate):  # pragma: no cover
     }
 
 
+def get_formatted_log(merged_logs):
+    for merged_log in merged_logs:
+        if 'entities' in merged_log:
+            entities = merged_log.get("entities")
+            predicted_entities = merged_log.get("predicted_entities")
+            merged_log["false_positive_entities"] = []
+            for entity in entities:
+                predicted_entity = is_entity_in_predicted(entity, predicted_entities)
+                if predicted_entity:
+                    entity["status"] = "success"
+                    entity["confidence"] = predicted_entity.get("confidence")
+                else:
+                    entity["status"] = "error"
+
+            for predicted_entity in predicted_entities:
+                entity = is_entity_in_predicted(predicted_entity, entities)
+                if entity is False:
+                    merged_log["false_positive_entities"].append(predicted_entity)
+            del merged_log['predicted_entities']
+    print(json.dumps(merged_logs, indent=2))
+    return merged_logs
+
+
 def merge_intent_entity_log(intent_evaluation, entity_evaluation):
     intent_logs = intent_evaluation.get("log")
     entity_logs = entity_evaluation.get("log")
@@ -318,13 +347,7 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
     for intent_log in intent_logs:
         for entity_log in entity_logs:
             if intent_log.get("text") == entity_log.get("text"):
-                intent_status = intent_log.get("status")
-                entity_status = entity_log.get("status")
                 intent_log.update(entity_log)
-                if intent_status == "success" and entity_status == "success":
-                    intent_log["status"] = "success"
-                else:
-                    intent_log["status"] = "error"
         merged_logs.append(intent_log)
     return merged_logs
 
@@ -369,7 +392,8 @@ def evaluate_update(repository_version, by, repository_authorization):
     intent_evaluation = result.get("intent_evaluation")
     entity_evaluation = result.get("entity_evaluation")
 
-    log = merge_intent_entity_log(intent_evaluation, entity_evaluation)
+    merged_logs = merge_intent_entity_log(intent_evaluation, entity_evaluation)
+    log = get_formatted_log(merged_logs)
 
     charts = plot_and_save_charts(repository_version, intent_results)
     evaluate_result = backend().request_backend_create_evaluate_results(
