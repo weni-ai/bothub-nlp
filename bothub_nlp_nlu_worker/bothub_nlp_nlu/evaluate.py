@@ -311,6 +311,24 @@ def entity_rasa_nlu_data(entity, evaluate):  # pragma: no cover
     }
 
 
+def merge_intent_entity_log(intent_evaluation, entity_evaluation):
+    intent_logs = intent_evaluation.get("log")
+    entity_logs = entity_evaluation.get("log")
+    merged_logs = []
+    for intent_log in intent_logs:
+        for entity_log in entity_logs:
+            if intent_log.get("text") == entity_log.get("text"):
+                intent_status = intent_log.get("status")
+                entity_status = entity_log.get("status")
+                intent_log.update(entity_log)
+                if intent_status == "success" and entity_status == "success":
+                    intent_log["status"] = "success"
+                else:
+                    intent_log["status"] = "error"
+        merged_logs.append(intent_log)
+    return merged_logs
+
+
 def evaluate_update(repository_version, by, repository_authorization):
     evaluations = backend().request_backend_start_evaluation(
         repository_version, repository_authorization
@@ -351,14 +369,15 @@ def evaluate_update(repository_version, by, repository_authorization):
     intent_evaluation = result.get("intent_evaluation")
     entity_evaluation = result.get("entity_evaluation")
 
+    log = merge_intent_entity_log(intent_evaluation, entity_evaluation)
+
     charts = plot_and_save_charts(repository_version, intent_results)
     evaluate_result = backend().request_backend_create_evaluate_results(
         {
             "repository_version": repository_version,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
-            "log": json.dumps(intent_evaluation.get("log")),
-            "log_entities": json.dumps(entity_evaluation.get("log")),
+            "log": json.dumps(log),
             "intentprecision": intent_evaluation.get("precision"),
             "intentf1_score": intent_evaluation.get("f1_score"),
             "intentaccuracy": intent_evaluation.get("accuracy"),
