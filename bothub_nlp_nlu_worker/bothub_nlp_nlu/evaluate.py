@@ -51,18 +51,13 @@ def collect_incorrect_entity_predictions(
         offset += len(entity_result.tokens)
     return errors
 
-# if (
-#             entity.get("start") == predicted_entity.get("start")
-#             and entity.get("end") == predicted_entity.get("end")
-#             and entity.get("value") == predicted_entity.get("value")
-#             and entity.get("entity") == predicted_entity.get("entity")
-#         ):
+
 def is_start_end_in_list(entity, predicted_entities):
     for predicted_entity in predicted_entities:
         if (
-            entity["start"] == predicted_entity["start"]
-            and entity["end"] == predicted_entity["end"]
-            and entity["value"] == predicted_entity["value"]
+            entity.get("start") == predicted_entity.get("start")
+            and entity.get("end") == predicted_entity.get("end")
+            and entity.get("value") == predicted_entity.get("value")
         ):
             return predicted_entity
     return False
@@ -71,10 +66,10 @@ def is_start_end_in_list(entity, predicted_entities):
 def is_entity_in_predicted(entity, predicted_entities, return_predicted=False):
     for predicted_entity in predicted_entities:
         if (
-            entity["start"] == predicted_entity["start"]
-            and entity["end"] == predicted_entity["end"]
-            and entity["value"] == predicted_entity["value"]
-            and entity["entity"] == predicted_entity["entity"]
+            entity.get("start") == predicted_entity.get("start")
+            and entity.get("end") == predicted_entity.get("end")
+            and entity.get("value") == predicted_entity.get("value")
+            and entity.get("entity") == predicted_entity.get("entity")
         ):
             if return_predicted:
                 return predicted_entity, True
@@ -339,14 +334,16 @@ def entity_rasa_nlu_data(entity, evaluate):  # pragma: no cover
 
 def get_formatted_log(merged_logs):
     for merged_log in merged_logs:
-        if 'entities' in merged_log:
+        if "entities" in merged_log:
             entities = merged_log.get("entities")
             predicted_entities = merged_log.get("predicted_entities")
             merged_log["true_entities"] = []
             merged_log["false_positive_entities"] = []
             merged_log["swapped_error_entities"] = []
             for entity in entities:
-                predicted_entity, is_entity_in_pred = is_entity_in_predicted(entity, predicted_entities, True)
+                predicted_entity, is_entity_in_pred = is_entity_in_predicted(
+                    entity, predicted_entities, True
+                )
                 swap_error_entity = is_start_end_in_list(entity, predicted_entities)
                 if is_entity_in_pred:
                     entity["status"] = "success"
@@ -354,19 +351,25 @@ def get_formatted_log(merged_logs):
                     merged_log["true_entities"].append(entity)
                 elif swap_error_entity:
                     pred_entity_copy = swap_error_entity.copy()
-                    pred_entity_copy['true_entity'] = entity.get('entity')
-                    pred_entity_copy['predicted_entity'] = swap_error_entity.get('entity')
-                    del pred_entity_copy['entity']
+                    pred_entity_copy["true_entity"] = entity.get("entity")
+                    pred_entity_copy["predicted_entity"] = swap_error_entity.get(
+                        "entity"
+                    )
+                    del pred_entity_copy["entity"]
                     merged_log["swapped_error_entities"].append(pred_entity_copy)
                 else:
                     entity["status"] = "error"
                     merged_log["true_entities"].append(entity)
 
             for predicted_entity in predicted_entities:
-                if not is_start_end_in_list(predicted_entity, merged_log['true_entities']) and not is_start_end_in_list(predicted_entity, merged_log['swapped_error_entities']):
+                if not is_start_end_in_list(
+                    predicted_entity, merged_log.get("true_entities")
+                ) and not is_start_end_in_list(
+                    predicted_entity, merged_log["swapped_error_entities"]
+                ):
                     merged_log["false_positive_entities"].append(predicted_entity)
-            # del merged_log['predicted_entities']
-    print(json.dumps(merged_logs, indent=2))
+            del merged_log["entities"]
+            del merged_log["predicted_entities"]
     return merged_logs
 
 
