@@ -351,7 +351,7 @@ def get_formatted_log(merged_logs):
                     merged_log["true_entities"].append(entity)
                 elif swap_error_entity:
                     pred_entity_copy = swap_error_entity.copy()
-                    pred_entity_copy["true_entity"] = entity.get("entity")
+                    pred_entity_copy["entity"] = entity.get("entity")
                     pred_entity_copy["predicted_entity"] = swap_error_entity.get(
                         "entity"
                     )
