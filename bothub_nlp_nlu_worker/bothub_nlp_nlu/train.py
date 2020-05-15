@@ -100,14 +100,6 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
                     )
                 )
 
-            for label_example in get_examples.get("label_examples"):
-                label_examples.append(
-                    Message.build(
-                        text=label_example.get("text"),
-                        entities=label_example.get("entities"),
-                    )
-                )
-
             rasa_nlu_config = get_rasa_nlu_config_from_update(update_request)
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
             training_data = BothubTrainingData(
