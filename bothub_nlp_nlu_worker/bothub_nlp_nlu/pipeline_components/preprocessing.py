@@ -81,7 +81,6 @@ class Preprocessing(Component):
 
         return phrase
 
-
     def english_preprocesing(self, phrase):
         # set regex for "mkt":
         mkt_regex = r"\b(mkt)\b"
