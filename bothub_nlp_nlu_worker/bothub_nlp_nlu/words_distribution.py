@@ -1,34 +1,17 @@
 from collections import Counter, OrderedDict
-import json
-from .utils import get_examples_request, get_examples_label_request, backend
+
+from .utils import get_examples_request
 
 
 def words_distribution_text(repository_version, language, repository_authorization):
-    examples_label_list = get_examples_label_request(
-        repository_version, repository_authorization
-    )
-
     examples_list = get_examples_request(repository_version, repository_authorization)
-
-    get_examples = backend().request_backend_get_entities_and_labels_nlu(
-        repository_version,
-        language,
-        json.dumps(
-            {
-                "examples": examples_list,
-                "label_examples_query": examples_label_list,
-                "repository_version": repository_version,
-            }
-        ),
-        repository_authorization,
-    )
 
     all_intents = []  # the list of all words
     intents = {}  # all the words separated by intent
     all_frequencies = {}  # the count of all words
     frequencies = {}  # the count of words separated by intent
 
-    for example in get_examples.get("examples"):
+    for example in examples_list:
         text = example.get("text")
         intent = example.get("intent")
         for word in text.split():
