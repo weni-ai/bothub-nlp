@@ -32,9 +32,8 @@ def add_whitespace_tokenizer():
     return {"name": "WhitespaceTokenizer"}
 
 
-def add_countvectors_featurizer():
-    # if update.get("use_analyze_char"):
-    if True:
+def add_countvectors_featurizer(update):
+    if update.get("use_analyze_char"):
         return {
             "name": "CountVectorsFeaturizer",
             "analyzer": "char",
@@ -44,13 +43,10 @@ def add_countvectors_featurizer():
         }
 
     else:
-        return {
-            "name": "CountVectorsFeaturizer",
-            "token_pattern": "(?u)\\b\\w+\\b",
-        }
+        return {"name": "CountVectorsFeaturizer", "token_pattern": "(?u)\\b\\w+\\b"}
 
 
-def new_internal_config():
+def transformer_network_diet_config():
     pipeline = []
 
     # Tokenizer
@@ -59,11 +55,7 @@ def new_internal_config():
     pipeline.append(add_countvectors_featurizer())
     # Intent Classifier
     pipeline.append(
-        {
-            "name": "DIETClassifier",
-            "entity_recognition": "False",
-            "BILOU_flag": "False",
-        }
+        {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
     )
     return pipeline
 
@@ -79,29 +71,57 @@ def old_internal_config():
     pipeline.append(
         {
             "name": "DIETClassifier",
-            "hidden_layers_sizes":
-                { "text": [256, 128] },
+            "hidden_layers_sizes": {"text": [256, 128]},
             "number_of_transformer_layers": 0,
             "weight_sparsity": 0,
             "intent_classification": "True",
             "entity_recognition": "False",
             "use_masked_language_model": "False",
-            "BILOU_flag": "False"
+            "BILOU_flag": "False",
         }
     )
     return pipeline
 
 
-def new_external_config():
+def transformer_network_diet_word_embedding_config():
+    pipeline = []
+
+    # Preprocessing
+    pipeline.append(
+        {"name": "bothub_nlp_nlu.pipeline_components.preprocessing.Preprocessing"}
+    )
+
+    # Language Model
+    pipeline.append({"name": "SpacyNLP"})
+
+    # Tokenizer
+    pipeline.append({"name": "SpacyTokenizer"})
+    # Featurizer
+    pipeline.append({"name": "SpacyFeaturizer"})
+
+    # Featurizer
+    pipeline.append(add_countvectors_featurizer())
+    # Intent Classifier
+    pipeline.append(
+        {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
+    )
+
+    # Entity Extractor
+    pipeline.append({"name": "CRFEntityExtractor"})
+
+    return pipeline
+
+
+def bert_config():
     pipeline = []
 
     pipeline.append(
-        {"name": "bothub_nlp_nlu.pipeline_components." "preprocessing.Preprocessing"}
+        {"name": "bothub_nlp_nlu.pipeline_components.preprocessing.Preprocessing"}
     )
     # NLP
     pipeline.append(
         {
-            "name": "bothub_nlp_nlu.pipeline_components." "HFTransformerNLP.HFTransformersNLP",
+            "name": "bothub_nlp_nlu.pipeline_components.HFTransformerNLP.HFTransformersNLP",
             "model_name": "bert_portuguese",
         }
     )
@@ -119,11 +139,7 @@ def new_external_config():
 
     # Intent Classifier
     pipeline.append(
-        {
-            "name": "DIETClassifier",
-            "entity_recognition": "False",
-            "BILOU_flag": "False",
-        }
+        {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
     )
 
     # Entity Extractor
@@ -131,17 +147,18 @@ def new_external_config():
 
     return pipeline
 
+
 def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     pipeline = []
 
-    if update.get("algorithm") == "EXTERNAL_NEW":
-        pipeline = new_external_config()
+    if update.get("algorithm") == "BERT":
+        pipeline = bert_config()
         return pipeline
-    elif update.get("algorithm")  == "INTERNAL_NEW":
-        pipeline = new_internal_config()
+    elif update.get("algorithm") == "ALGORITHM_TRANSFORMER_NETWORK_DIET":
+        pipeline = transformer_network_diet_config()
         return pipeline
-    elif update.get("algorithm")  == "INTERNAL_OLD":
-        pipeline = old_internal_config()
+    elif update.get("algorithm") == "ALGORITHM_TRANSFORMER_NETWORK_DIET_WORD_EMBEDDING":
+        pipeline = transformer_network_diet_word_embedding_config()
         return pipeline
 
     use_spacy = update.get("algorithm") == update.get(
@@ -152,17 +169,9 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
         {"name": "bothub_nlp_nlu.pipeline_components." "preprocessing.Preprocessing"}
     )
     # load spacy
-    pipeline.append(
-        {
-            "name": "SpacyNLP"
-        }
-    )
+    pipeline.append({"name": "SpacyNLP"})
     # tokenizer
-    pipeline.append(
-        {
-            "name": "SpacyTokenizer"
-        }
-    )
+    pipeline.append({"name": "SpacyTokenizer"})
     # featurizer
     if use_spacy:
         pipeline.append({"name": "SpacyFeaturizer"})
@@ -179,10 +188,7 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
             )
         else:
             pipeline.append(
-                {
-                    "name": "CountVectorsFeaturizer",
-                    "token_pattern": "(?u)\\b\\w+\\b",
-                }
+                {"name": "CountVectorsFeaturizer", "token_pattern": "(?u)\\b\\w+\\b"}
             )
     # intent classifier
     pipeline.append(
