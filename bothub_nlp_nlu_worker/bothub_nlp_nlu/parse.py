@@ -1,5 +1,4 @@
 from collections import OrderedDict
-
 from .utils import backend
 from .utils import update_interpreters
 
@@ -17,6 +16,8 @@ def minimal_entity(entity, self_flag=False):  # pragma: no cover
         "value": entity.get("value"),
         "entity": entity.get("entity"),
         "confidence": entity.get("confidence"),
+        "start": entity.get("start"),
+        "end": entity.get("end"),
     }
 
     if self_flag:
@@ -67,7 +68,6 @@ def parse_text(
         repository_version, repository_authorization, use_cache=use_cache
     )
     r = interpreter.parse(text)
-    print(r)
 
     if rasa_format:
         return r

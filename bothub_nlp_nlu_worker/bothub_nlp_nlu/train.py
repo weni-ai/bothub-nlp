@@ -74,25 +74,20 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
             examples = []
             label_examples = []
 
-            get_examples = backend().request_backend_get_entities_and_labels_nlu(
-                repository_version,
-                update_request.get("language"),
-                json.dumps(
-                    {
-                        "examples": examples_list,
-                        "label_examples_query": examples_label_list,
-                        "repository_version": repository_version,
-                    }
-                ),
-                repository_authorization,
-            )
-
-            for example in get_examples.get("examples"):
+            for example in examples_list:
                 examples.append(
                     Message.build(
                         text=example.get("text"),
                         intent=example.get("intent"),
                         entities=example.get("entities"),
+                    )
+                )
+
+            for label_example in examples_label_list:
+                label_examples.append(
+                    Message.build(
+                        text=label_example.get("text"),
+                        entities=label_example.get("entities"),
                     )
                 )
 
