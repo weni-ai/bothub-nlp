@@ -32,15 +32,11 @@ class BothubWriter(TrainingDataWriter):
         formatted_examples = [
             example.as_dict() for example in training_data.training_examples
         ]
-        formatted_label_examples = [
-            example.as_dict() for example in training_data.label_training_examples or []
-        ]
 
         return json_to_string(
             {
                 "rasa_nlu_data": {
                     "common_examples": formatted_examples,
-                    "label_examples": formatted_label_examples,
                     "regex_features": training_data.regex_features,
                     "entity_synonyms": formatted_synonyms,
                 }
@@ -78,20 +74,7 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
             examples = []
             label_examples = []
 
-            get_examples = backend().request_backend_get_entities_and_labels_nlu(
-                repository_version,
-                update_request.get("language"),
-                json.dumps(
-                    {
-                        "examples": examples_list,
-                        "label_examples_query": examples_label_list,
-                        "repository_version": repository_version,
-                    }
-                ),
-                repository_authorization,
-            )
-
-            for example in get_examples.get("examples"):
+            for example in examples_list:
                 examples.append(
                     Message.build(
                         text=example.get("text"),
@@ -100,7 +83,7 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
                     )
                 )
 
-            for label_example in get_examples.get("label_examples"):
+            for label_example in examples_label_list:
                 label_examples.append(
                     Message.build(
                         text=label_example.get("text"),

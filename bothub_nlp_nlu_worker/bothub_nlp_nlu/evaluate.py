@@ -31,38 +31,91 @@ excluded_itens = [
 ]
 
 
-def collect_nlu_successes(intent_results):
+def collect_incorrect_entity_predictions(
+    entity_results, merged_predictions, merged_targets
+):
+    errors = []
+    offset = 0
+    for entity_result in entity_results:
+        for i in range(offset, offset + len(entity_result.tokens)):
+            if merged_targets[i] != merged_predictions[i]:
+                errors.append(
+                    {
+                        "text": entity_result.message,
+                        "entities": entity_result.entity_targets,
+                        "predicted_entities": entity_result.entity_predictions,
+                        "entity_status": "error",
+                    }
+                )
+                break
+        offset += len(entity_result.tokens)
+    return errors
+
+
+def is_start_end_in_list(entity, predicted_entities):
+    for predicted_entity in predicted_entities:
+        if (
+            entity.get("start") == predicted_entity.get("start")
+            and entity.get("end") == predicted_entity.get("end")
+            and entity.get("value") == predicted_entity.get("value")
+        ):
+            return predicted_entity
+    return False
+
+
+def is_entity_in_predicted(entity, predicted_entities, return_predicted=False):
+    for predicted_entity in predicted_entities:
+        if (
+            entity.get("start") == predicted_entity.get("start")
+            and entity.get("end") == predicted_entity.get("end")
+            and entity.get("value") == predicted_entity.get("value")
+            and entity.get("entity") == predicted_entity.get("entity")
+        ):
+            if return_predicted:
+                return predicted_entity, True
+            return True
+    if return_predicted:
+        return None, False
+    return False
+
+
+def is_false_success(sentence_eval):
+    for true_entity in sentence_eval["entities"]:
+        match = False
+        if is_entity_in_predicted(true_entity, sentence_eval["predicted_entities"]):
+            match = True
+        if match is False:
+            return True
+    return False
+
+
+def collect_successful_entity_predictions(
+    entity_results, merged_predictions, merged_targets
+):
+    successes = []
+    offset = 0
+    for entity_result in entity_results:
+        for i in range(offset, offset + len(entity_result.tokens)):
+            if (
+                merged_targets[i] == merged_predictions[i]
+                and merged_targets[i] != "no_entity"
+            ):
+                successes.append(
+                    {
+                        "text": entity_result.message,
+                        "entities": entity_result.entity_targets,
+                        "predicted_entities": entity_result.entity_predictions,
+                        "entity_status": "success",
+                    }
+                )
+                break
+        offset += len(entity_result.tokens)
     successes = [
-        {
-            "text": r.message,
-            "intent": r.intent_target,
-            "intent_prediction": {
-                "name": r.intent_prediction,
-                "confidence": r.confidence,
-            },
-            "status": "success",
-        }
-        for r in intent_results
-        if r.intent_target == r.intent_prediction
+        sentence_eval
+        for sentence_eval in successes
+        if not is_false_success(sentence_eval)
     ]
     return successes
-
-
-def collect_nlu_errors(intent_results):
-    errors = [
-        {
-            "text": r.message,
-            "intent": r.intent_target,
-            "intent_prediction": {
-                "name": r.intent_prediction,
-                "confidence": r.confidence,
-            },
-            "status": "error",
-        }
-        for r in intent_results
-        if r.intent_target != r.intent_prediction
-    ]
-    return errors
 
 
 def evaluate_entities(entity_results, extractors):  # pragma: no cover
@@ -86,14 +139,55 @@ def evaluate_entities(entity_results, extractors):  # pragma: no cover
             exclude_label="no_entity",
         )
 
+        log = collect_incorrect_entity_predictions(
+            entity_results, merged_predictions, merged_targets
+        ) + collect_successful_entity_predictions(
+            entity_results, merged_predictions, merged_targets
+        )
+
         result = {
             "report": report,
             "precision": precision,
             "f1_score": f1,
             "accuracy": accuracy,
+            "log": log,
         }
 
     return result
+
+
+def collect_nlu_successes(intent_results):
+    successes = [
+        {
+            "text": r.message,
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
+            "intent_status": "success",
+        }
+        for r in intent_results
+        if r.intent_target == r.intent_prediction
+    ]
+    return successes
+
+
+def collect_nlu_errors(intent_results):
+    errors = [
+        {
+            "text": r.message,
+            "intent": r.intent_target,
+            "intent_prediction": {
+                "name": r.intent_prediction,
+                "confidence": r.confidence,
+            },
+            "intent_status": "error",
+        }
+        for r in intent_results
+        if r.intent_target != r.intent_prediction
+    ]
+    return errors
 
 
 def evaluate_intents(intent_results):  # pragma: no cover
@@ -238,6 +332,57 @@ def entity_rasa_nlu_data(entity, evaluate):  # pragma: no cover
     }
 
 
+def get_formatted_log(merged_logs):
+    for merged_log in merged_logs:
+        if "entities" in merged_log:
+            entities = merged_log.get("entities")
+            predicted_entities = merged_log.get("predicted_entities")
+            merged_log["true_entities"] = []
+            merged_log["false_positive_entities"] = []
+            merged_log["swapped_error_entities"] = []
+            for entity in entities:
+                predicted_entity, is_entity_in_pred = is_entity_in_predicted(
+                    entity, predicted_entities, True
+                )
+                swap_error_entity = is_start_end_in_list(entity, predicted_entities)
+                if is_entity_in_pred:
+                    entity["status"] = "success"
+                    entity["confidence"] = predicted_entity.get("confidence")
+                    merged_log["true_entities"].append(entity)
+                elif swap_error_entity:
+                    pred_entity_copy = swap_error_entity.copy()
+                    pred_entity_copy["entity"] = entity.get("entity")
+                    pred_entity_copy["predicted_entity"] = swap_error_entity.get(
+                        "entity"
+                    )
+                    del pred_entity_copy["entity"]
+                    merged_log["swapped_error_entities"].append(pred_entity_copy)
+                else:
+                    entity["status"] = "error"
+                    merged_log["true_entities"].append(entity)
+
+            for predicted_entity in predicted_entities:
+                if not is_start_end_in_list(
+                    predicted_entity, merged_log.get("true_entities")
+                ) and not is_start_end_in_list(
+                    predicted_entity, merged_log["swapped_error_entities"]
+                ):
+                    merged_log["false_positive_entities"].append(predicted_entity)
+    return merged_logs
+
+
+def merge_intent_entity_log(intent_evaluation, entity_evaluation):
+    intent_logs = intent_evaluation.get("log")
+    entity_logs = entity_evaluation.get("log")
+    merged_logs = []
+    for intent_log in intent_logs:
+        for entity_log in entity_logs:
+            if intent_log.get("text") == entity_log.get("text"):
+                intent_log.update(entity_log)
+        merged_logs.append(intent_log)
+    return merged_logs
+
+
 def evaluate_update(repository_version, by, repository_authorization):
     evaluations = backend().request_backend_start_evaluation(
         repository_version, repository_authorization
@@ -278,14 +423,16 @@ def evaluate_update(repository_version, by, repository_authorization):
     intent_evaluation = result.get("intent_evaluation")
     entity_evaluation = result.get("entity_evaluation")
 
-    charts = plot_and_save_charts(repository_version, intent_results)
+    merged_logs = merge_intent_entity_log(intent_evaluation, entity_evaluation)
+    log = get_formatted_log(merged_logs)
 
+    charts = plot_and_save_charts(repository_version, intent_results)
     evaluate_result = backend().request_backend_create_evaluate_results(
         {
             "repository_version": repository_version,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
-            "log": json.dumps(intent_evaluation.get("log")),
+            "log": json.dumps(log),
             "intentprecision": intent_evaluation.get("precision"),
             "intentf1_score": intent_evaluation.get("f1_score"),
             "intentaccuracy": intent_evaluation.get("accuracy"),
