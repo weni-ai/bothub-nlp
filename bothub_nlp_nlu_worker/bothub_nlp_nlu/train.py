@@ -65,16 +65,17 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
     )
 
     examples_list = get_examples_request(repository_version, repository_authorization)
-    examples_label_list = get_examples_label_request(
-        repository_version, repository_authorization
-    )
+    # examples_label_list = get_examples_label_request(
+    #     repository_version, repository_authorization
+    # )
+    print(examples_list)
 
     with PokeLogging() as pl:
         try:
             examples = []
-            label_examples = []
 
             for example in examples_list:
+                print("Text: " + str(example.get("text")) + "   Intent:  " + str(example.get("intent")))
                 examples.append(
                     Message.build(
                         text=example.get("text"),
@@ -83,19 +84,12 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
                     )
                 )
 
-            for label_example in examples_label_list:
-                label_examples.append(
-                    Message.build(
-                        text=label_example.get("text"),
-                        entities=label_example.get("entities"),
-                    )
-                )
-
+            print('######### PRINT IS HERE ##############')
+            print(examples)
+            print(len(examples))
             rasa_nlu_config = get_rasa_nlu_config_from_update(update_request)
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
-            training_data = BothubTrainingData(
-                label_training_examples=label_examples, training_examples=examples
-            )
+            training_data = TrainingData(training_examples=examples)
 
             trainer.train(training_data)
 

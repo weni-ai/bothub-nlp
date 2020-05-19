@@ -231,6 +231,7 @@ class UpdateInterpreters:
         persistor = BothubPersistor(repository_version, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
+        # self.interpreters[repository_name] = Interpreter.load(
         self.interpreters[repository_name] = BothubInterpreter.load(
             model_directory, components.ComponentBuilder(use_cache=False)
         )
