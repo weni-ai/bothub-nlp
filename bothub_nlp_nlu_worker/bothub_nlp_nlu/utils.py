@@ -140,9 +140,8 @@ def bert_config(language):
 def legacy_internal_config(update):
     pipeline = []
     # load spacy
-    pipeline.append({"name": "SpacyNLP"})
     # tokenizer
-    pipeline.append({"name": "SpacyTokenizer"})
+    pipeline.append(add_whitespace_tokenizer)
     # featurizer
     pipeline.append(add_countvectors_featurizer(update))
     # intent classifier
