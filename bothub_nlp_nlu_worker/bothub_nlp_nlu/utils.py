@@ -96,7 +96,7 @@ def transformer_network_diet_word_embedding_config(update):
     pipeline.append({"name": "SpacyFeaturizer"})
 
     # Featurizer
-    pipeline.append(add_countvectors_featurizer())
+    pipeline.append(add_countvectors_featurizer(update))
     # Intent Classifier
     pipeline.append(
         {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
