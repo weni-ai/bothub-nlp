@@ -139,7 +139,6 @@ def bert_config(language):
 
 def legacy_internal_config(update):
     pipeline = []
-    # load spacy
     # tokenizer
     pipeline.append(add_whitespace_tokenizer)
     # featurizer
