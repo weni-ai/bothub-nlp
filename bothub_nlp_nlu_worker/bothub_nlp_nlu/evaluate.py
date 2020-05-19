@@ -368,8 +368,6 @@ def get_formatted_log(merged_logs):
                     predicted_entity, merged_log["swapped_error_entities"]
                 ):
                     merged_log["false_positive_entities"].append(predicted_entity)
-            del merged_log["entities"]
-            del merged_log["predicted_entities"]
     return merged_logs
 
 

@@ -170,6 +170,7 @@ tensor2tensor==1.14.1
 tensorboard==1.14.0
 tensorflow==1.14.0
 tensorflow-datasets==2.1.0
+Unidecode==1.1.1
 tensorflow-estimator==1.14.0
 tensorflow-gan==2.0.0
 tensorflow-hub==0.7.0

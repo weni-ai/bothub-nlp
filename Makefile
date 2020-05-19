@@ -38,7 +38,6 @@ install_development_requirements:
 start_celery:
 	@celery worker --autoscale 50,10 -O fair --workdir bothub_nlp_nlu_worker -A celery_app -c 1 -l INFO -E -Q en
 
-
 # Utils
 
 ## Colors

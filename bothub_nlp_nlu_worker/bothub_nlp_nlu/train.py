@@ -32,15 +32,11 @@ class BothubWriter(TrainingDataWriter):
         formatted_examples = [
             example.as_dict() for example in training_data.training_examples
         ]
-        formatted_label_examples = [
-            example.as_dict() for example in training_data.label_training_examples or []
-        ]
 
         return json_to_string(
             {
                 "rasa_nlu_data": {
                     "common_examples": formatted_examples,
-                    "label_examples": formatted_label_examples,
                     "regex_features": training_data.regex_features,
                     "entity_synonyms": formatted_synonyms,
                 }
