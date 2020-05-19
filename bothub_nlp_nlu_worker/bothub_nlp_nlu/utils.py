@@ -23,7 +23,10 @@ def add_whitespace_tokenizer():
 
 
 def add_preprocessing(update):
-    return {"name": "bothub_nlp_nlu.pipeline_components.preprocessing.Preprocessing", "language": update.get('language')}
+    return {
+        "name": "bothub_nlp_nlu.pipeline_components.preprocessing.Preprocessing",
+        "language": update.get("language"),
+    }
 
 
 def add_countvectors_featurizer(update):
@@ -83,9 +86,7 @@ def transformer_network_diet_word_embedding_config(update):
     pipeline = []
 
     # Preprocessing
-    pipeline.append(
-        add_preprocessing(update)
-    )
+    pipeline.append(add_preprocessing(update))
 
     # Language Model
     pipeline.append({"name": "SpacyNLP"})
@@ -108,9 +109,7 @@ def transformer_network_diet_word_embedding_config(update):
 def bert_config(language):
     pipeline = []
 
-    pipeline.append(
-        add_preprocessing(language)
-    )
+    pipeline.append(add_preprocessing(language))
     # NLP
     pipeline.append(
         {
@@ -140,10 +139,8 @@ def bert_config(language):
 
 def legacy_internal_config(update):
     pipeline = []
-    # load spacy
-    pipeline.append({"name": "SpacyNLP"})
     # tokenizer
-    pipeline.append({"name": "SpacyTokenizer"})
+    pipeline.append(add_whitespace_tokenizer)
     # featurizer
     pipeline.append(add_countvectors_featurizer(update))
     # intent classifier
@@ -181,7 +178,6 @@ def legacy_external_config(update):
 
 
 def get_rasa_nlu_config_from_update(update):  # pragma: no cover
-    print(update.get('algorithm'))
     if update.get("algorithm") == "BERT":
         pipeline = bert_config(update)
     elif update.get("algorithm") == "transformer_network_diet":
@@ -226,9 +222,9 @@ class UpdateInterpreters:
         persistor = BothubPersistor(repository_version, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
-        self.interpreters[repository_name] = Interpreter(None, {'language': update_request.get('language')}).load(
-            model_directory, components.ComponentBuilder(use_cache=False)
-        )
+        self.interpreters[repository_name] = Interpreter(
+            None, {"language": update_request.get("language")}
+        ).load(model_directory, components.ComponentBuilder(use_cache=False))
         return self.get(repository_version, repository_authorization)
 
 

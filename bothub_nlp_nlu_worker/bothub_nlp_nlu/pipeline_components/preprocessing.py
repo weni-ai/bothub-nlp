@@ -23,7 +23,9 @@ class Preprocessing(Component):
     # and should be able to create reasonable results with the defaults.
     defaults = {"language": None}
 
-    def __init__(self, component_config: Optional[Dict[Text, Any]] = None, language: str = None) -> None:
+    def __init__(
+        self, component_config: Optional[Dict[Text, Any]] = None, language: str = None
+    ) -> None:
         super().__init__(component_config)
         self.language = component_config.get("language")
 
@@ -136,7 +138,7 @@ class Preprocessing(Component):
         return cls(component_config, language)
 
     def provide_context(self) -> Dict[Text, Any]:
-        return {'language': self.language}
+        return {"language": self.language}
 
     def train(
         self,
@@ -169,11 +171,7 @@ class Preprocessing(Component):
                 print(example_text)
                 training_data.training_examples[idx - subtract_idx].text = example_text
 
-    def process(
-        self,
-        message: Message,
-        **kwargs: Any,
-    ) -> None:
+    def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
         print(self.language)
         APOSTROPHE_OPTIONS = ["'", "`"]
