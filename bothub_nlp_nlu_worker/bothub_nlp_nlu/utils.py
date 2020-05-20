@@ -45,15 +45,15 @@ def add_countvectors_featurizer(update):
 
 def add_embedding_intent_classifier():
     return {
-            "name": "DIETClassifier",
-            "hidden_layers_sizes": {"text": [256, 128]},
-            "number_of_transformer_layers": 0,
-            "weight_sparsity": 0,
-            "intent_classification": True,
-            "entity_recognition": False,
-            "use_masked_language_model": False,
-            "BILOU_flag": False,
-        }
+        "name": "DIETClassifier",
+        "hidden_layers_sizes": {"text": [256, 128]},
+        "number_of_transformer_layers": 0,
+        "weight_sparsity": 0,
+        "intent_classification": True,
+        "entity_recognition": False,
+        "use_masked_language_model": False,
+        "BILOU_flag": False,
+    }
 
 
 def add_diet_classifier():
@@ -64,7 +64,7 @@ def legacy_internal_config(update):
     pipeline = [
         add_whitespace_tokenizer(),  # Tokenizer
         add_countvectors_featurizer(update),  # Featurizer
-        add_embedding_intent_classifier()  # Intent Classifier
+        add_embedding_intent_classifier(),  # Intent Classifier
     ]
 
     return pipeline
@@ -76,7 +76,7 @@ def legacy_external_config(update):
         {"name": "SpacyTokenizer"},  # Tokenizer
         {"name": "SpacyFeaturizer"},  # Spacy Featurizer
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
-        add_embedding_intent_classifier()  # intent classifier
+        add_embedding_intent_classifier(),  # intent classifier
     ]
 
     return pipeline
@@ -87,7 +87,7 @@ def transformer_network_diet_config(update):
         add_preprocessing(update),  # Preprocessing
         add_whitespace_tokenizer(),  # Tokenizer
         add_countvectors_featurizer(update),  # Featurizer
-        add_diet_classifier()  # Intent Classifier
+        add_diet_classifier(),  # Intent Classifier
     ]
 
     return pipeline
@@ -100,7 +100,7 @@ def transformer_network_diet_word_embedding_config(update):
         {"name": "SpacyTokenizer"},  # Tokenizer
         {"name": "SpacyFeaturizer"},  # Spacy Featurizer
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
-        add_diet_classifier()  # Intent Classifier
+        add_diet_classifier(),  # Intent Classifier
     ]
 
     return pipeline
@@ -119,10 +119,10 @@ def transformer_network_diet_bert_config(update):
             "intent_split_symbol": "_",
         },
         {  # Bert Featurizer
-            "name": "bothub_nlp_nlu.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom",
+            "name": "bothub_nlp_nlu.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
         },
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
-        add_diet_classifier()  # Intent Classifier
+        add_diet_classifier(),  # Intent Classifier
     ]
 
     return pipeline
