@@ -21,10 +21,13 @@ class Preprocessing(Component):
     # these values can be overwritten in the pipeline configuration
     # of the model. The component should choose sensible defaults
     # and should be able to create reasonable results with the defaults.
-    defaults = {}
+    defaults = {"language": None}
 
-    def __init__(self, component_config: Optional[Dict[Text, Any]] = None) -> None:
+    def __init__(
+        self, component_config: Optional[Dict[Text, Any]] = None, language: str = None
+    ) -> None:
         super().__init__(component_config)
+        self.language = component_config.get("language")
 
     def portuguese_preprocesing(self, phrase):
 
@@ -126,6 +129,17 @@ class Preprocessing(Component):
 
         return phrase
 
+    @classmethod
+    def create(
+        cls, component_config: Dict[Text, Any], config: RasaNLUModelConfig
+    ) -> "Preprocessing":
+        # component_config = override_defaults(cls.defaults, component_config)
+        language = config.language
+        return cls(component_config, language)
+
+    def provide_context(self) -> Dict[Text, Any]:
+        return {"language": self.language}
+
     def train(
         self,
         training_data: TrainingData,
@@ -133,7 +147,6 @@ class Preprocessing(Component):
         **kwargs: Any,
     ) -> None:
         """Train this component"""
-
         not_repeated_phrases = set()
         size = len(training_data.training_examples)
         subtract_idx = 0
@@ -158,14 +171,9 @@ class Preprocessing(Component):
                 print(example_text)
                 training_data.training_examples[idx - subtract_idx].text = example_text
 
-    def process(
-        self,
-        message: Message,
-        config: Optional[RasaNLUModelConfig] = None,
-        **kwargs: Any,
-    ) -> None:
+    def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
-
+        print(self.language)
         APOSTROPHE_OPTIONS = ["'", "`"]
 
         # removing accent and lowercasing characters
@@ -174,9 +182,8 @@ class Preprocessing(Component):
         for APOSTROPHE in APOSTROPHE_OPTIONS:
             message.text = message.text.replace(APOSTROPHE, "")
 
-        if config.language == "en":
+        if self.language == "en":
             message.text = self.english_preprocesing(message.text)
-            print(message.text)
 
-        if config.language == "pt_br":
+        if self.language == "pt_br":
             message.text = self.portuguese_preprocesing(message.text)

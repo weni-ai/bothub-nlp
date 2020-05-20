@@ -47,9 +47,7 @@ def format_parse_output(
             ("intent_ranking", intent_ranking),
             (
                 "entities_list",
-                list(
-                    OrderedDict.fromkeys([x.get("entity") for x in entities])
-                ),
+                list(OrderedDict.fromkeys([x.get("entity") for x in entities])),
             ),
             ("entities", entities),
         ]

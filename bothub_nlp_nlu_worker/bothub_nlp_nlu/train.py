@@ -1,4 +1,3 @@
-import json
 from tempfile import mkdtemp
 from collections import defaultdict
 
@@ -6,6 +5,7 @@ from rasa.nlu.model import Trainer
 from rasa.nlu.training_data import Message, TrainingData
 from rasa.nlu.components import ComponentBuilder
 from rasa.nlu.training_data.formats.readerwriter import TrainingDataWriter
+
 from rasa.nlu.utils import json_to_string
 
 from .utils import get_rasa_nlu_config_from_update
@@ -70,7 +70,12 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
             examples = []
 
             for example in examples_list:
-                print("Text: " + str(example.get("text")) + "   Intent:  " + str(example.get("intent")))
+                print(
+                    "Text: "
+                    + str(example.get("text"))
+                    + "   Intent:  "
+                    + str(example.get("intent"))
+                )
                 examples.append(
                     Message.build(
                         text=example.get("text"),
