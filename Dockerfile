@@ -30,17 +30,13 @@ ENV BUILD_PACKAGES "build-essential"
 
 RUN apt-get update && apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
 
+FROM base
+
 RUN pip install --upgrade pip
 
 RUN pip install -U pip setuptools
 
-RUN pip wheel --wheel-dir=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
-
-FROM base
-
-COPY --from=builder ${PYTHON_WHEELS_PATH} ${PYTHON_WHEELS_PATH}
-
-RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
+RUN pip install ${PIP_REQUIREMENTS}
 
 COPY . .
 
