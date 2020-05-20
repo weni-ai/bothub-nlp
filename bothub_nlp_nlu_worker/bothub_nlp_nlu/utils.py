@@ -43,151 +43,104 @@ def add_countvectors_featurizer(update):
         return {"name": "CountVectorsFeaturizer", "token_pattern": "(?u)\\b\\w+\\b"}
 
 
-def transformer_network_diet_config(update):
-    pipeline = []
-
-    # Preprocessing
-    pipeline.append(add_preprocessing(update))
-    # Tokenizer
-    pipeline.append(add_whitespace_tokenizer())
-    # Featurizer
-    pipeline.append(add_countvectors_featurizer(update))
-    # Intent Classifier
-    pipeline.append(
-        {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
-    )
-    return pipeline
+def add_embedding_intent_classifier():
+    return {
+        "name": "DIETClassifier",
+        "hidden_layers_sizes": {"text": [256, 128]},
+        "number_of_transformer_layers": 0,
+        "weight_sparsity": 0,
+        "intent_classification": True,
+        "entity_recognition": False,
+        "use_masked_language_model": False,
+        "BILOU_flag": False,
+    }
 
 
-def old_internal_config():
-    pipeline = []
-
-    # Tokenizer
-    pipeline.append(add_whitespace_tokenizer())
-    # Featurizer
-    pipeline.append(add_countvectors_featurizer())
-    # Intent Classifier
-    pipeline.append(
-        {
-            "name": "DIETClassifier",
-            "hidden_layers_sizes": {"text": [256, 128]},
-            "number_of_transformer_layers": 0,
-            "weight_sparsity": 0,
-            "intent_classification": "True",
-            "entity_recognition": "False",
-            "use_masked_language_model": "False",
-            "BILOU_flag": "False",
-        }
-    )
-    return pipeline
-
-
-def transformer_network_diet_word_embedding_config(update):
-    pipeline = []
-
-    # Preprocessing
-    pipeline.append(add_preprocessing(update))
-
-    # Language Model
-    pipeline.append({"name": "SpacyNLP"})
-
-    # Tokenizer
-    pipeline.append({"name": "SpacyTokenizer"})
-    # Featurizer
-    pipeline.append({"name": "SpacyFeaturizer"})
-
-    # Featurizer
-    pipeline.append(add_countvectors_featurizer(update))
-    # Intent Classifier
-    pipeline.append(
-        {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
-    )
-
-    return pipeline
-
-
-def bert_config(language):
-    pipeline = []
-
-    pipeline.append(add_preprocessing(language))
-    # NLP
-    pipeline.append(
-        {
-            "name": "bothub_nlp_nlu.pipeline_components.HFTransformerNLP.HFTransformersNLP",
-            "model_name": "bert_portuguese",
-        }
-    )
-    # Tokenizer
-    pipeline.append(
-        {
-            "name": "bothub_nlp_nlu.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
-            "intent_tokenization_flag": "False",
-            "intent_split_symbol": "_",
-        }
-    )
-    # Featurizer
-    featurizer_component = add_countvectors_featurizer()
-    pipeline.append(featurizer_component)
-
-    # Intent Classifier
-    pipeline.append(
-        {"name": "DIETClassifier", "entity_recognition": "False", "BILOU_flag": "False"}
-    )
-
-    return pipeline
+def add_diet_classifier():
+    return {"name": "DIETClassifier", "entity_recognition": False, "BILOU_flag": False}
 
 
 def legacy_internal_config(update):
-    pipeline = []
-    # tokenizer
-    pipeline.append(add_whitespace_tokenizer)
-    # featurizer
-    pipeline.append(add_countvectors_featurizer(update))
-    # intent classifier
-    pipeline.append(
-        {
-            "name": "EmbeddingIntentClassifier",
-            "similarity_type": "inner"
-            if update.get("use_competing_intents")
-            else "cosine",
-        }
-    )
+    pipeline = [
+        add_whitespace_tokenizer(),  # Tokenizer
+        add_countvectors_featurizer(update),  # Featurizer
+        add_embedding_intent_classifier(),  # Intent Classifier
+    ]
 
     return pipeline
 
 
 def legacy_external_config(update):
-    pipeline = []
-    # load spacy
-    pipeline.append({"name": "SpacyNLP"})
-    # tokenizer
-    pipeline.append({"name": "SpacyTokenizer"})
-    # featurizer
-    pipeline.append({"name": "SpacyFeaturizer"})
-    # intent classifier
-    pipeline.append(
-        {
-            "name": "EmbeddingIntentClassifier",
-            "similarity_type": "inner"
-            if update.get("use_competing_intents")
-            else "cosine",
-        }
-    )
+    pipeline = [
+        {"name": "SpacyNLP"},  # Language Model
+        {"name": "SpacyTokenizer"},  # Tokenizer
+        {"name": "SpacyFeaturizer"},  # Spacy Featurizer
+        add_countvectors_featurizer(update),  # Bag of Words Featurizer
+        add_embedding_intent_classifier(),  # intent classifier
+    ]
+
+    return pipeline
+
+
+def transformer_network_diet_config(update):
+    pipeline = [
+        add_preprocessing(update),  # Preprocessing
+        add_whitespace_tokenizer(),  # Tokenizer
+        add_countvectors_featurizer(update),  # Featurizer
+        add_diet_classifier(),  # Intent Classifier
+    ]
+
+    return pipeline
+
+
+def transformer_network_diet_word_embedding_config(update):
+    pipeline = [
+        add_preprocessing(update),  # Preprocessing
+        {"name": "SpacyNLP"},  # Language Model
+        {"name": "SpacyTokenizer"},  # Tokenizer
+        {"name": "SpacyFeaturizer"},  # Spacy Featurizer
+        add_countvectors_featurizer(update),  # Bag of Words Featurizer
+        add_diet_classifier(),  # Intent Classifier
+    ]
+
+    return pipeline
+
+
+def transformer_network_diet_bert_config(update):
+    pipeline = [
+        add_preprocessing(update),
+        {  # NLP
+            "name": "bothub_nlp_nlu.pipeline_components.HFTransformerNLP.HFTransformersNLP",
+            "model_name": "bert_portuguese",
+        },
+        {  # Tokenizer
+            "name": "bothub_nlp_nlu.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
+            "intent_tokenization_flag": False,
+            "intent_split_symbol": "_",
+        },
+        {  # Bert Featurizer
+            "name": "bothub_nlp_nlu.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
+        },
+        add_countvectors_featurizer(update),  # Bag of Words Featurizer
+        add_diet_classifier(),  # Intent Classifier
+    ]
 
     return pipeline
 
 
 def get_rasa_nlu_config_from_update(update):  # pragma: no cover
-    if update.get("algorithm") == "BERT":
-        pipeline = bert_config(update)
+    if update.get("algorithm") == "neural_network_internal":
+        pipeline = legacy_internal_config(update)
+    elif update.get("algorithm") == "neural_network_external":
+        pipeline = legacy_external_config(update)
     elif update.get("algorithm") == "transformer_network_diet":
         pipeline = transformer_network_diet_config(update)
     elif update.get("algorithm") == "transformer_network_diet_word_embedding":
         pipeline = transformer_network_diet_word_embedding_config(update)
-    elif update.get("algorithm") == "neural_network_internal":
-        pipeline = legacy_internal_config(update)
-    elif update.get("algorithm") == "neural_network_external":
-        pipeline = legacy_external_config(update)
+    elif update.get("algorithm") == "transformer_network_diet_bert":
+        pipeline = transformer_network_diet_bert_config(update)
+    else:
+        return
 
     # entity extractor
     pipeline.append({"name": "CRFEntityExtractor"})
