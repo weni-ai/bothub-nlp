@@ -44,20 +44,6 @@ class BothubWriter(TrainingDataWriter):
         )
 
 
-class BothubTrainingData(TrainingData):
-    def __init__(self, label_training_examples=None, **kwargs):  # pragma: no cover
-        if label_training_examples:
-            self.label_training_examples = self.sanitize_examples(
-                label_training_examples
-            )
-        else:
-            self.label_training_examples = []
-        super().__init__(**kwargs)
-
-    def as_json(self, **kwargs):
-        return BothubWriter().dumps(self)  # pragma: no cover
-
-
 def train_update(repository_version, by, repository_authorization):  # pragma: no cover
     update_request = backend().request_backend_start_training_nlu(
         repository_version, by, repository_authorization
