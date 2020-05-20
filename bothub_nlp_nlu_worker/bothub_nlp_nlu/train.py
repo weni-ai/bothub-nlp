@@ -12,7 +12,6 @@ from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
 from .utils import backend
 from .utils import get_examples_request
-from .utils import get_examples_label_request
 from .persistor import BothubPersistor
 from . import logger
 
@@ -65,10 +64,6 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
     )
 
     examples_list = get_examples_request(repository_version, repository_authorization)
-    # examples_label_list = get_examples_label_request(
-    #     repository_version, repository_authorization
-    # )
-    print(examples_list)
 
     with PokeLogging() as pl:
         try:
@@ -84,9 +79,6 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
                     )
                 )
 
-            print('######### PRINT IS HERE ##############')
-            print(examples)
-            print(len(examples))
             rasa_nlu_config = get_rasa_nlu_config_from_update(update_request)
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
             training_data = TrainingData(training_examples=examples)

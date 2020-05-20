@@ -10,17 +10,6 @@ from rasa.nlu.config import RasaNLUModelConfig
 from rasa.nlu.model import Interpreter
 from .persistor import BothubPersistor
 
-
-class BothubInterpreter(Interpreter):
-    @staticmethod
-    def default_output_attributes():  # pragma: no cover
-        return {
-            "intent": {"name": None, "confidence": 0.0},
-            "entities": [],
-            "labels_as_entity": [],
-        }
-
-
 def backend():
     return bothub_backend.get_backend(
         "bothub_backend.bothub.BothubBackend",
@@ -231,8 +220,7 @@ class UpdateInterpreters:
         persistor = BothubPersistor(repository_version, repository_authorization)
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
-        # self.interpreters[repository_name] = Interpreter.load(
-        self.interpreters[repository_name] = BothubInterpreter.load(
+        self.interpreters[repository_name] = Interpreter.load(
             model_directory, components.ComponentBuilder(use_cache=False)
         )
         return self.get(repository_version, repository_authorization)
