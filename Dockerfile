@@ -40,6 +40,10 @@ FROM base
 
 COPY --from=builder ${PYTHON_WHEELS_PATH} ${PYTHON_WHEELS_PATH}
 
+RUN pip install --upgrade pip
+
+RUN pip install -U pip setuptools
+
 RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
 COPY . .
