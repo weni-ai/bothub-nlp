@@ -70,7 +70,6 @@ def legacy_internal_config(update):
         add_countvectors_featurizer(update),  # Featurizer
         add_embedding_intent_classifier(),  # Intent Classifier
     ]
-
     return pipeline
 
 
@@ -82,7 +81,6 @@ def legacy_external_config(update):
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
         add_embedding_intent_classifier(),  # intent classifier
     ]
-
     return pipeline
 
 
@@ -93,7 +91,6 @@ def transformer_network_diet_config(update):
         add_countvectors_featurizer(update),  # Featurizer
         add_diet_classifier(),  # Intent Classifier
     ]
-
     return pipeline
 
 
@@ -106,7 +103,6 @@ def transformer_network_diet_word_embedding_config(update):
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
         add_diet_classifier(),  # Intent Classifier
     ]
-
     return pipeline
 
 
@@ -128,7 +124,6 @@ def transformer_network_diet_bert_config(update):
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
         add_diet_classifier(),  # Intent Classifier
     ]
-
     return pipeline
 
 
