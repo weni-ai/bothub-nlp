@@ -56,12 +56,6 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
             examples = []
 
             for example in examples_list:
-                print(
-                    "Text: "
-                    + str(example.get("text"))
-                    + "   Intent:  "
-                    + str(example.get("intent"))
-                )
                 examples.append(
                     Message.build(
                         text=example.get("text"),
