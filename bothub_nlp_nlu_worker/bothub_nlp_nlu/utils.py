@@ -18,6 +18,10 @@ def backend():
     )
 
 
+def add_spacy_nlp():
+    return {"name": "bothub_nlp_nlu.pipeline_components.spacy_nlp.SpacyNLP"}
+
+
 def add_whitespace_tokenizer():
     return {"name": "WhitespaceTokenizer"}
 
@@ -72,7 +76,7 @@ def legacy_internal_config(update):
 
 def legacy_external_config(update):
     pipeline = [
-        {"name": "SpacyNLP"},  # Language Model
+        add_spacy_nlp(),  # Language Model
         {"name": "SpacyTokenizer"},  # Tokenizer
         {"name": "SpacyFeaturizer"},  # Spacy Featurizer
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
@@ -96,7 +100,7 @@ def transformer_network_diet_config(update):
 def transformer_network_diet_word_embedding_config(update):
     pipeline = [
         add_preprocessing(update),  # Preprocessing
-        {"name": "SpacyNLP"},  # Language Model
+        add_spacy_nlp(),  # Language Model
         {"name": "SpacyTokenizer"},  # Tokenizer
         {"name": "SpacyFeaturizer"},  # Spacy Featurizer
         add_countvectors_featurizer(update),  # Bag of Words Featurizer
