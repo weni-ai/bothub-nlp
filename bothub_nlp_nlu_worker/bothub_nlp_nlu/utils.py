@@ -64,6 +64,41 @@ def add_diet_classifier():
     return {"name": "DIETClassifier", "entity_recognition": False, "BILOU_flag": False}
 
 
+def add_entity_extractor(pipeline):
+    pipeline.append(
+        {
+            "name": "LexicalSyntacticFeaturizer",
+            "features": [
+                ["low", "title", "upper"],
+                [
+                    "BOS",
+                    "EOS",
+                    "low",
+                    "prefix5",
+                    "prefix2",
+                    "suffix5",
+                    "suffix3",
+                    "suffix2",
+                    "upper",
+                    "title",
+                    "digit",
+                ],
+                ["low", "title", "upper"],
+            ],
+        }
+    )
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components.diet_classifier.DIETClassifierCustom",
+            "intent_classification": False,
+            "entity_recognition": True,
+            "use_masked_language_model": False,
+            "number_of_transformer_layers": 0,
+        }
+    )
+    return pipeline
+
+
 def legacy_internal_config(update):
     pipeline = [
         add_whitespace_tokenizer(),  # Tokenizer
@@ -142,7 +177,12 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
         return
 
     # entity extractor
-    pipeline.append({"name": "CRFEntityExtractor"})
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components.crf_entity_extractor.CRFEntityExtractor"
+        }
+    )
+    # pipeline = add_entity_extractor(pipeline)
 
     # spacy named entity recognition
     if update.get("use_name_entities"):

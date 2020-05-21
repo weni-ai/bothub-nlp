@@ -93,9 +93,7 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
 
             rasa_nlu_config = get_rasa_nlu_config_from_update(update_request)
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
-            training_data = BothubTrainingData(
-                label_training_examples=label_examples, training_examples=examples
-            )
+            training_data = TrainingData(training_examples=examples)
 
             trainer.train(training_data)
 
