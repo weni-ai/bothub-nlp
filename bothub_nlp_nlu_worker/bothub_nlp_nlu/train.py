@@ -1,4 +1,3 @@
-import json
 from tempfile import mkdtemp
 from collections import defaultdict
 
@@ -6,13 +5,13 @@ from rasa.nlu.model import Trainer
 from rasa.nlu.training_data import Message, TrainingData
 from rasa.nlu.components import ComponentBuilder
 from rasa.nlu.training_data.formats.readerwriter import TrainingDataWriter
+
 from rasa.nlu.utils import json_to_string
 
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
 from .utils import backend
 from .utils import get_examples_request
-from .utils import get_examples_label_request
 from .persistor import BothubPersistor
 from . import logger
 
@@ -45,34 +44,16 @@ class BothubWriter(TrainingDataWriter):
         )
 
 
-class BothubTrainingData(TrainingData):
-    def __init__(self, label_training_examples=None, **kwargs):  # pragma: no cover
-        if label_training_examples:
-            self.label_training_examples = self.sanitize_examples(
-                label_training_examples
-            )
-        else:
-            self.label_training_examples = []
-        super().__init__(**kwargs)
-
-    def as_json(self, **kwargs):
-        return BothubWriter().dumps(self)  # pragma: no cover
-
-
 def train_update(repository_version, by, repository_authorization):  # pragma: no cover
     update_request = backend().request_backend_start_training_nlu(
         repository_version, by, repository_authorization
     )
 
     examples_list = get_examples_request(repository_version, repository_authorization)
-    examples_label_list = get_examples_label_request(
-        repository_version, repository_authorization
-    )
 
     with PokeLogging() as pl:
         try:
             examples = []
-            label_examples = []
 
             for example in examples_list:
                 examples.append(
@@ -80,14 +61,6 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
                         text=example.get("text"),
                         intent=example.get("intent"),
                         entities=example.get("entities"),
-                    )
-                )
-
-            for label_example in examples_label_list:
-                label_examples.append(
-                    Message.build(
-                        text=label_example.get("text"),
-                        entities=label_example.get("entities"),
                     )
                 )
 
