@@ -168,12 +168,10 @@ class Preprocessing(Component):
                 subtract_idx += 1
             else:
                 not_repeated_phrases.add(example_text)
-                print(example_text)
                 training_data.training_examples[idx - subtract_idx].text = example_text
 
     def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
-        print(self.language)
         APOSTROPHE_OPTIONS = ["'", "`"]
 
         # removing accent and lowercasing characters

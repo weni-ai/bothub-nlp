@@ -4,7 +4,6 @@ from rasa.nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
 
 
 class SpacyNLP(RasaNLUSpacyNLP):
-
     @classmethod
     def load(
         cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs
@@ -27,4 +26,3 @@ class SpacyNLP(RasaNLUSpacyNLP):
 
         cls.ensure_proper_language_model(nlp_language)
         return cls(component_config, nlp_language)
-
