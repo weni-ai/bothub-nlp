@@ -2,6 +2,7 @@ import json
 import logging
 import uuid
 
+from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.test import get_entity_extractors, plot_attribute_confidences
 from rasa.nlu.test import get_evaluation_metrics
 from rasa.nlu.test import (
@@ -368,8 +369,6 @@ def get_formatted_log(merged_logs):
                     predicted_entity, merged_log["swapped_error_entities"]
                 ):
                     merged_log["false_positive_entities"].append(predicted_entity)
-            del merged_log["entities"]
-            del merged_log["predicted_entities"]
     return merged_logs
 
 
@@ -402,7 +401,7 @@ def evaluate_update(repository_version, by, repository_authorization):
 
     test_data = TrainingData(training_examples=training_examples)
     interpreter = update_interpreters.get(
-        repository_version, repository_authorization, use_cache=False
+        repository_version, repository_authorization, rasa_version, use_cache=False
     )
 
     result = {

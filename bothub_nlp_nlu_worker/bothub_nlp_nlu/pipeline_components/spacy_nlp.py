@@ -4,8 +4,6 @@ from rasa.nlu.utils.spacy_utils import SpacyNLP as RasaNLUSpacyNLP
 
 
 class SpacyNLP(RasaNLUSpacyNLP):
-    name = "optimized_spacy_nlp_with_labels"
-
     @classmethod
     def load(
         cls, meta, model_dir=None, model_metadata=None, cached_component=None, **kwargs
@@ -28,10 +26,3 @@ class SpacyNLP(RasaNLUSpacyNLP):
 
         cls.ensure_proper_language_model(nlp_language)
         return cls(component_config, nlp_language)
-
-    def train(self, training_data, config, **kwargs):
-        for example in training_data.training_examples:
-            example.set("spacy_doc", self.doc_for_text(example.text))
-        if training_data.label_training_examples:
-            for example in training_data.label_training_examples:
-                example.set("spacy_doc", self.doc_for_text(example.text))
