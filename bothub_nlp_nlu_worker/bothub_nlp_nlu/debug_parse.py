@@ -1,6 +1,7 @@
 import numpy as np
 from collections import OrderedDict
 from lime.lime_text import LimeTextExplainer
+from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.test import remove_pretrained_extractors
 from .parse import minimal_entity
 from .utils import backend
@@ -142,7 +143,7 @@ def debug_parse_text(
     repository_version, repository_authorization, text, use_cache=True
 ):
     interpreter = update_interpreters.get(
-        repository_version, repository_authorization, use_cache=use_cache
+        repository_version, repository_authorization, rasa_version, use_cache=use_cache
     )
     r = interpreter.parse(text)
 

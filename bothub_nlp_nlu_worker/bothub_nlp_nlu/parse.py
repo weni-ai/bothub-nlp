@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from .utils import backend
+from rasa.nlu import __version__ as rasa_version
 from .utils import update_interpreters
 
 
@@ -63,7 +63,7 @@ def parse_text(
     use_cache=True,
 ):
     interpreter = update_interpreters.get(
-        repository_version, repository_authorization, use_cache=use_cache
+        repository_version, repository_authorization, rasa_version, use_cache=use_cache
     )
     r = interpreter.parse(text)
 

@@ -1,6 +1,7 @@
 from tempfile import mkdtemp
 from collections import defaultdict
 
+from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.model import Trainer
 from rasa.nlu.training_data import Message, TrainingData
 from rasa.nlu.components import ComponentBuilder
@@ -70,7 +71,9 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
 
             trainer.train(training_data)
 
-            persistor = BothubPersistor(repository_version, repository_authorization)
+            persistor = BothubPersistor(
+                repository_version, repository_authorization, rasa_version
+            )
             trainer.persist(
                 mkdtemp(),
                 persistor=persistor,
