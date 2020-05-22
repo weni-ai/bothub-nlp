@@ -221,7 +221,7 @@ class UpdateInterpreters:
         self.interpreters[repository_name] = Interpreter(
             None, {"language": update_request.get("language")}
         ).load(model_directory, components.ComponentBuilder(use_cache=False))
-        return self.get(repository_version, repository_authorization)
+        return self.get(repository_version, repository_authorization, rasa_version)
 
 
 class PokeLoggingHandler(logging.StreamHandler):
