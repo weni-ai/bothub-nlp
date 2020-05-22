@@ -1,6 +1,5 @@
 from collections import OrderedDict
-
-from .utils import backend
+from rasa.nlu import __version__ as rasa_version
 from .utils import update_interpreters
 
 
@@ -17,6 +16,8 @@ def minimal_entity(entity, self_flag=False):  # pragma: no cover
         "value": entity.get("value"),
         "entity": entity.get("entity"),
         "confidence": entity.get("confidence"),
+        "start": entity.get("start"),
+        "end": entity.get("end"),
     }
 
     if self_flag:
@@ -38,52 +39,17 @@ def format_parse_output(
 ):  # pragma: no cover
     intent = r.get("intent", None)
     intent_ranking = r.get("intent_ranking")
-    labels_as_entity = r.get("labels_as_entity")
-    extracted_entities = r.get("entities")
-
-    entities = labels_as_entity
-
-    for entity in extracted_entities:
-        replaced = False
-        for i, label in enumerate(labels_as_entity):
-            if position_match(entity, label):
-                entities[i] = entity
-                replaced = True
-                break
-        if not replaced:
-            entities.append(entity)
-
-    entities_dict = {}
-
-    for entity in reversed(order_by_confidence(entities)):
-        label_value = "other"
-        is_label = entity.get("label_as_entity", False)
-        if is_label:
-            label_value = entity.get("entity")
-        else:
-            repository_entity = backend().request_backend_repository_entity_nlu_parse(
-                repository_version, repository_authorization, entity.get("entity")
-            )
-            if repository_entity.get("label"):
-                label_value = repository_entity.get("label_value")
-
-        if not entities_dict.get(label_value):
-            entities_dict[label_value] = []
-
-        entities_dict[label_value].append(minimal_entity(entity, is_label))
+    entities = r.get("entities")
 
     out = OrderedDict(
         [
             ("intent", intent),
             ("intent_ranking", intent_ranking),
-            ("labels_list", list(entities_dict.keys())),
             (
                 "entities_list",
-                list(
-                    OrderedDict.fromkeys([x.get("entity") for x in extracted_entities])
-                ),
+                list(OrderedDict.fromkeys([x.get("entity") for x in entities])),
             ),
-            ("entities", entities_dict),
+            ("entities", entities),
         ]
     )
     return out
@@ -97,7 +63,7 @@ def parse_text(
     use_cache=True,
 ):
     interpreter = update_interpreters.get(
-        repository_version, repository_authorization, use_cache=use_cache
+        repository_version, repository_authorization, rasa_version, use_cache=use_cache
     )
     r = interpreter.parse(text)
 

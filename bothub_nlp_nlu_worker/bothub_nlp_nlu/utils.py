@@ -11,16 +11,6 @@ from rasa.nlu.model import Interpreter
 from .persistor import BothubPersistor
 
 
-class BothubInterpreter(Interpreter):
-    @staticmethod
-    def default_output_attributes():  # pragma: no cover
-        return {
-            "intent": {"name": None, "confidence": 0.0},
-            "entities": [],
-            "labels_as_entity": [],
-        }
-
-
 def backend():
     return bothub_backend.get_backend(
         "bothub_backend.bothub.BothubBackend",
@@ -28,69 +18,176 @@ def backend():
     )
 
 
-def get_rasa_nlu_config_from_update(update):  # pragma: no cover
-    pipeline = []
-    use_spacy = update.get("algorithm") == update.get(
-        "ALGORITHM_NEURAL_NETWORK_EXTERNAL"
-    )
-    # load spacy
-    pipeline.append(
-        {
-            "name": "bothub_nlp_nlu.pipeline_components."
-            "optimized_spacy_nlp_with_labels.SpacyNLP"
+def add_spacy_nlp():
+    return {"name": "bothub_nlp_nlu.pipeline_components.spacy_nlp.SpacyNLP"}
+
+
+def add_whitespace_tokenizer():
+    return {"name": "WhitespaceTokenizer"}
+
+
+def add_preprocessing(update):
+    return {
+        "name": "bothub_nlp_nlu.pipeline_components.preprocessing.Preprocessing",
+        "language": update.get("language"),
+    }
+
+
+def add_countvectors_featurizer(update):
+    if update.get("use_analyze_char"):
+        return {
+            "name": "CountVectorsFeaturizer",
+            "analyzer": "char",
+            "min_ngram": 3,
+            "max_ngram": 3,
+            "token_pattern": "(?u)\\b\\w+\\b",
         }
-    )
-    # tokenizer
-    pipeline.append(
-        {
-            "name": "bothub_nlp_nlu.pipeline_components."
-            "tokenizer_spacy_with_labels.SpacyTokenizer"
-        }
-    )
-    # featurizer
-    if use_spacy:
-        pipeline.append({"name": "SpacyFeaturizer"})
+
     else:
-        if update.get("use_analyze_char"):
-            pipeline.append(
-                {
-                    "name": "CountVectorsFeaturizer",
-                    "analyzer": "char",
-                    "min_ngram": 3,
-                    "max_ngram": 3,
-                    "token_pattern": "(?u)\\b\\w+\\b",
-                }
-            )
-        else:
-            pipeline.append(
-                {
-                    "name": "bothub_nlp_nlu.pipeline_components."
-                    "count_vectors_featurizer_no_lemmatize.CountVectorsFeaturizerCustom",
-                    "token_pattern": "(?u)\\b\\w+\\b",
-                }
-            )
-    # intent classifier
+        return {"name": "CountVectorsFeaturizer", "token_pattern": "(?u)\\b\\w+\\b"}
+
+
+def add_embedding_intent_classifier():
+    return {
+        "name": "DIETClassifier",
+        "hidden_layers_sizes": {"text": [256, 128]},
+        "number_of_transformer_layers": 0,
+        "weight_sparsity": 0,
+        "intent_classification": True,
+        "entity_recognition": False,
+        "use_masked_language_model": False,
+        "BILOU_flag": False,
+    }
+
+
+def add_diet_classifier():
+    return {"name": "DIETClassifier", "entity_recognition": False, "BILOU_flag": False}
+
+
+def add_entity_extractor(pipeline):
     pipeline.append(
         {
-            "name": "EmbeddingIntentClassifier",
-            "similarity_type": "inner"
-            if update.get("use_competing_intents")
-            else "cosine",
+            "name": "LexicalSyntacticFeaturizer",
+            "features": [
+                ["low", "title", "upper"],
+                [
+                    "BOS",
+                    "EOS",
+                    "low",
+                    "prefix5",
+                    "prefix2",
+                    "suffix5",
+                    "suffix3",
+                    "suffix2",
+                    "upper",
+                    "title",
+                    "digit",
+                ],
+                ["low", "title", "upper"],
+            ],
         }
     )
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components.diet_classifier.DIETClassifierCustom",
+            "intent_classification": False,
+            "entity_recognition": True,
+            "use_masked_language_model": False,
+            "number_of_transformer_layers": 0,
+        }
+    )
+    return pipeline
+
+
+def legacy_internal_config(update):
+    pipeline = [
+        add_whitespace_tokenizer(),  # Tokenizer
+        add_countvectors_featurizer(update),  # Featurizer
+        add_embedding_intent_classifier(),  # Intent Classifier
+    ]
+    return pipeline
+
+
+def legacy_external_config(update):
+    pipeline = [
+        add_spacy_nlp(),  # Language Model
+        {"name": "SpacyTokenizer"},  # Tokenizer
+        {"name": "SpacyFeaturizer"},  # Spacy Featurizer
+        add_countvectors_featurizer(update),  # Bag of Words Featurizer
+        add_embedding_intent_classifier(),  # intent classifier
+    ]
+    return pipeline
+
+
+def transformer_network_diet_config(update):
+    pipeline = [
+        add_preprocessing(update),  # Preprocessing
+        add_whitespace_tokenizer(),  # Tokenizer
+        add_countvectors_featurizer(update),  # Featurizer
+        add_diet_classifier(),  # Intent Classifier
+    ]
+    return pipeline
+
+
+def transformer_network_diet_word_embedding_config(update):
+    pipeline = [
+        add_preprocessing(update),  # Preprocessing
+        add_spacy_nlp(),  # Language Model
+        {"name": "SpacyTokenizer"},  # Tokenizer
+        {"name": "SpacyFeaturizer"},  # Spacy Featurizer
+        add_countvectors_featurizer(update),  # Bag of Words Featurizer
+        add_diet_classifier(),  # Intent Classifier
+    ]
+    return pipeline
+
+
+def transformer_network_diet_bert_config(update):
+    pipeline = [
+        add_preprocessing(update),
+        {  # NLP
+            "name": "bothub_nlp_nlu.pipeline_components.HFTransformerNLP.HFTransformersNLP",
+            "model_name": "bert_portuguese",
+        },
+        {  # Tokenizer
+            "name": "bothub_nlp_nlu.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
+            "intent_tokenization_flag": False,
+            "intent_split_symbol": "_",
+        },
+        {  # Bert Featurizer
+            "name": "bothub_nlp_nlu.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
+        },
+        add_countvectors_featurizer(update),  # Bag of Words Featurizer
+        add_diet_classifier(),  # Intent Classifier
+    ]
+    return pipeline
+
+
+def get_rasa_nlu_config_from_update(update):  # pragma: no cover
+    if update.get("algorithm") == "neural_network_internal":
+        pipeline = legacy_internal_config(update)
+    elif update.get("algorithm") == "neural_network_external":
+        pipeline = legacy_external_config(update)
+    elif update.get("algorithm") == "transformer_network_diet":
+        pipeline = transformer_network_diet_config(update)
+    elif update.get("algorithm") == "transformer_network_diet_word_embedding":
+        pipeline = transformer_network_diet_word_embedding_config(update)
+    elif update.get("algorithm") == "transformer_network_diet_bert":
+        pipeline = transformer_network_diet_bert_config(update)
+    else:
+        return
 
     # entity extractor
-    pipeline.append({"name": "CRFEntityExtractor"})
+    pipeline.append(
+        {
+            "name": "bothub_nlp_nlu.pipeline_components.crf_entity_extractor.CRFEntityExtractor"
+        }
+    )
+    # pipeline = add_entity_extractor(pipeline)
+
     # spacy named entity recognition
     if update.get("use_name_entities"):
         pipeline.append({"name": "SpacyEntityExtractor"})
-    # label extractor
-    pipeline.append(
-        {
-            "name": "bothub_nlp_nlu.pipeline_components."
-            "crf_label_as_entity_extractor.CRFLabelAsEntityExtractor"
-        }
-    )
+
     return RasaNLUModelConfig(
         {"language": update.get("language"), "pipeline": pipeline}
     )
@@ -99,7 +196,9 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
 class UpdateInterpreters:
     interpreters = {}
 
-    def get(self, repository_version, repository_authorization, use_cache=True):
+    def get(
+        self, repository_version, repository_authorization, rasa_version, use_cache=True
+    ):
         update_request = backend().request_backend_parse_nlu(
             repository_version, repository_authorization
         )
@@ -114,13 +213,15 @@ class UpdateInterpreters:
 
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(repository_version, repository_authorization)
+        persistor = BothubPersistor(
+            repository_version, repository_authorization, rasa_version
+        )
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
-        self.interpreters[repository_name] = BothubInterpreter.load(
-            model_directory, components.ComponentBuilder(use_cache=False)
-        )
-        return self.get(repository_version, repository_authorization)
+        self.interpreters[repository_name] = Interpreter(
+            None, {"language": update_request.get("language")}
+        ).load(model_directory, components.ComponentBuilder(use_cache=False))
+        return self.get(repository_version, repository_authorization, rasa_version)
 
 
 class PokeLoggingHandler(logging.StreamHandler):
@@ -183,28 +284,3 @@ def get_examples_request(update_id, repository_authorization):  # pragma: no cov
             page = request_examples_page.get("next")
 
     return examples
-
-
-def get_examples_label_request(update_id, repository_authorization):  # pragma: no cover
-    start_examples = backend().request_backend_get_examples_labels(
-        update_id, False, None, repository_authorization
-    )
-
-    examples_label = start_examples.get("results")
-
-    page = start_examples.get("next")
-
-    if page:
-        while True:
-            request_examples_page = backend().request_backend_get_examples_labels(
-                update_id, True, page, repository_authorization
-            )
-
-            examples_label += request_examples_page.get("results")
-
-            if request_examples_page.get("next") is None:
-                break
-
-            page = request_examples_page.get("next")
-
-    return examples_label
