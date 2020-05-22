@@ -2,6 +2,7 @@ import json
 import logging
 import uuid
 
+from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.test import get_entity_extractors, plot_attribute_confidences
 from rasa.nlu.test import get_evaluation_metrics
 from rasa.nlu.test import (
@@ -400,7 +401,7 @@ def evaluate_update(repository_version, by, repository_authorization):
 
     test_data = TrainingData(training_examples=training_examples)
     interpreter = update_interpreters.get(
-        repository_version, repository_authorization, use_cache=False
+        repository_version, repository_authorization, rasa_version, use_cache=False
     )
 
     result = {

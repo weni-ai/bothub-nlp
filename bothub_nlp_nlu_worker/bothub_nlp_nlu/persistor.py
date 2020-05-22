@@ -9,11 +9,17 @@ from decouple import config
 
 class BothubPersistor(Persistor):
     def __init__(
-        self, repository_version=None, repository_authorization=None, *args, **kwargs
+        self,
+        repository_version=None,
+        repository_authorization=None,
+        rasa_version=None,
+        *args,
+        **kwargs
     ):
         super().__init__(*args, **kwargs)
         self.repository_version = repository_version
         self.repository_authorization = repository_authorization
+        self.rasa_version = rasa_version
 
     def backend(self):
         return bothub_backend.get_backend(
@@ -25,14 +31,17 @@ class BothubPersistor(Persistor):
         with open(tarname, "rb") as tar_file:
             data = tar_file.read()
             self.backend().send_training_backend_nlu_persistor(
-                self.repository_version, data, self.repository_authorization
+                self.repository_version,
+                data,
+                self.repository_authorization,
+                self.rasa_version,
             )
 
     def retrieve(self, model_name, target_path):
         tar_name = self._tar_name(model_name)
 
         train = self.backend().request_backend_parse_nlu_persistor(
-            self.repository_version, self.repository_authorization
+            self.repository_version, self.repository_authorization, self.rasa_version
         )
 
         if train.get("from_aws"):

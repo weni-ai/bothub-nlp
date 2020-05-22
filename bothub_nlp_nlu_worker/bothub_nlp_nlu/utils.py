@@ -196,7 +196,9 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
 class UpdateInterpreters:
     interpreters = {}
 
-    def get(self, repository_version, repository_authorization, use_cache=True):
+    def get(
+        self, repository_version, repository_authorization, rasa_version, use_cache=True
+    ):
         update_request = backend().request_backend_parse_nlu(
             repository_version, repository_authorization
         )
@@ -211,7 +213,9 @@ class UpdateInterpreters:
 
         if interpreter and use_cache:
             return interpreter
-        persistor = BothubPersistor(repository_version, repository_authorization)
+        persistor = BothubPersistor(
+            repository_version, repository_authorization, rasa_version
+        )
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
         self.interpreters[repository_name] = Interpreter(
