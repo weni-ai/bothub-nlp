@@ -12,10 +12,10 @@ from rasa.nlu.utils import json_to_string
 from .utils import get_rasa_nlu_config_from_update
 from .utils import PokeLogging
 from .utils import backend
-from .utils import get_examples_request
 from .persistor import BothubPersistor
 from . import logger
 
+from bothub_nlp_rasa_utils.utils import get_examples_request
 
 class BothubWriter(TrainingDataWriter):
     def dumps(self, training_data, **kwargs):  # pragma: no cover

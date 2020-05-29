@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from rasa.nlu import __version__ as rasa_version
-from .utils import update_interpreters
+
+from bothub_nlp_rasa_utils.utils import update_interpreters
 
 
 def order_by_confidence(l):

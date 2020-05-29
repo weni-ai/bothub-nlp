@@ -5,7 +5,8 @@ from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.test import remove_pretrained_extractors
 from .parse import minimal_entity
 from .utils import backend
-from .utils import update_interpreters
+
+from bothub_nlp_rasa_utils.utils import update_interpreters
 
 
 class DebugSentenceLime:

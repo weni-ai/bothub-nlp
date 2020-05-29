@@ -13,8 +13,8 @@ from bothub_nlp_nlu.sentence_suggestion import (
 from bothub_nlp_nlu.words_distribution import (
     words_distribution_text as words_distribution_core,
 )
-from bothub_nlp_nlu.train import train_update as train_update_core
-from bothub_nlp_nlu.evaluate import evaluate_update as evaluate_update_core
+from bothub_nlp_rasa_utils.train import train_update as train_update_core
+from bothub_nlp_rasa_utils.evaluate import evaluate_update as evaluate_update_core
 
 
 @celery_app.task(name=TASK_NLU_PARSE_TEXT)
