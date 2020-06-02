@@ -1,50 +1,4 @@
-from tempfile import mkdtemp
-from collections import defaultdict
-
-from rasa.nlu import __version__ as rasa_version
-from rasa.nlu.model import Trainer
-from rasa.nlu.training_data import Message, TrainingData
-from rasa.nlu.components import ComponentBuilder
-from rasa.nlu.training_data.formats.readerwriter import TrainingDataWriter
-
-from rasa.nlu.utils import json_to_string
-
-from .utils import get_rasa_nlu_config_from_update
-from .utils import PokeLogging
-from .utils import backend
-from .utils import get_examples_request
-from .persistor import BothubPersistor
-from . import logger
-
 from bothub_nlp_rasa_utils import train
-
-
-class BothubWriter(TrainingDataWriter):
-    def dumps(self, training_data, **kwargs):  # pragma: no cover
-        js_entity_synonyms = defaultdict(list)
-        for k, v in training_data.entity_synonyms.items():
-            if k != v:
-                js_entity_synonyms[v].append(k)
-
-        formatted_synonyms = [
-            {"value": value, "synonyms": syns}
-            for value, syns in js_entity_synonyms.items()
-        ]
-
-        formatted_examples = [
-            example.as_dict() for example in training_data.training_examples
-        ]
-
-        return json_to_string(
-            {
-                "rasa_nlu_data": {
-                    "common_examples": formatted_examples,
-                    "regex_features": training_data.regex_features,
-                    "entity_synonyms": formatted_synonyms,
-                }
-            },
-            **kwargs,
-        )
 
 
 def send_job_ai_plataform(repository_version, by, repository_authorization):
@@ -89,4 +43,4 @@ def train_update(repository_version, by, repository_authorization):  # pragma: n
     if settings.GOOGLE:
         send_job_ai_plataform(repository_version, by, repository_authorization)
     else:
-        train(repository_version, by, repository_authorization)
+        train.train_update(repository_version, by, repository_authorization)
