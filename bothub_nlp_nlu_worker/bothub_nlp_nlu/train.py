@@ -1,3 +1,4 @@
+from bothub_nlp_celery import settings
 from bothub_nlp_rasa_utils import train
 
 
@@ -40,7 +41,7 @@ def send_job_ai_plataform(repository_version, by, repository_authorization):
 
 
 def train_update(repository_version, by, repository_authorization):  # pragma: no cover
-    if settings.GOOGLE:
+    if settings.BOTHUB_NLP_AI_PLATFORM:
         send_job_ai_plataform(repository_version, by, repository_authorization)
     else:
         train.train_update(repository_version, by, repository_authorization)
