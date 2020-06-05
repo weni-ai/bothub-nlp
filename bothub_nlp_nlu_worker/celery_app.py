@@ -15,8 +15,7 @@ from bothub_nlp_nlu.sentence_suggestion import (
 from bothub_nlp_nlu.words_distribution import (
     words_distribution_text as words_distribution_core,
 )
-from bothub_nlp_rasa_utils import train
-from bothub_nlp_nlu.evaluate import evaluate_update as evaluate_update_core
+from bothub_nlp_rasa_utils import train, evaluate
 
 
 @celery_app.task(name=TASK_NLU_PARSE_TEXT)
@@ -47,7 +46,7 @@ def train_update(repository_version, by_id, repository_authorization):
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def evaluate_update(repository_version, by_id, repository_authorization):
-    return evaluate_update_core(repository_version, by_id, repository_authorization)
+    return evaluate.evaluate_update(repository_version, by_id, repository_authorization)
 
 
 @celery_app.task(name=TASK_NLU_WORDS_DISTRIBUTION)
