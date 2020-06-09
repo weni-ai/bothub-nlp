@@ -57,13 +57,13 @@ RUN git clone --branch master --depth 1 --single-branch \
     && python3.6 scripts/link_lang_spacy.py ka ./spacy-langs/ka/ \
     && python3.6 scripts/link_lang_spacy.py kk ./spacy-langs/kk/ \
     && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/sw/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/az/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/be/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/bs/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/ky/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/mk/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/sq/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/uz/
+    && python3.6 scripts/link_lang_spacy.py az ./spacy-langs/az/ \
+    && python3.6 scripts/link_lang_spacy.py be ./spacy-langs/be/ \
+    && python3.6 scripts/link_lang_spacy.py bs ./spacy-langs/bs/ \
+    && python3.6 scripts/link_lang_spacy.py ky ./spacy-langs/ky/ \
+    && python3.6 scripts/link_lang_spacy.py mk ./spacy-langs/mk/ \
+    && python3.6 scripts/link_lang_spacy.py sq ./spacy-langs/sq/ \
+    && python3.6 scripts/link_lang_spacy.py uz ./spacy-langs/uz/
 
 ARG DOWNLOAD_SPACY_MODELS
 
