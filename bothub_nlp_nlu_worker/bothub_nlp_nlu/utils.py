@@ -166,17 +166,17 @@ def entitity_extractor():
             "features": [
                 ["low", "title", "upper"],
                 [
-                  "BOS",
-                  "EOS",
-                  "low",
-                  "prefix5",
-                  "prefix2",
-                  "suffix5",
-                  "suffix3",
-                  "suffix2",
-                  "upper",
-                  "title",
-                  "digit",
+                    "BOS",
+                    "EOS",
+                    "low",
+                    "prefix5",
+                    "prefix2",
+                    "suffix5",
+                    "suffix3",
+                    "suffix2",
+                    "upper",
+                    "title",
+                    "digit",
                 ],
                 ["low", "title", "upper"],
             ],
@@ -199,7 +199,7 @@ def transformer_entitity_extractor():
             "intent_classification": False,
             "entity_recognition": True,
             "use_masked_language_model": False,
-        },
+        }
     ]
     return pipeline
 
@@ -215,6 +215,8 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     if update.get("use_name_entities") or update.get("algorithm") in spacy_algorithms:
         pipeline.append(add_spacy_nlp())
 
+    update["use_transformer_entities"] = False
+
     if update.get("algorithm") == "neural_network_internal":
         pipeline.extend(legacy_internal_config(update))
     elif update.get("algorithm") == "neural_network_external":
@@ -228,11 +230,15 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     else:
         return
 
-    update["use_transformer_entities"] = True
     # entity extractor
-    if update.get("use_transformer_entities") and "transformer" not in update.get("algorithm"):
+    if update.get("use_transformer_entities") and "transformer" not in update.get(
+        "algorithm"
+    ):
         pipeline.extend(transformer_entitity_extractor())
-    elif "transformer" not in update.get("algorithm") or ("transformer" in update.get("algorithm") and not update.get("use_transformer_entities")):
+    elif "transformer" not in update.get("algorithm") or (
+        "transformer" in update.get("algorithm")
+        and not update.get("use_transformer_entities")
+    ):
         pipeline.extend(entitity_extractor())
 
     # spacy named entity recognition
