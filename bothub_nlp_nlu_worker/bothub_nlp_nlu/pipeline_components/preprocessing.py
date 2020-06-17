@@ -172,13 +172,9 @@ class Preprocessing(Component):
 
     def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
-        APOSTROPHE_OPTIONS = ["'", "`"]
 
         # removing accent and lowercasing characters
         message.text = unidecode(message.text.lower())
-        # remove apostrophe from the phrase (important be first than s_regex regex)
-        for APOSTROPHE in APOSTROPHE_OPTIONS:
-            message.text = message.text.replace(APOSTROPHE, "")
 
         if self.language == "en":
             message.text = self.english_preprocesing(message.text)
