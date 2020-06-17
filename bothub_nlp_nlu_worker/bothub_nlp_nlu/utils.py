@@ -215,8 +215,6 @@ def get_rasa_nlu_config_from_update(update):  # pragma: no cover
     if update.get("use_name_entities") or update.get("algorithm") in spacy_algorithms:
         pipeline.append(add_spacy_nlp())
 
-    update["use_transformer_entities"] = False
-
     if update.get("algorithm") == "neural_network_internal":
         pipeline.extend(legacy_internal_config(update))
     elif update.get("algorithm") == "neural_network_external":
