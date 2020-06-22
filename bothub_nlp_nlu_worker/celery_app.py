@@ -6,7 +6,6 @@ from bothub_nlp_celery.tasks import TASK_NLU_SENTENCE_SUGGESTION_TEXT
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 from bothub_nlp_celery.tasks import TASK_NLU_WORDS_DISTRIBUTION
-from bothub_nlp_celery.actions import send_job_ai_plataform
 from bothub_nlp_nlu.parse import parse_text as parse_text_core
 from bothub_nlp_nlu.debug_parse import debug_parse_text as debug_parse_text_core
 from bothub_nlp_nlu.sentence_suggestion import (
@@ -39,9 +38,7 @@ def sentence_suggestion_text(*args, **kwargs):
 
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
 def train_update(repository_version, by_id, repository_authorization):
-    if settings.BOTHUB_NLP_AI_PLATFORM:
-        return send_job_ai_plataform(repository_version, by_id, repository_authorization)
-    return train.train_update(repository_version, by_id, repository_authorization)
+    return train.train_update(repository_version, by_id, repository_authorization, celery_app.current_task.request.id)
 
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
