@@ -6,7 +6,7 @@ contextvars==2.3
 plac==0.9.6
 python-decouple==3.1
 celery==4.3.0
-git+https://github.com/bothub-it/bothub-backend.git@1.0.10
+git+https://github.com/bothub-it/bothub-backend.git@1.0.11
 redis
 flake8
 git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.15
