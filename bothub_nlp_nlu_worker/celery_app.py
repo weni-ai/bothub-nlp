@@ -1,3 +1,4 @@
+from bothub_nlp_celery import settings
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
@@ -13,8 +14,8 @@ from bothub_nlp_nlu.sentence_suggestion import (
 from bothub_nlp_nlu.words_distribution import (
     words_distribution_text as words_distribution_core,
 )
-from bothub_nlp_nlu.train import train_update as train_update_core
-from bothub_nlp_nlu.evaluate import evaluate_update as evaluate_update_core
+from bothub_nlp_rasa_utils import train, evaluate
+from bothub_nlp_rasa_utils.utils import backend
 
 
 @celery_app.task(name=TASK_NLU_PARSE_TEXT)
@@ -38,12 +39,18 @@ def sentence_suggestion_text(*args, **kwargs):
 
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
 def train_update(repository_version, by_id, repository_authorization):
-    return train_update_core(repository_version, by_id, repository_authorization)
+    backend().request_backend_save_queue_id(
+        repository_version=repository_version,
+        repository_authorization=repository_authorization,
+        task_id=celery_app.current_task.request.id,
+        from_queue=1
+    )
+    return train.train_update(repository_version, by_id, repository_authorization)
 
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def evaluate_update(repository_version, by_id, repository_authorization):
-    return evaluate_update_core(repository_version, by_id, repository_authorization)
+    return evaluate.evaluate_update(repository_version, by_id, repository_authorization)
 
 
 @celery_app.task(name=TASK_NLU_WORDS_DISTRIBUTION)
