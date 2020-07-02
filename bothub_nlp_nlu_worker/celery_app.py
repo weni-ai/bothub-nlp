@@ -40,7 +40,7 @@ def sentence_suggestion_text(*args, **kwargs):
 @celery_app.task(name=TASK_NLU_TRAIN_UPDATE)
 def train_update(repository_version, by_id, repository_authorization):
     backend().request_backend_save_queue_id(
-        repository_version=repository_version,
+        update_id=repository_version,
         repository_authorization=repository_authorization,
         task_id=celery_app.current_task.request.id,
         from_queue=1
@@ -50,7 +50,7 @@ def train_update(repository_version, by_id, repository_authorization):
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def evaluate_update(repository_version, by_id, repository_authorization):
-    return evaluate.evaluate_update(repository_version, by_id, repository_authorization)
+    return evaluate.evaluate_update(repository_version, repository_authorization)
 
 
 @celery_app.task(name=TASK_NLU_WORDS_DISTRIBUTION)
