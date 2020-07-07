@@ -13,7 +13,6 @@ git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.16
 git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.7
 black==19.3b0
 kombu==4.5.0
-rasa==1.10.4
 spacy==2.1.9
 pymorphy2==0.8
 pythainlp
