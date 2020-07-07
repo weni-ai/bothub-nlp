@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from rasa.nlu import __version__ as rasa_version
-
 from bothub_nlp_rasa_utils.utils import update_interpreters
+from bothub_nlp_rasa_utils.parse import get_interpreter, parse_interpreter
 
 
 def order_by_confidence(l):
@@ -63,10 +63,8 @@ def parse_text(
     rasa_format=False,
     use_cache=True,
 ):
-    interpreter = update_interpreters.get(
-        repository_version, repository_authorization, rasa_version, use_cache=use_cache
-    )
-    r = interpreter.parse(text)
+    interpreter = get_interpreter(repository_version, repository_authorization, use_cache)
+    r = parse_interpreter(interpreter, text)
 
     if rasa_format:
         return r
