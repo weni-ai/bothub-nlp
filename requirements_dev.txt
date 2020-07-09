@@ -10,7 +10,7 @@ git+https://github.com/bothub-it/bothub-backend.git@1.0.11
 redis
 flake8
 git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.16
-git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.8
+git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.9
 black==19.3b0
 kombu==4.5.0
 spacy==2.1.9
