@@ -141,7 +141,9 @@ def n_samples_by_sentence_lenght(sentence):
 def debug_parse_text(
     repository_version, repository_authorization, text, use_cache=True
 ):
-    interpreter = get_interpreter(repository_version, repository_authorization, use_cache)
+    interpreter = get_interpreter(
+        repository_version, repository_authorization, use_cache
+    )
     r = parse_interpreter(interpreter, text)
 
     intention_names = get_intention_list(repository_authorization)

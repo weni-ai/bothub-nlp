@@ -63,7 +63,9 @@ def parse_text(
     rasa_format=False,
     use_cache=True,
 ):
-    interpreter = get_interpreter(repository_version, repository_authorization, use_cache)
+    interpreter = get_interpreter(
+        repository_version, repository_authorization, use_cache
+    )
     r = parse_interpreter(interpreter, text)
 
     if rasa_format:
