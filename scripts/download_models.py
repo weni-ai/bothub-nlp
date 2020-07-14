@@ -10,7 +10,12 @@ from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
 from collections import OrderedDict
-
+from bothub_nlp_rasa_utils.pipeline_components.registry import (
+                                                model_class_dict,
+                                                model_weights_defaults,
+                                                model_tokenizer_dict,
+                                                from_pt_dict,
+                                            )
 
 logger = logging.getLogger("download_spacy_models")
 
@@ -55,6 +60,12 @@ def download_spacy_models(languages=None, debug=False):
                 link(model_name, lang, force=True, model_path=package_path)
             else:
                 raise Exception("Error to download {}".format(lang))
+        elif value.startswith("bert+"):
+            model_name = value.split('+', 1)[1]
+            model_class_dict[model_name].from_pretrained(
+                model_weights_defaults[model_name], cache_dir=None,
+                from_pt=from_pt_dict.get(model_name, False)
+            )
         elif lang != value:
             logger.debug("downloading {}".format(value))
             download(value)
