@@ -46,6 +46,8 @@ RUN pip install -U pip setuptools
 
 RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
+RUN pip install torch==1.5.1+cpu torchvision==0.6.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
 COPY . .
 
 #RUN git clone --branch master --depth 1 --single-branch \
