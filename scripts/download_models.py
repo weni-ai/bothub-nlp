@@ -11,13 +11,36 @@ from spacy.cli import link
 from spacy.util import get_package_path
 from collections import OrderedDict
 from bothub_nlp_rasa_utils.pipeline_components.registry import (
-                                                model_class_dict,
                                                 model_weights_defaults,
-                                                model_tokenizer_dict,
                                                 from_pt_dict,
+                                                model_config_url
                                             )
 
-logger = logging.getLogger("download_spacy_models")
+logger = logging.getLogger("download_models")
+
+
+def download_file(file_dir, url):
+    local_filename = url.split('/')[-1]
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(os.path.join(file_dir, local_filename), 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    return local_filename
+
+
+def download_bert(model_name, model_dir):
+    os.makedirs(model_dir, exist_ok=True)
+    model_url = hf_bucket_url(
+        model_weights_defaults.get(model_name),
+        filename=(WEIGHTS_NAME if from_pt_dict.get(model_name, False) else TF2_WEIGHTS_NAME),
+    )
+
+    config_url = model_config_url.get(model_name)
+    logger.info('downloading bert')
+    download_file(model_dir, model_url)
+    download_file(model_dir, config_url)
+    logger.info('finished downloading bert')
 
 
 def cast_supported_languages(i):
@@ -28,7 +51,7 @@ def cast_supported_languages(i):
     languages=plac.Annotation(help="Languages to download"),
     debug=plac.Annotation(help="Enable debug", kind="flag", abbrev="D"),
 )
-def download_spacy_models(languages=None, debug=False):
+def download_models(languages=None, debug=False):
     logging.basicConfig(
         format="%(name)s - %(levelname)s - %(message)s",
         level=logging.DEBUG if debug else logging.INFO,
@@ -62,10 +85,7 @@ def download_spacy_models(languages=None, debug=False):
                 raise Exception("Error to download {}".format(lang))
         elif value.startswith("bert+"):
             model_name = value.split('+', 1)[1]
-            model_class_dict[model_name].from_pretrained(
-                model_weights_defaults[model_name], cache_dir=None,
-                from_pt=from_pt_dict.get(model_name, False)
-            )
+            download_bert(model_name, model_dir='bothub_nlp_nlu_worker/model')
         elif lang != value:
             logger.debug("downloading {}".format(value))
             download(value)
