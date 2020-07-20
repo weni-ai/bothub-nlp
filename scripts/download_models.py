@@ -19,7 +19,7 @@ from bothub_nlp_rasa_utils.pipeline_components.registry import (
 logger = logging.getLogger("download_models")
 
 
-def download_file(file_dir, url):
+def download_file(url, file_dir,):
     local_filename = url.split('/')[-1]
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
@@ -38,8 +38,8 @@ def download_bert(model_name, model_dir):
 
     config_url = model_config_url.get(model_name)
     logger.info('downloading bert')
-    download_file(model_dir, model_url)
-    download_file(model_dir, config_url)
+    download_file(model_url, model_dir)
+    download_file(config_url, model_dir)
     logger.info('finished downloading bert')
 
 
