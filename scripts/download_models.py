@@ -4,12 +4,14 @@ import sys
 import subprocess
 import logging
 import plac
+import requests
 
 from decouple import config
 from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
 from collections import OrderedDict
+from transformers.file_utils import TF2_WEIGHTS_NAME, WEIGHTS_NAME, hf_bucket_url
 from bothub_nlp_rasa_utils.pipeline_components.registry import (
                                                 model_weights_defaults,
                                                 from_pt_dict,
@@ -19,27 +21,28 @@ from bothub_nlp_rasa_utils.pipeline_components.registry import (
 logger = logging.getLogger("download_models")
 
 
-def download_file(url, file_dir,):
-    local_filename = url.split('/')[-1]
+def download_file(url, file_name):
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
-        with open(os.path.join(file_dir, local_filename), 'wb') as f:
+        with open(file_name, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
-    return local_filename
+    return file_name
 
 
 def download_bert(model_name, model_dir):
     os.makedirs(model_dir, exist_ok=True)
+    from_pt = from_pt_dict.get(model_name, False)
     model_url = hf_bucket_url(
         model_weights_defaults.get(model_name),
-        filename=(WEIGHTS_NAME if from_pt_dict.get(model_name, False) else TF2_WEIGHTS_NAME),
+        filename=(WEIGHTS_NAME if from_pt else TF2_WEIGHTS_NAME),
     )
 
     config_url = model_config_url.get(model_name)
     logger.info('downloading bert')
-    download_file(model_url, model_dir)
-    download_file(config_url, model_dir)
+    model_name = 'pytorch_model.bin' if from_pt else 'tf_model.h5'
+    download_file(model_url, os.path.join(model_dir, model_name))
+    download_file(config_url, os.path.join(model_dir, 'config.json'))
     logger.info('finished downloading bert')
 
 
@@ -98,4 +101,4 @@ def download_models(languages=None, debug=False):
 
 
 if __name__ == "__main__":
-    plac.call(download_spacy_models, sys.argv[1:])
+    plac.call(download_models, sys.argv[1:])
