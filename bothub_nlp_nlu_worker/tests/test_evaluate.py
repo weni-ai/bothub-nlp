@@ -180,5 +180,6 @@ class TestEvaluateTask(unittest.TestCase):
             self.current_update.get("user_id"),
             self.repository_authorization,
         )
-        self.assertEqual(result.get("id"), 1787)
-        self.assertEqual(result.get("version"), 189)
+
+        self.assertEqual(1787, result.get("id"))
+        self.assertEqual(189, result.get("version"))

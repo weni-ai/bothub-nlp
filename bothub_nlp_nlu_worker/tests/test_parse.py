@@ -44,8 +44,8 @@ class TestParseTask(unittest.TestCase):
             "ok",
         )
 
-        self.assertEqual(result.get("intent").get("name"), "affirmative")
-        self.assertEqual(len(result.get("intent_ranking")), 4)
+        self.assertEqual("affirmative", result.get("intent").get("name"))
+        self.assertEqual(4, len(result.get("intent_ranking")))
 
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu",
@@ -74,6 +74,6 @@ class TestParseTask(unittest.TestCase):
             True,
         )
 
-        self.assertEqual(result.get("intent").get("name"), "affirmative")
-        self.assertEqual(result.get("text"), "ok")
-        self.assertEqual(len(result.get("intent_ranking")), 4)
+        self.assertEqual("affirmative", result.get("intent").get("name"))
+        self.assertEqual("okay", result.get("text"))
+        self.assertEqual(4, len(result.get("intent_ranking")))
