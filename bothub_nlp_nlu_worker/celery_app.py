@@ -1,4 +1,3 @@
-from bothub_nlp_celery import settings
 from bothub_nlp_celery.app import celery_app
 from bothub_nlp_celery.tasks import TASK_NLU_PARSE_TEXT
 from bothub_nlp_celery.tasks import TASK_NLU_DEBUG_PARSE_TEXT
