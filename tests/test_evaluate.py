@@ -3,8 +3,7 @@ import uuid
 import base64
 from unittest.mock import patch
 
-#from bothub_nlp_nlu_worker.bothub_nlp_nlu.utils import backend
-from bothub_nlp_nlu_worker.tests.celery_app import evaluate_update
+from bothub_nlp_nlu_worker.celery_app import evaluate_update
 
 
 class TestEvaluateTask(unittest.TestCase):
@@ -14,8 +13,7 @@ class TestEvaluateTask(unittest.TestCase):
         self.current_update = {
             "ready_for_train": True,
             "current_version_id": 6647,
-            "repository_authorization_user_id": 303,
-            "language": "pt_br",
+            "repository_authorization_user_id": 303
         }
 
     @patch(
@@ -160,7 +158,7 @@ class TestEvaluateTask(unittest.TestCase):
             "repository_uuid": "0f6b9644-db55-49a2-a20d-2af74106d892",
             "total_training_end": 3,
             "language": "pt_br",
-            "bot_data": base64.b64encode(open('./6647_5_pt_br.tar.gz', 'rb').read())},
+            "bot_data": base64.b64encode(open('6647_5_pt_br.tar.gz', 'rb').read())},
     )
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_create_evaluate_results",
