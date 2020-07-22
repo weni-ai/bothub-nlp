@@ -2,7 +2,7 @@ import unittest
 import uuid
 from unittest.mock import patch
 
-from bothub_nlp_nlu_worker.celery_app import train_update
+from celery_app import train_update
 
 
 

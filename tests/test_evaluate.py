@@ -3,7 +3,7 @@ import uuid
 import base64
 from unittest.mock import patch
 
-from bothub_nlp_nlu_worker.celery_app import evaluate_update
+from celery_app import evaluate_update
 
 
 class TestEvaluateTask(unittest.TestCase):

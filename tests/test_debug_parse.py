@@ -4,7 +4,7 @@ import uuid
 import base64
 from unittest.mock import patch
 
-from bothub_nlp_nlu_worker.celery_app import debug_parse_text
+from celery_app import debug_parse_text
 
 
 class TestDebugParseTask(unittest.TestCase):
