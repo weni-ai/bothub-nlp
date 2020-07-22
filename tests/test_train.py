@@ -1,5 +1,6 @@
 import unittest
 import uuid
+import os
 from unittest.mock import patch
 
 from celery_app import train_update
@@ -19,6 +20,10 @@ class TestTrainTask(unittest.TestCase):
             "current_version_id": 6647,
             "repository_authorization_user_id": 303
         }
+
+        # change directory to load /models
+        os.chdir("../bothub_nlp_nlu_worker")
+        print("Current Working Directory ", os.getcwd())
 
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_save_queue_id",

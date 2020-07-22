@@ -2,6 +2,7 @@ import json
 import unittest
 import uuid
 import base64
+import os
 from unittest.mock import patch
 
 from celery_app import debug_parse_text
@@ -16,6 +17,8 @@ class TestDebugParseTask(unittest.TestCase):
             "current_version_id": 6647,
             "repository_authorization_user_id": 303
         }
+        # change directory to load /models
+        os.chdir("../bothub_nlp_nlu_worker")
 
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu",
@@ -33,7 +36,7 @@ class TestDebugParseTask(unittest.TestCase):
             "repository_uuid": "0f6b9644-db55-49a2-a20d-2af74106d892",
             "total_training_end": 3,
             "language": "pt_br",
-            "bot_data": base64.b64encode(open('6647_5_pt_br.tar.gz', 'rb').read())},
+            "bot_data": base64.b64encode(open('example_bert_pt_br.tar.gz', 'rb').read())},
     )
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_info",
@@ -70,7 +73,7 @@ class TestDebugParseTask(unittest.TestCase):
             "repository_uuid": "0f6b9644-db55-49a2-a20d-2af74106d892",
             "total_training_end": 3,
             "language": "pt_br",
-            "bot_data": base64.b64encode(open('6647_5_pt_br.tar.gz', 'rb').read())},
+            "bot_data": base64.b64encode(open('example_bert_pt_br.tar.gz', 'rb').read())},
     )
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_info",
