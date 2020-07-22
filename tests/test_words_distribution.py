@@ -1,28 +1,22 @@
 import unittest
 import uuid
+import json
 from unittest.mock import patch
 
-from bothub_nlp_nlu_worker.bothub_nlp_nlu.utils import backend
-from bothub_nlp_nlu_worker.tests.celery_app import train_update
+from bothub_nlp_nlu_worker.celery_app import words_distribution
 
 
-class TestTrainTask(unittest.TestCase):
-    def setUp(self):
-        pass
+class TestWordDistributionTask(unittest.TestCase):
 
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_start_training_nlu",
-        return_value={
+    def setUp(self, *args):
+        self.repository_authorization = uuid.uuid4()
+        self.current_update = {
+            "ready_for_train": True,
+            "current_version_id": 6647,
+            "repository_authorization_user_id": 303,
             "language": "pt_br",
-            "repository_version": 6647,
-            "repository_uuid": "e1e8a0fa-625c-4ba3-8b91-4c9f308db791",
-            "intent": [],
-            "total_training_end": 4,
-            "use_name_entities": False,
-            "use_competing_intents": False,
-            "use_analyze_char": False
-        },
-    )
+        }
+
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_get_examples",
         return_value={
@@ -171,7 +165,8 @@ class TestTrainTask(unittest.TestCase):
                 {"text": "namoro", "intent": "affirmative", "entities": []},
                 {"text": "fui estrupada", "intent": "bias", "entities": []},
                 {"text": "quero morrer agora", "intent": "bias", "entities": []},
-                {"text": "mas minha amiga esta sofrendo com abuso. O namorado dela grita com ele", "intent": "bias", "entities": []},
+                {"text": "mas minha amiga esta sofrendo com abuso. O namorado dela grita com ele", "intent": "bias",
+                 "entities": []},
                 {"text": "estou bem", "intent": "affirmative", "entities": []},
                 {"text": "meu namorado esta me batendo", "intent": "bias", "entities": []},
                 {"text": "também relacionamento abusivo", "intent": "bias", "entities": []},
@@ -391,39 +386,14 @@ class TestTrainTask(unittest.TestCase):
             ],
         },
     )
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_get_examples_labels",
-        return_value={"count": 0, "next": None, "previous": None, "results": []},
-    )
-    @patch(
-        "bothub_backend.bothub.BothubBackend.send_training_backend_nlu_persistor",
-        return_value={},
-    )
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_traininglog_nlu",
-        return_value={},
-    )
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_trainfail_nlu",
-        return_value={},
-    )
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_save_queue_id",
-        return_value={},
-    )
 
-    def test_train(self, *args):
+    def test_parse_without_rasa_format(self, *args):
 
-        repository_authorization = uuid.uuid4()
-        current_update = {
-            "ready_for_train": True,
-            "current_version_id": 6647,
-            "repository_authorization_user_id": 303,
-            "language": "pt_br",
-        }
-
-        train_update(
-            current_update.get("current_version_id"),
-            current_update.get("repository_authorization_user_id"),
-            repository_authorization
+        result = words_distribution(
+            self.current_update.get("current_version_id"),
+            "pt_br",
+            self.repository_authorization,
         )
+
+        print(json.dumps(result, indent=2))
+        self.assertEqual(4, len(result.get("words")))
