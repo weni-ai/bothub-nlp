@@ -64,10 +64,10 @@ RUN git clone --branch master --depth 1 --single-branch \
     && python3.6 scripts/link_lang_spacy.py mk ./spacy-langs/mk/ \
     && python3.6 scripts/link_lang_spacy.py uz ./spacy-langs/uz/
 
-ARG DOWNLOAD_SPACY_MODELS
+ARG DOWNLOAD_MODELS
 
-RUN if [ ${DOWNLOAD_SPACY_MODELS} ]; then \
-        python3.6 scripts/download_spacy_models.py ${DOWNLOAD_SPACY_MODELS}; \
+RUN if [ ${DOWNLOAD_MODELS} ]; then \
+        python3.6 scripts/download_spacy_models.py ${DOWNLOAD_MODELS}; \
     fi
 
 ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp_nlu_worker.celery_app", "-c", "1", "-l", "INFO", "-E" ]
