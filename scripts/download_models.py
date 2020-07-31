@@ -88,7 +88,7 @@ def download_models(languages=None, debug=False):
                 raise Exception("Error to download {}".format(lang))
         elif value.startswith("bert+"):
             model_name = value.split('+', 1)[1]
-            download_bert(model_name, model_dir='bothub_nlp_nlu_worker/model')
+            download_bert(model_name, model_dir='model')
         elif lang != value:
             logger.debug("downloading {}".format(value))
             download(value)
