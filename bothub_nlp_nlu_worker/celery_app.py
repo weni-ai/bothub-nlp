@@ -15,8 +15,6 @@ from bothub_nlp_nlu.words_distribution import (
 )
 from bothub_nlp_rasa_utils import train, evaluate
 from bothub_nlp_rasa_utils.utils import backend
-import os
-print(os.getcwd())
 
 
 @celery_app.task(name=TASK_NLU_PARSE_TEXT)

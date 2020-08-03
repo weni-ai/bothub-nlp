@@ -20,6 +20,9 @@ subprocess.run(
         "INFO",
         "-E",
         "-Q",
-        queue_name(settings.BOTHUB_NLP_LANGUAGE_QUEUE, model_name=settings.BOTHUB_LANGUAGE_MODEL)
+        queue_name(
+            settings.BOTHUB_NLP_LANGUAGE_QUEUE,
+            model_name=settings.BOTHUB_LANGUAGE_MODEL,
+        ),
     ]
 )
