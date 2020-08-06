@@ -21,7 +21,7 @@ class TestDebugParseTask(unittest.TestCase):
         os.chdir("../bothub_nlp_nlu_worker")
 
     @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu",
+        "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu_persistor",
         return_value={
             "version_id": 6647,
             "total_training_end": 4,
@@ -58,7 +58,7 @@ class TestDebugParseTask(unittest.TestCase):
         self.assertEqual(4, len(result.get("words").get("ok")))
 
     @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu",
+        "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu_persistor",
         return_value={
             "version_id": 6647,
             "total_training_end": 4,
