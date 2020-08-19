@@ -104,8 +104,8 @@ class DebugSentenceLime:
         return result_per_intent
 
 
-def get_intention_list(repository_authorization):
-    info = backend().request_backend_info(repository_authorization)
+def get_intention_list(repository_authorization, repository_version):
+    info = backend().request_backend_info(repository_authorization, repository_version=repository_version)
     return info.get("intents", [])
 
 
@@ -146,7 +146,7 @@ def debug_parse_text(
     )
     r = parse_interpreter(interpreter, text)
 
-    intention_names = get_intention_list(repository_authorization)
+    intention_names = get_intention_list(repository_authorization, repository_version)
     result_per_word = DebugSentenceLime(
         interpreter, intention_names
     ).get_result_per_word(text, n_samples_by_sentence_lenght(text))
