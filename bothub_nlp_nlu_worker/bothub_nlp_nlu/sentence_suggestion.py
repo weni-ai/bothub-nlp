@@ -146,8 +146,11 @@ class SentenceSuggestion:
 
 
 def sentence_suggestion_text(text, percentage_to_replace, n):
+    if nlp_language is None:
+        return "spacy model not loaded in this language"
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
+
     similar_sentences = SentenceSuggestion().get_suggestions(
         text, percentage_to_replace, n
     )
