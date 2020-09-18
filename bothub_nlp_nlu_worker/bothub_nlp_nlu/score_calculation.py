@@ -10,8 +10,13 @@ def score_normal(x,  optimal):
         Based on normal distribution,
         score will decay if current value is below or above target
     """
-    slim_const = 2
-    result = math.exp(-((x - optimal) ** 2) / (2 * (optimal/slim_const) ** 2))
+
+    try:
+        slim_const = 2
+        result = math.exp(-((x - optimal) ** 2) / (2 * (optimal/slim_const) ** 2))
+    except ZeroDivisionError:
+        return 100
+
     return result * 100
 
 
@@ -20,8 +25,13 @@ def score_cumulated(x, optimal):
         Based on cumulated distribution,
         score will increase as close current value is to the target
     """
-    factor = 10/optimal
-    sigma_func = 1/(1 + np.exp(-(-5 + x*factor)))
+
+    try:
+        factor = 10/optimal
+        sigma_func = 1/(1 + np.exp(-(-5 + x*factor)))
+    except ZeroDivisionError:
+        return 100
+
     return sigma_func * 100
 
 
