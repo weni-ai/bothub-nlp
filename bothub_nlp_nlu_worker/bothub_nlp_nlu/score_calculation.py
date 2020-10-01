@@ -35,18 +35,6 @@ def score_cumulated(x, optimal):
     return sigma_func * 100
 
 
-def plot_func(func, optimal):
-
-    x = np.linspace(0, 2*optimal, 100)
-    y = [func(n, optimal=optimal) for n in x]
-
-    plt.plot(x, y)
-    plt.plot([optimal, optimal], [0, 100])
-    plt.ylabel('score')
-    plt.xlabel('distance')
-    plt.show()
-
-
 def intentions_balance_score(dataset):
     intentions = dataset["intentions"]
     sentences = dataset["train"]
@@ -59,7 +47,7 @@ def intentions_balance_score(dataset):
 
     scores = []
     for intention in sentences.keys():
-        this_size = len(sentences[intention])
+        this_size = sentences[intention]
         excl_size = train_count - this_size
 
         # Mean of sentences/intention excluding this intention
@@ -88,7 +76,7 @@ def intentions_size_score(dataset):
 
     scores = []
     for intention in sentences.keys():
-        this_size = len(sentences[intention])
+        this_size = sentences[intention]
         if this_size >= optimal:
             scores.append(1.0)
         else:
@@ -128,6 +116,11 @@ def evaluate_size_score(dataset):
 # TODO: word distribution score
 
 def arrange_data(train_data, eval_data):
+    """
+        :param train_data: list of sentences {"intent";"text"}
+        :param eval_data:  list of sentences {"intent";"text"}
+        :return: formatted dataset
+    """
     dataset = {
         "intentions": [],
         "train_count": len(train_data),
@@ -139,17 +132,17 @@ def arrange_data(train_data, eval_data):
     for data in train_data:
         if data["intent"] not in dataset["intentions"]:
             dataset["intentions"].append(data["intent"])
-            dataset["train"][data["intent"]] = []
+            dataset["train"][data["intent"]] = 0
 
-        dataset["train"][data["intent"]].append(data["text"])
+        dataset["train"][data["intent"]] += 1
 
     for data in eval_data:
         if data["intent"] not in dataset["intentions"]:
             continue
         if data["intent"] not in dataset["evaluate"]:
-            dataset["evaluate"][data["intent"]] = []
+            dataset["evaluate"][data["intent"]] = 0
 
-        dataset["evaluate"][data["intent"]].append(data["text"])
+        dataset["evaluate"][data["intent"]] += 1
 
     return dataset
 
@@ -159,13 +152,11 @@ def get_scores(repository_version, repository_authorization):
     train_data = backend().request_backend_get_examples(
         repository_version, False, None, repository_authorization
     ).get("results")
-    # print(train_data)
 
     eval_data = backend().request_backend_start_evaluation(
         repository_version,
         repository_authorization
     )
-    # print(eval_data)
 
     dataset = arrange_data(train_data, eval_data)
 
@@ -185,53 +176,55 @@ def get_scores(repository_version, repository_authorization):
     return scores
 
 
+def plot_func(func, optimal):
+
+    x = np.linspace(0, 2*optimal, 100)
+    y = [func(n, optimal=optimal) for n in x]
+
+    plt.plot(x, y)
+    plt.plot([optimal, optimal], [0, 100])
+    plt.ylabel('score')
+    plt.xlabel('distance')
+    plt.show()
+
+
 if __name__ == "__main__":
+    # Test examples:
+
     mocked_repository_example = {
         "intentions": ["a", "b", "c", "d", "e"],
         "train_count": 103,
         "train": {
-            "a": ["intenção A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A", "outra frase da A",
-                  "outra frase da A", "outra frase da A"],
-            "b": ["intenção B", "outra frase da B", "frase 3", "frase 4", "frase 5"],
-            "c": ["intenção C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
-                  "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
-                  "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
-                  "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C", "outra frase da C",
-                  "outra frase da C", "outra frase da C", "outra frase da C"],
-            "d": ["intenção D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D",
-                  "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D",
-                  "outra frase da D", "outra frase da D", "outra frase da D", "outra frase da D"],
-            "e": ["intenção E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E",
-                  "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E",
-                  "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E",
-                  "outra frase da E", "outra frase da E", "outra frase da E", "outra frase da E"],
+            "a": 42,
+            "b": 5,
+            "c": 23,
+            "d": 14,
+            "e": 19,
         },
         "evaluate_count": 29,
         "evaluate": {
-            "a": ["teste A", "outra frase teste da A", "outra frase teste da A", "outra frase teste da A",
-                  "outra frase teste da A"],
-            "b": ["teste B", "outra frase teste da B", "frase teste3", "frase teste4", "frase teste5"],
-            "c": ["teste C", "outra frase teste da C", "outra frase teste da C", "outra frase teste da C",
-                  "outra frase teste da C"],
-            "d": ["teste D", "outra frase teste da D", "outra frase teste da D", "outra frase teste da D",
-                  "outra frase teste da D", "outra frase teste da D", "outra frase teste da D"],
-            "e": ["teste E", "outra frase teste da E", "outra frase teste da E", "outra frase teste da E",
-                  "outra frase teste da E", "outra frase teste da E", "outra frase teste da E"],
+            "a": 5,
+            "b": 5,
+            "c": 5,
+            "d": 7,
+            "e": 7,
         }
     }
 
-    plot_func(score_cumulated, 50)
-    plot_func(score_normal, 50)
+    plot_func(score_cumulated, optimal=50)
+    plot_func(score_normal, optimal=50)
 
-    sc = intentions_balance_score(
+    test = intentions_balance_score(
         mocked_repository_example
     )
+    print("Balance Score: ", test["score"], test["recommended"])
 
-    print(sc["score"], sc["recommended"])
+    test = intentions_size_score(
+        mocked_repository_example
+    )
+    print("Number of training sentences Score: ", test["score"], test["recommended"])
+
+    test = evaluate_size_score(
+        mocked_repository_example
+    )
+    print("Number of evaluation sentences Score: ", test["score"], test["recommended"])
