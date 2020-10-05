@@ -61,4 +61,4 @@ You need to set --build-arg when you are building docker-compose
 
 | Argument | Type | Default | Description |
 |--|--|--|--|
-| DOWNLOAD_SPACY_MODELS | ```string```|  ```en:en_core_web_md``` | Set supported languages. Separe languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]:[LANGUAGE_LOCATION]```.
+| DOWNLOAD_MODELS | ```string```|  ```en:en_core_web_md``` | Set supported languages. Separe languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]:[LANGUAGE_LOCATION]```.
