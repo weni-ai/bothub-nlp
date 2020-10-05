@@ -15,7 +15,7 @@ from transformers.file_utils import TF2_WEIGHTS_NAME, WEIGHTS_NAME, hf_bucket_ur
 from bothub_nlp_rasa_utils.pipeline_components.registry import (
     model_weights_defaults,
     from_pt_dict,
-    model_url,
+    model_download_url,
     model_config_url,
 )
 
@@ -123,11 +123,11 @@ def download_file(url, file_name):
 
 def download_bert(model_name, model_dir):
     os.makedirs(model_dir, exist_ok=True)
-    
+
     from_pt = from_pt_dict.get(model_name, False)
-    model_url = model_url.get(model_name)
+    model_url = model_download_url.get(model_name)
     config_url = model_config_url.get(model_name)
-    
+
     logger.info("downloading bert")
     model_name = "pytorch_model.bin" if from_pt else "tf_model.h5"
     download_file(model_url, os.path.join(model_dir, model_name))
