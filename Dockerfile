@@ -46,28 +46,30 @@ RUN pip install -U pip setuptools
 
 RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
+RUN pip install torch==1.5.1+cpu torchvision==0.6.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
 COPY . .
 
-RUN git clone --branch master --depth 1 --single-branch \
-    https://github.com/Ilhasoft/spacy-lang-models \
-    spacy-langs \
-    && python3.6 scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
-    && python3.6 scripts/link_lang_spacy.py mn ./spacy-langs/mn/ \
-    && python3.6 scripts/link_lang_spacy.py ha ./spacy-langs/ha/ \
-    && python3.6 scripts/link_lang_spacy.py ka ./spacy-langs/ka/ \
-    && python3.6 scripts/link_lang_spacy.py kk ./spacy-langs/kk/ \
-    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/sw/ \
-    && python3.6 scripts/link_lang_spacy.py az ./spacy-langs/az/ \
-    && python3.6 scripts/link_lang_spacy.py be ./spacy-langs/be/ \
-    && python3.6 scripts/link_lang_spacy.py bs ./spacy-langs/bs/ \
-    && python3.6 scripts/link_lang_spacy.py ky ./spacy-langs/ky/ \
-    && python3.6 scripts/link_lang_spacy.py mk ./spacy-langs/mk/ \
-    && python3.6 scripts/link_lang_spacy.py uz ./spacy-langs/uz/
+#RUN git clone --branch master --depth 1 --single-branch \
+#    https://github.com/Ilhasoft/spacy-lang-models \
+#    spacy-langs \
+#    && python3.6 scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
+#    && python3.6 scripts/link_lang_spacy.py mn ./spacy-langs/mn/ \
+#    && python3.6 scripts/link_lang_spacy.py ha ./spacy-langs/ha/ \
+#    && python3.6 scripts/link_lang_spacy.py ka ./spacy-langs/ka/ \
+#    && python3.6 scripts/link_lang_spacy.py kk ./spacy-langs/kk/ \
+#    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/sw/ \
+#    && python3.6 scripts/link_lang_spacy.py az ./spacy-langs/az/ \
+#    && python3.6 scripts/link_lang_spacy.py be ./spacy-langs/be/ \
+#    && python3.6 scripts/link_lang_spacy.py bs ./spacy-langs/bs/ \
+#    && python3.6 scripts/link_lang_spacy.py ky ./spacy-langs/ky/ \
+#    && python3.6 scripts/link_lang_spacy.py mk ./spacy-langs/mk/ \
+#    && python3.6 scripts/link_lang_spacy.py uz ./spacy-langs/uz/
 
 ARG DOWNLOAD_MODELS
 
 RUN if [ ${DOWNLOAD_MODELS} ]; then \
-        python3.6 scripts/download_spacy_models.py ${DOWNLOAD_MODELS}; \
+        python3.6 scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
 ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp_nlu_worker.celery_app", "-c", "1", "-l", "INFO", "-E" ]

@@ -39,8 +39,8 @@ def format_parse_output(
     repository_version, r, repository_authorization
 ):  # pragma: no cover
     intent = r.get("intent", None)
-    intent_ranking = r.get("intent_ranking")
-    entities = r.get("entities")
+    intent_ranking = r.get("intent_ranking", [])
+    entities = r.get("entities", [])
 
     out = OrderedDict(
         [
@@ -48,7 +48,7 @@ def format_parse_output(
             ("intent_ranking", intent_ranking),
             (
                 "entities_list",
-                list(OrderedDict.fromkeys([x.get("entity") for x in entities])),
+                list(OrderedDict.fromkeys([x.get("entity", None) for x in entities])),
             ),
             ("entities", entities),
         ]
@@ -63,7 +63,9 @@ def parse_text(
     rasa_format=False,
     use_cache=True,
 ):
-    interpreter = get_interpreter(repository_version, repository_authorization, use_cache)
+    interpreter = get_interpreter(
+        repository_version, repository_authorization, use_cache
+    )
     r = parse_interpreter(interpreter, text)
 
     if rasa_format:

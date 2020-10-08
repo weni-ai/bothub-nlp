@@ -10,29 +10,23 @@ from spacy.compat import symlink_to
 
 
 @plac.annotations(
-    lang=plac.Annotation(help='Language code'),
-    lang_path=plac.Annotation(help='Language path'))
+    lang=plac.Annotation(help="Language code"),
+    lang_path=plac.Annotation(help="Language path"),
+)
 def link_lang_spacy(lang, lang_path):
-    origin_path = os.path.join(
-        str(get_package_path('spacy').resolve()),
-        'lang',
-        lang,
-    )
+    origin_path = os.path.join(str(get_package_path("spacy").resolve()), "lang", lang)
     try:
-        symlink_to(
-            Path(origin_path),
-            os.path.abspath(lang_path),
-        )
+        symlink_to(Path(origin_path), os.path.abspath(lang_path))
         try:
-            importlib.import_module('spacy.lang.{}'.format(lang))
-            print('link created')
+            importlib.import_module("spacy.lang.{}".format(lang))
+            print("link created")
         except Exception as e:
-            print('link not created')
+            print("link not created")
             raise e
     except Exception as e:
-        print('error to create link to {} from {}'.format(lang, lang_path))
+        print("error to create link to {} from {}".format(lang, lang_path))
         raise e
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     plac.call(link_lang_spacy, sys.argv[1:])
