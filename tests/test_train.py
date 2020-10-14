@@ -6,7 +6,6 @@ from unittest.mock import patch
 from celery_app import train_update
 
 
-
 class TestTrainTask(unittest.TestCase):
 
     bert_language = "pt_br"
@@ -18,6 +17,8 @@ class TestTrainTask(unittest.TestCase):
         self.current_update = {
             "ready_for_train": True,
             "current_version_id": 6647,
+            "language": "pt_br",
+            "algorithm": "transformer_network_diet_bert",
             "repository_authorization_user_id": 303
         }
 
@@ -37,6 +38,7 @@ class TestTrainTask(unittest.TestCase):
             "repository_version": 6647,
             "repository_uuid": "e1e8a0fa-625c-4ba3-8b91-4c9f308db791",
             "intent": [],
+            "algorithm": "transformer_network_diet_bert",
             "total_training_end": 4,
             "use_name_entities": False,
             "use_competing_intents": False,
@@ -439,10 +441,11 @@ class TestTrainTask(unittest.TestCase):
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_start_training_nlu",
         return_value={
-            "language": "generic_language",
+            "language": "pt_br",
             "repository_version": 6647,
             "repository_uuid": "e1e8a0fa-625c-4ba3-8b91-4c9f308db791",
             "intent": [],
+            "algorithm": "transformer_network_diet",
             "total_training_end": 4,
             "use_name_entities": False,
             "use_competing_intents": False,
