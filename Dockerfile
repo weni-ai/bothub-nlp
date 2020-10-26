@@ -46,8 +46,6 @@ RUN pip install -U pip setuptools
 
 RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
-RUN pip install torch==1.5.1+cpu torchvision==0.6.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
-
 COPY . .
 
 #RUN git clone --branch master --depth 1 --single-branch \
@@ -67,9 +65,12 @@ COPY . .
 #    && python3.6 scripts/link_lang_spacy.py uz ./spacy-langs/uz/
 
 ARG DOWNLOAD_MODELS
-
-RUN if [ ${DOWNLOAD_MODELS} ]; then \
-        python3.6 scripts/download_models.py ${DOWNLOAD_MODELS}; \
+#Install torch with cuda 10.1
+RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
+        pip3 install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html && \
+        python3.6 download_models.py ${DOWNLOAD_MODELS}; \
+    elif [ ${DOWNLOAD_MODELS} ]; then \
+        python3.6 download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
 ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp_nlu_worker.celery_app", "-c", "1", "-l", "INFO", "-E" ]
