@@ -21,6 +21,7 @@ class TestDebugParseTask(unittest.TestCase):
     cur_dir = os.getcwd().split("/")[-1]
     if cur_dir == "bothub_nlp_nlu_worker":
         os.chdir("tests")
+    print(os.listdir())
 
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu_persistor",
