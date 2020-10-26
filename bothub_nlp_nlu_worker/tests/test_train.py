@@ -23,6 +23,16 @@ class TestTrainTask(unittest.TestCase):
         }
 
         # change directory to load /models
+        # change directory to /tests
+        try:
+            os.chdir("bothub_nlp_worker")
+        except Exception:
+            pass
+        try:
+            os.chdir("bothub_nlp_nlu_worker")
+        except Exception:
+            pass
+
         cur_dir = os.getcwd().split("/")[-1]
         if cur_dir == "tests":
             os.chdir("../")

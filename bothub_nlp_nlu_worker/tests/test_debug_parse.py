@@ -18,10 +18,19 @@ class TestDebugParseTask(unittest.TestCase):
         }
 
     # change directory to /tests
-    cur_dir = os.getcwd().split("/")[-1]
-    if cur_dir == "bothub_nlp_nlu_worker":
+    try:
+        os.chdir("bothub_nlp_worker")
+    except Exception:
+        pass
+    try:
+        os.chdir("bothub_nlp_nlu_worker")
+    except Exception:
+        pass
+    try:
         os.chdir("tests")
-    print(os.listdir())
+    except Exception:
+        pass
+
 
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu_persistor",
