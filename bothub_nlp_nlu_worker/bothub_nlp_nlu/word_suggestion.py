@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from bothub_nlp_celery.app import nlp_language
-import random
 import numpy as np
 
 
@@ -12,9 +11,7 @@ class WordSuggestion:
         self.row2key = {row: key for key, row in self.nlp.vocab.vectors.key2row.items()}
 
     def most_similar(self, word, *, batch_size=1024, topn=1, sort=True):
-        input_vector = self.nlp(word).vector.reshape(
-            1, self.nlp.vocab.vectors.shape[1]
-        )
+        input_vector = self.nlp(word).vector.reshape(1, self.nlp.vocab.vectors.shape[1])
         best_rows = np.zeros((1, self.n_highest), dtype="i")
         scores = np.zeros((1, self.n_highest), dtype="f")
 
@@ -30,9 +27,7 @@ class WordSuggestion:
             )[
                 :, -self.n_highest :
             ]  # get n_highest scores rows in O(n)
-            scores[i : i + batch_size] = np.partition(
-                sims, -self.n_highest, axis=1
-            )[
+            scores[i : i + batch_size] = np.partition(sims, -self.n_highest, axis=1)[
                 :, -self.n_highest :
             ]  # get n_highest scores in O(n)
 
@@ -71,8 +66,6 @@ def word_suggestion_text(text, n):
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
 
-    similar_words = WordSuggestion().most_similar(
-        text, topn=n
-    )
+    similar_words = WordSuggestion().most_similar(text, topn=n)
     print(similar_words)
     return OrderedDict([("text", text), ("similar_words", similar_words)])

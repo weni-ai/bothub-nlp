@@ -149,12 +149,14 @@ class SentenceSuggestion:
 def get_intent_sentences(examples_list, intent):
     intent_sentences = []
     for example in examples_list:
-        if example.get('intent') == intent:
-            intent_sentences.append(example.get('text'))
+        if example.get("intent") == intent:
+            intent_sentences.append(example.get("text"))
     return intent_sentences
 
 
-def intent_sentence_suggestion_text(repository_version, repository_authorization, intent, percentage_to_replace, n):
+def intent_sentence_suggestion_text(
+    repository_version, repository_authorization, intent, percentage_to_replace, n
+):
     if nlp_language is None:
         return "spacy model not loaded in this language"
     if nlp_language.vocab.vectors_length == 0:
@@ -165,7 +167,9 @@ def intent_sentence_suggestion_text(repository_version, repository_authorization
 
     similar_sentences = []
     for sentence in intent_sentences:
-        sentences = SentenceSuggestion().get_suggestions(sentence, percentage_to_replace, n)
+        sentences = SentenceSuggestion().get_suggestions(
+            sentence, percentage_to_replace, n
+        )
         similar_sentences.extend(sentences)
 
     return OrderedDict([("intent", intent), ("suggested_sentences", similar_sentences)])

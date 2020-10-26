@@ -1,6 +1,4 @@
 from collections import OrderedDict
-from rasa.nlu import __version__ as rasa_version
-from bothub_nlp_rasa_utils.utils import update_interpreters
 from bothub_nlp_rasa_utils.parse import get_interpreter, parse_interpreter
 
 
