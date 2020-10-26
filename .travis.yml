@@ -4,7 +4,7 @@ python:
 services:
   - docker
 install:
-  - pip install -r requirements_dev.txt
+  - pip install -r requirements.txt
   - pip install coveralls
 env:
   global:
@@ -12,9 +12,9 @@ env:
     - BOTHUB_NLP_LANGUAGE_QUEUE="en"
     - BOTHUB_NLP_SERVICE_WORKER=true
 before_script:
-  - python scripts/download_spacy_models.py en:en_core_web_md
+  - python scripts/download_spacy_models.py en-BERT
 script:
   - flake8
-#  - travis_wait coverage run -m unittest discover bothub_nlp_nlu_worker/tests
-#after_success:
-#  - coveralls
+  - travis_wait coverage run -m unittest discover bothub_nlp_nlu_worker/tests
+after_success:
+  - coveralls
