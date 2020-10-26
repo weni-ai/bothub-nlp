@@ -15,10 +15,12 @@ class TestParseTask(unittest.TestCase):
             "current_version_id": 6647,
             "repository_authorization_user_id": 303,
         }
-        # change directory to load /model
-        cur_dir = os.getcwd().split("/")[-1]
-        if cur_dir == "tests":
-            os.chdir("../")
+        self.local_path = os.getcwd()
+
+    # change directory to /tests
+    cur_dir = os.getcwd().split("/")[-1]
+    if cur_dir == "bothub_nlp_nlu_worker":
+        os.chdir("tests")
 
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu_persistor",
