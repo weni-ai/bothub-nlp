@@ -67,7 +67,7 @@ COPY . .
 ARG DOWNLOAD_MODELS
 #Install torch with cuda 10.1
 RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
-        pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html && \
+        pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html; \
     fi
 
 RUN if [ ${DOWNLOAD_MODELS} ]; then \
