@@ -31,7 +31,6 @@ class TestDebugParseTask(unittest.TestCase):
     except Exception:
         pass
 
-
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_parse_nlu_persistor",
         return_value={
