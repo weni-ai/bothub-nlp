@@ -29,7 +29,7 @@ coloredlogs==10.0
 colorhash==1.0.2
 ConfigArgParse==1.1
 contextvars==2.3
-cryptography==2.8
+cryptography==3.2
 cycler==0.10.0
 cymem==2.0.3
 DAWG-Python==0.7.2
