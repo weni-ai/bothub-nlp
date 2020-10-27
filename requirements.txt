@@ -13,7 +13,7 @@ black==19.3b0
 blis==0.2.4
 git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.28
 git+https://github.com/bothub-it/bothub-backend.git@1.0.12
-git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.27dev
+git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.28staging
 boto3==1.12.25
 botocore==1.15.25
 bz2file==0.98
