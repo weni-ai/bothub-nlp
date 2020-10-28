@@ -10,11 +10,8 @@ from bothub_nlp_celery.tasks import TASK_NLU_WORDS_DISTRIBUTION
 from bothub_nlp_celery.tasks import TASK_NLU_SCORE_CALCULATION
 from bothub_nlp_nlu.parse import parse_text as parse_text_core
 from bothub_nlp_nlu.debug_parse import debug_parse_text as debug_parse_text_core
-from bothub_nlp_nlu.sentence_suggestion import sentence_suggestion_text as sentence_suggestion_text_core
-from bothub_nlp_nlu.words_distribution import words_distribution_text as words_distribution_core
 from bothub_nlp_nlu.score_calculation import get_scores as score_calculation_core
 
-from bothub_nlp_rasa_utils import train, evaluate
 from bothub_nlp_nlu.sentence_suggestion import (
     sentence_suggestion_text as sentence_suggestion_text_core,
 )
@@ -52,8 +49,12 @@ def sentence_suggestion_text(*args, **kwargs):
 
 
 @celery_app.task(name=TASK_NLU_INTENT_SENTENCE_SUGGESTION_TEXT)
-def intent_sentence_suggestion_text(repository_version, repository_authorization, *args, **kwargs):
-    return intent_sentence_suggestion_text_core(repository_version, repository_authorization, *args, **kwargs)
+def intent_sentence_suggestion_text(
+    repository_version, repository_authorization, *args, **kwargs
+):
+    return intent_sentence_suggestion_text_core(
+        repository_version, repository_authorization, *args, **kwargs
+    )
 
 
 @celery_app.task(name=TASK_NLU_WORD_SUGGESTION_TEXT)
@@ -73,9 +74,13 @@ def train_update(repository_version, by_id, repository_authorization):
 
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
-def evaluate_update(repository_version, by_id, repository_authorization, cross_validation):
+def evaluate_update(
+    repository_version, by_id, repository_authorization, cross_validation
+):
     if cross_validation:
-        return evaluate_crossval.evaluate_crossval_update(repository_version, by_id, repository_authorization)
+        return evaluate_crossval.evaluate_crossval_update(
+            repository_version, by_id, repository_authorization
+        )
     return evaluate.evaluate_update(repository_version, repository_authorization)
 
 
@@ -88,6 +93,4 @@ def words_distribution(repository_version, language, repository_authorization):
 
 @celery_app.task(name=TASK_NLU_SCORE_CALCULATION)
 def score_calculation(repository_version, repository_authorization):
-    return score_calculation_core(
-        repository_version, repository_authorization
-    )
+    return score_calculation_core(repository_version, repository_authorization)

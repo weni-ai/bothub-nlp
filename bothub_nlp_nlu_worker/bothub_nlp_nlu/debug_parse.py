@@ -1,11 +1,9 @@
 import numpy as np
 from collections import OrderedDict
 from lime.lime_text import LimeTextExplainer
-from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.test import remove_pretrained_extractors
 from .parse import minimal_entity
 from bothub_nlp_rasa_utils.utils import backend
-from bothub_nlp_rasa_utils.utils import update_interpreters
 from bothub_nlp_rasa_utils.parse import get_interpreter, parse_interpreter
 
 
@@ -105,7 +103,9 @@ class DebugSentenceLime:
 
 
 def get_intention_list(repository_authorization, repository_version):
-    info = backend().request_backend_info(repository_authorization, repository_version=repository_version)
+    info = backend().request_backend_info(
+        repository_authorization, repository_version=repository_version
+    )
     return info.get("intents", [])
 
 
