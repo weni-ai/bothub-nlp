@@ -5,6 +5,7 @@ import subprocess
 import logging
 import plac
 import requests
+import posixpath
 
 from decouple import config
 from spacy.cli import download
@@ -121,7 +122,8 @@ def download_file(url, file_name):
     return file_name
 
 
-def download_bert(model_name, model_dir):
+def download_bert(model_name):
+    model_dir = posixpath.join("bothub_nlp_nlu_worker", model_name)
     os.makedirs(model_dir, exist_ok=True)
 
     from_pt = from_pt_dict.get(model_name, False)
@@ -129,9 +131,10 @@ def download_bert(model_name, model_dir):
     config_url = model_config_url.get(model_name)
 
     logger.info("downloading bert")
-    model_name = "pytorch_model.bin" if from_pt else "tf_model.h5"
-    download_file(model_url, os.path.join(model_dir, model_name))
-    download_file(config_url, os.path.join(model_dir, "config.json"))
+
+    model_file_name = "pytorch_model.bin" if from_pt else "tf_model.h5"
+    download_file(model_url, posixpath.join(model_dir, model_file_name))
+    download_file(config_url, posixpath.join(model_dir, "config.json"))
     logger.info("finished downloading bert")
 
 
@@ -191,7 +194,7 @@ def download_models(languages=None, debug=False):
                 logger.debug("downloading {}".format(value))
                 download(value)
         elif model == "BERT":
-            download_bert(value, model_dir="bothub_nlp_nlu_worker/model")
+            download_bert(value)
 
 
 if __name__ == "__main__":
