@@ -109,7 +109,10 @@ lang_to_model = {
     "kk": {
         "SPACY": "pip+kk_bothub_sm:https://s3.amazonaws.com/bothub-models/spacy-2.1.9/kk_bothub_sm-1.0.0.zip"
     },
-    "xx": {"SPACY": "xx"},
+    "xx": {
+        "SPACY": "xx",
+        "BERT": "bert_multilang"
+    },
 }
 
 
