@@ -7,10 +7,8 @@ from bothub_nlp_celery.tasks import TASK_NLU_WORD_SUGGESTION_TEXT
 from bothub_nlp_celery.tasks import TASK_NLU_TRAIN_UPDATE
 from bothub_nlp_celery.tasks import TASK_NLU_EVALUATE_UPDATE
 from bothub_nlp_celery.tasks import TASK_NLU_WORDS_DISTRIBUTION
-from bothub_nlp_celery.tasks import TASK_NLU_SCORE_CALCULATION
 from bothub_nlp_nlu.parse import parse_text as parse_text_core
 from bothub_nlp_nlu.debug_parse import debug_parse_text as debug_parse_text_core
-from bothub_nlp_nlu.score_calculation import get_scores as score_calculation_core
 
 from bothub_nlp_nlu.sentence_suggestion import (
     sentence_suggestion_text as sentence_suggestion_text_core,
@@ -89,8 +87,3 @@ def words_distribution(repository_version, language, repository_authorization):
     return words_distribution_core(
         repository_version, language, repository_authorization
     )
-
-
-@celery_app.task(name=TASK_NLU_SCORE_CALCULATION)
-def score_calculation(repository_version, repository_authorization):
-    return score_calculation_core(repository_version, repository_authorization)
