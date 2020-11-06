@@ -3,7 +3,7 @@ import uuid
 import json
 from unittest.mock import patch
 
-from celery_app import words_distribution
+from celery_app_test import words_distribution
 
 
 class TestWordDistributionTask(unittest.TestCase):

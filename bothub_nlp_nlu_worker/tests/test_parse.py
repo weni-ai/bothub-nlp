@@ -4,7 +4,7 @@ import base64
 import os
 from unittest.mock import patch
 
-from celery_app import parse_text
+from celery_app_test import parse_text
 
 
 class TestParseTask(unittest.TestCase):
