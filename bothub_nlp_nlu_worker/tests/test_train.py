@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
+from celery_app import train_update
 import uuid
 import os
 
@@ -112,7 +113,6 @@ class TestTrainTask(TestCase):
     @patch.dict(os.environ, dict({"BOTHUB_LANGUAGE_MODEL": "BERT"}))
     def test_train_bert(self, *args):
 
-        from celery_app_test import train_update
         train_update(
             self.current_update.get("current_version_id"),
             self.current_update.get("repository_authorization_user_id"),
@@ -175,7 +175,6 @@ class TestTrainTask(TestCase):
         return_value={},
     )
     def test_train_transformer_diet(self, *args):
-        from celery_app_test import train_update
         train_update(
             self.current_update.get("current_version_id"),
             self.current_update.get("repository_authorization_user_id"),

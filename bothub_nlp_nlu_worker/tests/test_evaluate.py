@@ -4,7 +4,7 @@ import base64
 import os
 from unittest.mock import patch
 
-from celery_app_test import evaluate_update
+from celery_app import evaluate_update
 
 
 class TestEvaluateTask(unittest.TestCase):
@@ -245,6 +245,7 @@ class TestEvaluateTask(unittest.TestCase):
             self.current_update.get("repository_version"),
             self.current_update.get("user_id"),
             self.repository_authorization,
+            cross_validation=False
         )
 
         self.assertEqual(1787, result.get("id"))
