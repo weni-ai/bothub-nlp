@@ -1,18 +1,16 @@
-import unittest
-import uuid
-import os
+from unittest import TestCase
 from unittest.mock import patch
 
-from celery_app_test import train_update
+import uuid
+import os
 
 
-class TestTrainTask(unittest.TestCase):
+class TestTrainTask(TestCase):
 
     # bert_language = "pt_br"
     bert_language = "en"
 
     def setUp(self, *args):
-
         self.repository_authorization = uuid.uuid4()
         self.current_update = {
             "ready_for_train": True,
@@ -111,8 +109,10 @@ class TestTrainTask(unittest.TestCase):
         "bothub_backend.bothub.BothubBackend.request_backend_trainfail_nlu",
         return_value={},
     )
+    @patch.dict(os.environ, dict({"BOTHUB_LANGUAGE_MODEL": "BERT"}))
     def test_train_bert(self, *args):
 
+        from celery_app_test import train_update
         train_update(
             self.current_update.get("current_version_id"),
             self.current_update.get("repository_authorization_user_id"),
@@ -175,6 +175,7 @@ class TestTrainTask(unittest.TestCase):
         return_value={},
     )
     def test_train_transformer_diet(self, *args):
+        from celery_app_test import train_update
         train_update(
             self.current_update.get("current_version_id"),
             self.current_update.get("repository_authorization_user_id"),
