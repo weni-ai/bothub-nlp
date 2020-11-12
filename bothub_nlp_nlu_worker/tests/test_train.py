@@ -11,7 +11,7 @@ class TestTrainTask(TestCase):
 
     # # bert_language = "pt_br"
     bert_language = "en"
-    #
+
     def setUp(self, *args):
         self.repository_authorization = uuid.uuid4()
         self.current_update = {

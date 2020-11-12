@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from bothub_nlp_nlu_worker.bothub_nlp_nlu.parse import parse_text
 
+
 class TestParseTask(unittest.TestCase):
     def setUp(self, *args):
         self.repository_authorization = uuid.uuid4()
