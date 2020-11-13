@@ -1,18 +1,18 @@
-import unittest
-import uuid
-import os
+from unittest import TestCase
 from unittest.mock import patch
 
-from celery_app_test import train_update
+# from celery_app_test import train_update
+from bothub_nlp_rasa_utils import train
+import uuid
+import os
 
 
-class TestTrainTask(unittest.TestCase):
+class TestTrainTask(TestCase):
 
-    # bert_language = "pt_br"
+    # # bert_language = "pt_br"
     bert_language = "en"
 
     def setUp(self, *args):
-
         self.repository_authorization = uuid.uuid4()
         self.current_update = {
             "ready_for_train": True,
@@ -38,10 +38,6 @@ class TestTrainTask(unittest.TestCase):
             os.chdir("../")
         print("Current Working Directory ", os.getcwd())
 
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_save_queue_id",
-        return_value={},
-    )
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_start_training_nlu",
         return_value={
@@ -112,17 +108,12 @@ class TestTrainTask(unittest.TestCase):
         return_value={},
     )
     def test_train_bert(self, *args):
-
-        train_update(
+        train.train_update(
             self.current_update.get("current_version_id"),
             self.current_update.get("repository_authorization_user_id"),
             self.repository_authorization,
         )
 
-    @patch(
-        "bothub_backend.bothub.BothubBackend.request_backend_save_queue_id",
-        return_value={},
-    )
     @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_start_training_nlu",
         return_value={
@@ -175,7 +166,7 @@ class TestTrainTask(unittest.TestCase):
         return_value={},
     )
     def test_train_transformer_diet(self, *args):
-        train_update(
+        train.train_update(
             self.current_update.get("current_version_id"),
             self.current_update.get("repository_authorization_user_id"),
             self.repository_authorization,

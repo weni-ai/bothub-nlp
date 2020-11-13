@@ -4,7 +4,7 @@ import base64
 import os
 from unittest.mock import patch
 
-from celery_app_test import evaluate_update
+from bothub_nlp_rasa_utils.evaluate import evaluate_update
 
 
 class TestEvaluateTask(unittest.TestCase):
@@ -243,7 +243,6 @@ class TestEvaluateTask(unittest.TestCase):
     def test_evaluate_ok(self, *args):
         result = evaluate_update(
             self.current_update.get("repository_version"),
-            self.current_update.get("user_id"),
             self.repository_authorization,
         )
 

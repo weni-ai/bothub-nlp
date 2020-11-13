@@ -5,7 +5,7 @@ import base64
 import os
 from unittest.mock import patch
 
-from celery_app_test import debug_parse_text
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.debug_parse import debug_parse_text
 
 
 class TestDebugParseTask(unittest.TestCase):

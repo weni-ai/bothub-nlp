@@ -15,8 +15,8 @@ from bothub_nlp_nlu_worker.bothub_nlp_nlu.sentence_suggestion import (
 from bothub_nlp_nlu_worker.bothub_nlp_nlu.words_distribution import (
     words_distribution_text as words_distribution_core,
 )
-from bothub_nlp_rasa_utils import train, evaluate
 from bothub_nlp_rasa_utils.utils import backend
+from bothub_nlp_rasa_utils import train, evaluate, evaluate_crossval
 
 
 @celery_app.task(name=TASK_NLU_PARSE_TEXT)
@@ -50,7 +50,13 @@ def train_update(repository_version, by_id, repository_authorization):
 
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
-def evaluate_update(repository_version, by_id, repository_authorization):
+def evaluate_update(
+    repository_version, by_id, repository_authorization, cross_validation
+):
+    if cross_validation:
+        return evaluate_crossval.evaluate_crossval_update(
+            repository_version, by_id, repository_authorization
+        )
     return evaluate.evaluate_update(repository_version, repository_authorization)
 
 

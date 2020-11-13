@@ -3,7 +3,7 @@ import uuid
 import json
 from unittest.mock import patch
 
-from celery_app_test import words_distribution
+from bothub_nlp_nlu_worker.bothub_nlp_nlu.words_distribution import words_distribution_text
 
 
 class TestWordDistributionTask(unittest.TestCase):
@@ -502,7 +502,7 @@ class TestWordDistributionTask(unittest.TestCase):
     )
     def test_parse_without_rasa_format(self, *args):
 
-        result = words_distribution(
+        result = words_distribution_text(
             self.current_update.get("current_version_id"),
             "pt_br",
             self.repository_authorization,
