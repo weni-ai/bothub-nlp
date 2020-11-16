@@ -242,8 +242,7 @@ class TestEvaluateTask(unittest.TestCase):
     )
     def test_evaluate_ok(self, *args):
         result = evaluate_update(
-            self.current_update.get("repository_version"),
-            self.repository_authorization,
+            self.current_update.get("repository_version"), self.repository_authorization
         )
 
         self.assertEqual(1787, result.get("id"))

@@ -129,6 +129,11 @@ def download_bert(model_name):
     model_dir = posixpath.join("bothub_nlp_nlu_worker", model_name)
     os.makedirs(model_dir, exist_ok=True)
 
+    # model_url = hf_bucket_url(
+    #     model_weights_defaults.get(model_name),
+    #     filename=(WEIGHTS_NAME if from_pt else TF2_WEIGHTS_NAME),
+    # )
+
     from_pt = from_pt_dict.get(model_name, False)
     model_url = model_download_url.get(model_name)
     config_url = model_config_url.get(model_name)
