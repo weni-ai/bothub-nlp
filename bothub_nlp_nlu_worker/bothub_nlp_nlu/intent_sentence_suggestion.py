@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from bothub_nlp_celery.app import nlp_language
-from .utils import get_examples_request
+from bothub_nlp_rasa_utils.utils import get_examples_request
 import random
 import numpy as np
 
