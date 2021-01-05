@@ -13,7 +13,6 @@ black==19.3b0
 blis==0.2.4
 git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.30
 git+https://github.com/bothub-it/bothub-backend.git@1.0.13
-git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.31developing1
 boto3==1.12.25
 botocore==1.15.25
 bz2file==0.98
@@ -201,3 +200,10 @@ Werkzeug==1.0.0
 wrapt==1.12.1
 yarl==1.4.2
 zipp==3.1.0
+
+rasa==1.10.6
+transformers==2.11.0
+emoji==0.6.0
+recognizers-text-suite
+
+tensorflow-gpu==2.1.2

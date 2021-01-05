@@ -22,7 +22,7 @@ class TestEvaluateTask(unittest.TestCase):
     except Exception:
         pass
     try:
-        os.chdir("bothub_nlp_nlu_worker")
+        os.chdir("nlu_worker")
     except Exception:
         pass
     try:

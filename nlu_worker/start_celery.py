@@ -11,7 +11,7 @@ subprocess.run(
         "-O",
         "fair",
         "--workdir",
-        "bothub_nlp_nlu_worker",
+        "nlu_worker",
         "-A",
         "celery_app",
         "-c",
