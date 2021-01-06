@@ -39,7 +39,7 @@ start_celery:
 	@celery worker --autoscale 50,10 -O fair --workdir bothub_nlp_nlu_worker -A celery_app -c 1 -l INFO -E -Q en
 
 python_celery:
-	@python bothub_nlp_nlu_worker/start_celery.py
+	@python bothub/start_celery.py
 # Utils
 
 ## Colors

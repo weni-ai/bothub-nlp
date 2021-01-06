@@ -32,8 +32,10 @@ from rasa.nlu.test import (
     ResponseSelectionEvaluationResult,
 )
 from rasa.nlu.training_data import Message, TrainingData
-from .utils import backend, update_interpreters, get_examples_request, PokeLogging
-from .pipeline_builder import get_rasa_nlu_config
+from utils.backend import backend
+from utils.pipeline_builder import get_rasa_nlu_config
+from utils.poke_logging import PokeLogging
+from utils.examples_request import get_examples_request
 
 logger = logging.getLogger(__name__)
 

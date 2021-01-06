@@ -4,7 +4,10 @@ import base64
 import os
 from unittest.mock import patch
 
-from bothub_nlp_rasa_utils.evaluate import evaluate_update
+import sys
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from bothub.nlu_worker.task.evaluate import evaluate_update
 
 
 class TestEvaluateTask(unittest.TestCase):

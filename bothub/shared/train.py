@@ -1,15 +1,23 @@
 from tempfile import mkdtemp
 import os
-
+import logging
 from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.model import Trainer
 from rasa.nlu.training_data import Message, TrainingData
 from rasa.nlu.components import ComponentBuilder
 
-from .utils import PokeLogging, backend, get_examples_request, intersection
-from .persistor import BothubPersistor
-from bothub_nlp_rasa_utils import logger
-from .pipeline_builder import get_rasa_nlu_config
+from utils.poke_logging import PokeLogging
+from utils.backend import backend
+from utils.examples_request import get_examples_request
+from utils.persistor import BothubPersistor
+from utils.pipeline_builder import get_rasa_nlu_config
+
+logger = logging.getLogger('bothub-nlp-worker')
+
+
+def intersection(lst1, lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
 
 
 def load_lookup_tables(update_request):
@@ -42,14 +50,14 @@ def train_update(repository_version, by, repository_authorization, from_queue='c
 
     """ update_request (v2/repository/preprocessing/authorization/train/start_training/) signature:
     {
-        'language': 'pt_br', 
-        'repository_version': 47, 
-        'repository_uuid': '1d8e0d6f-1941-42a3-84c5-788706c7072e', 
-        'intent': [4, 5], 
-        'algorithm': 'transformer_network_diet_bert', 
-        'use_name_entities': False, 
-        'use_competing_intents': False, 
-        'use_analyze_char': False, 
+        'language': 'pt_br',
+        'repository_version': 47,
+        'repository_uuid': '1d8e0d6f-1941-42a3-84c5-788706c7072e',
+        'intent': [4, 5],
+        'algorithm': 'transformer_network_diet_bert',
+        'use_name_entities': False,
+        'use_competing_intents': False,
+        'use_analyze_char': False,
         'total_training_end': 0
     }
     """

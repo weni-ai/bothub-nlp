@@ -1,10 +1,9 @@
 import numpy as np
+import utils.backend as backend
 from collections import OrderedDict
 from lime.lime_text import LimeTextExplainer
 from rasa.nlu.test import remove_pretrained_extractors
-from .parse import minimal_entity
-from bothub_nlp_rasa_utils.utils import backend
-from bothub_nlp_rasa_utils.parse import get_interpreter, parse_interpreter
+from rasa.nlu import __version__ as rasa_version
 
 
 class DebugSentenceLime:
@@ -18,7 +17,7 @@ class DebugSentenceLime:
     def parse(self, text_list):
         result_list = []
         for text in text_list:
-            result_json = parse_interpreter(self.interpreter, text)
+            result_json = self.interpreter.parse(text)
 
             idx_dict = (
                 {}
@@ -102,6 +101,21 @@ class DebugSentenceLime:
         return result_per_intent
 
 
+def minimal_entity(entity, self_flag=False):  # pragma: no cover
+    out = {
+        "value": entity.get("value"),
+        "entity": entity.get("entity"),
+        "confidence": entity.get("confidence"),
+        "start": entity.get("start"),
+        "end": entity.get("end"),
+    }
+
+    if self_flag:
+        out.update({"self": True})
+
+    return out
+
+
 def get_intention_list(repository_authorization, repository_version):
     info = backend().request_backend_info(
         repository_authorization, repository_version=repository_version
@@ -139,12 +153,12 @@ def n_samples_by_sentence_lenght(sentence):
 
 
 def debug_parse_text(
-    repository_version, repository_authorization, text, use_cache=True
+    repository_version, repository_authorization, interpreter_manager, text, use_cache=True
 ):
-    interpreter = get_interpreter(
-        repository_version, repository_authorization, use_cache
+    interpreter = interpreter_manager.get_interpreter(
+        repository_version, repository_authorization, rasa_version, use_cache
     )
-    r = parse_interpreter(interpreter, text)
+    r = interpreter.parse(text)
 
     intention_names = get_intention_list(repository_authorization, repository_version)
     result_per_word = DebugSentenceLime(

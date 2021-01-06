@@ -5,7 +5,7 @@ import base64
 import os
 from unittest.mock import patch
 
-from nlu_worker.task.debug_parse import debug_parse_text
+from bothub.nlu_worker.task.debug_parse import debug_parse_text
 
 
 class TestDebugParseTask(unittest.TestCase):

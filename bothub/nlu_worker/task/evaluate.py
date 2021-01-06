@@ -17,8 +17,7 @@ from rasa.nlu.test import substitute_labels
 from rasa.nlu.training_data import Message
 from rasa.nlu.training_data import TrainingData
 
-from .utils import backend
-from .utils import update_interpreters
+import utils.backend as backend
 
 logger = logging.getLogger(__name__)
 
@@ -390,7 +389,7 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
     return merged_logs
 
 
-def evaluate_update(repository_version, repository_authorization):
+def evaluate_update(repository_version, repository_authorization, interpreter_manager):
     evaluations = backend().request_backend_start_evaluation(
         repository_version, repository_authorization
     )
@@ -406,7 +405,7 @@ def evaluate_update(repository_version, repository_authorization):
         )
 
     test_data = TrainingData(training_examples=training_examples)
-    interpreter = update_interpreters.get(
+    interpreter = interpreter_manager.get_intepreter(
         repository_version, repository_authorization, rasa_version, use_cache=False
     )
 

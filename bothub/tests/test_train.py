@@ -1,10 +1,14 @@
+import uuid
 from unittest import TestCase
 from unittest.mock import patch
 
-# from celery_app_test import train_update
-from bothub_nlp_rasa_utils import train
-import uuid
 import os
+import sys
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# from celery_app_test import train_update
+
+from bothub.shared import train
 
 
 class TestTrainTask(TestCase):

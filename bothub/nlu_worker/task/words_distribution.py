@@ -1,6 +1,6 @@
 from collections import Counter, OrderedDict
 
-from bothub_nlp_rasa_utils.utils import get_examples_request
+from utils.examples_request import get_examples_request
 
 
 def words_distribution_text(repository_version, language, repository_authorization):

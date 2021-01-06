@@ -1,8 +1,10 @@
 from collections import OrderedDict
 from bothub_nlp_celery.app import nlp_language
-from bothub_nlp_rasa_utils.utils import get_examples_request
+
 import random
 import numpy as np
+
+from utils.examples_request import get_examples_request
 
 
 class SentenceSuggestion:

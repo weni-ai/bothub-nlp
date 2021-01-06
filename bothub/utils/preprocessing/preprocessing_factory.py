@@ -1,8 +1,10 @@
-from bothub_nlp_rasa_utils import logger
+import logging
 
 from .preprocessing_base import PreprocessingBase
 from .preprocessing_english import PreprocessingEnglish
 from .preprocessing_portuguese import PreprocessingPortuguese
+
+logger = logging.getLogger('bothub-nlp-worker')
 
 
 class PreprocessingFactory:
@@ -10,7 +12,7 @@ class PreprocessingFactory:
 
     @staticmethod
     def get_preprocess(language: str = None):
-        
+
         try:
             if language == "en":
                 return PreprocessingEnglish()
