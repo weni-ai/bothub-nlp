@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
-class PreprocessingInterface():
+
+class PreprocessingInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod

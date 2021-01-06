@@ -8,6 +8,7 @@ import sys
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from bothub.nlu_worker.task.evaluate import evaluate_update
+from bothub.nlu_worker.interpreter_manager import InterpreterManager
 
 
 class TestEvaluateTask(unittest.TestCase):
@@ -18,6 +19,7 @@ class TestEvaluateTask(unittest.TestCase):
             "current_version_id": 6647,
             "repository_authorization_user_id": 303,
         }
+        self.interpreter_manager = InterpreterManager()
 
     # change directory to /tests
     try:
@@ -247,6 +249,7 @@ class TestEvaluateTask(unittest.TestCase):
         result = evaluate_update(
             self.current_update.get("repository_version"),
             self.repository_authorization,
+            self.interpreter_manager,
         )
 
         self.assertEqual(1787, result.get("id"))

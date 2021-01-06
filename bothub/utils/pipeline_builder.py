@@ -1,11 +1,11 @@
 from rasa.nlu.config import RasaNLUModelConfig
-from bothub_nlp_celery.utils import choose_best_algorithm, ALGORITHM_TO_LANGUAGE_MODEL
+from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings
 from .pipeline_components.registry import language_to_model
 
 
 def add_spacy_nlp():
-    return {"name": "utils.pipeline_components.spacy_nlp.SpacyNLP"}
+    return {"name": "bothub.utils.pipeline_components.spacy_nlp.SpacyNLP"}
 
 
 def add_whitespace_tokenizer():
@@ -14,21 +14,21 @@ def add_whitespace_tokenizer():
 
 def add_preprocessing(update):
     return {
-        "name": "utils.pipeline_components.preprocessing.Preprocessing",
+        "name": "bothub.utils.pipeline_components.preprocessing.Preprocessing",
         "language": update.get("language"),
     }
 
 
 def add_regex_featurizer():
     return {
-        "name": "utils.pipeline_components.regex_featurizer.RegexFeaturizerCustom",
+        "name": "bothub.utils.pipeline_components.regex_featurizer.RegexFeaturizerCustom",
         "case_sensitive": False
     }
 
 
 def add_regex_entity_extractor():
     return {
-        "name": "utils.pipeline_components.regex_entity_extractor.RegexEntityExtractorCustom",
+        "name": "bothub.utils.pipeline_components.regex_entity_extractor.RegexEntityExtractorCustom",
     }
 
 
@@ -72,7 +72,7 @@ def add_legacy_countvectors_featurizer(update):
 
 def add_microsoft_entity_extractor(update):
     return {
-        "name": "utils.pipeline_components.microsoft_recognizers_extractor.MicrosoftRecognizersExtractor",
+        "name": "bothub.utils.pipeline_components.microsoft_recognizers_extractor.MicrosoftRecognizersExtractor",
         "dimensions": update['prebuilt_entities'],
         "language": update.get('language')
     }
@@ -80,7 +80,7 @@ def add_microsoft_entity_extractor(update):
 
 def add_embedding_intent_classifier():
     return {
-        "name": "utils.pipeline_components.diet_classifier.DIETClassifierCustom",
+        "name": "bothub.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
         "hidden_layers_sizes": {"text": [256, 128]},
         "number_of_transformer_layers": 0,
         "weight_sparsity": 0,
@@ -93,7 +93,7 @@ def add_embedding_intent_classifier():
 
 def add_diet_classifier(epochs=300, bert=False):
     model = {
-        "name": "utils.pipeline_components.diet_classifier.DIETClassifierCustom",
+        "name": "bothub.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
         "entity_recognition": True,
         "BILOU_flag": False,
         "epochs": epochs
@@ -150,16 +150,16 @@ def transformer_network_diet_word_embedding_config(update):
 def transformer_network_diet_bert_config(update):
     pipeline = [
         {  # NLP
-            "name": "utils.pipeline_components.hf_transformer.HFTransformersNLPCustom",
+            "name": "bothub.utils.pipeline_components.hf_transformer.HFTransformersNLPCustom",
             "model_name": language_to_model.get(update.get("language"), 'bert_multilang'),
         },
         {  # Tokenizer
-            "name": "utils.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
+            "name": "bothub.utils.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
             "intent_tokenization_flag": False,
             "intent_split_symbol": "_",
         },
         {  # Bert Featurizer
-            "name": "utils.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
+            "name": "bothub.utils.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
         },
     ]
     # pipeline.append(add_regex_entity_extractor())

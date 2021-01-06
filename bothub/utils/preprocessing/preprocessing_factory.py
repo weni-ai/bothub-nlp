@@ -4,7 +4,7 @@ from .preprocessing_base import PreprocessingBase
 from .preprocessing_english import PreprocessingEnglish
 from .preprocessing_portuguese import PreprocessingPortuguese
 
-logger = logging.getLogger('bothub-nlp-worker')
+logger = logging.getLogger(__name__)
 
 
 class PreprocessingFactory:

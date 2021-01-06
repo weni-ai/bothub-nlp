@@ -6,6 +6,7 @@ import os
 from unittest.mock import patch
 
 from bothub.nlu_worker.task.debug_parse import debug_parse_text
+from bothub.nlu_worker.interpreter_manager import InterpreterManager
 
 
 class TestDebugParseTask(unittest.TestCase):
@@ -16,6 +17,7 @@ class TestDebugParseTask(unittest.TestCase):
             "current_version_id": 6647,
             "repository_authorization_user_id": 303,
         }
+        self.interpreter_manager = InterpreterManager()
 
     # change directory to /tests
     try:
@@ -51,6 +53,7 @@ class TestDebugParseTask(unittest.TestCase):
         result = debug_parse_text(
             self.current_update.get("current_version_id"),
             self.repository_authorization,
+            self.interpreter_manager,
             "ok",
         )
         print(json.dumps(result, indent=2))
@@ -76,6 +79,7 @@ class TestDebugParseTask(unittest.TestCase):
         result = debug_parse_text(
             self.current_update.get("current_version_id"),
             self.repository_authorization,
+            self.interpreter_manager,
             "ok",
             True,
         )

@@ -1,9 +1,11 @@
 import numpy as np
-import utils.backend as backend
+
 from collections import OrderedDict
 from lime.lime_text import LimeTextExplainer
 from rasa.nlu.test import remove_pretrained_extractors
 from rasa.nlu import __version__ as rasa_version
+
+from bothub.utils.backend import backend
 
 
 class DebugSentenceLime:

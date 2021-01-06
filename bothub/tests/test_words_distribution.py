@@ -3,7 +3,7 @@ import uuid
 import json
 from unittest.mock import patch
 
-from nlu_worker.task.words_distribution import words_distribution_text
+from bothub.nlu_worker.task.words_distribution import words_distribution_text
 
 
 class TestWordDistributionTask(unittest.TestCase):

@@ -1,8 +1,9 @@
-from rasa.nlu.model import Interpreter
 from rasa.nlu import components
 from tempfile import mkdtemp
-from utils.persistor import BothubPersistor
-from utils.backend import backend
+
+from bothub.utils.persistor import BothubPersistor
+from bothub.utils.backend import backend
+from bothub.utils.rasa_components.custom_interpreter import CustomInterpreter
 
 
 class InterpreterManager:
@@ -35,11 +36,11 @@ class InterpreterManager:
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
 
-        interpreter = Interpreter(
+        interpreter = CustomInterpreter(
             None, {"language": update_request.get("language")}
         )
         interpreter = interpreter.load(
-                model_directory, components.ComponentBuilder(use_cache=False)
+            model_directory, components.ComponentBuilder(use_cache=False)
         )
 
         # update/creates cache

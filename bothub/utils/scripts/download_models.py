@@ -13,14 +13,14 @@ from spacy.cli import link
 from spacy.util import get_package_path
 from collections import OrderedDict
 from transformers.file_utils import TF2_WEIGHTS_NAME, WEIGHTS_NAME, hf_bucket_url
-from bothub_nlp_rasa_utils.pipeline_components.registry import (
+from bothub.utils.pipeline_components.registry import (
     model_weights_defaults,
     from_pt_dict,
     model_download_url,
     model_config_url,
 )
 
-logger = logging.getLogger("download_models")
+logger = logging.getLogger(__name__)
 
 lang_to_model = {
     "en": {"SPACY": "en_core_web_lg", "BERT": "bert_english"},

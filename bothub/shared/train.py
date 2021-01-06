@@ -6,13 +6,13 @@ from rasa.nlu.model import Trainer
 from rasa.nlu.training_data import Message, TrainingData
 from rasa.nlu.components import ComponentBuilder
 
-from utils.poke_logging import PokeLogging
-from utils.backend import backend
-from utils.examples_request import get_examples_request
-from utils.persistor import BothubPersistor
-from utils.pipeline_builder import get_rasa_nlu_config
+from bothub.utils.poke_logging import PokeLogging
+from bothub.utils.backend import backend
+from bothub.utils.examples_request import get_examples_request
+from bothub.utils.persistor import BothubPersistor
+from bothub.utils.pipeline_builder import get_rasa_nlu_config
 
-logger = logging.getLogger('bothub-nlp-worker')
+logger = logging.getLogger(__name__)
 
 
 def intersection(lst1, lst2):

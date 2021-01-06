@@ -17,7 +17,7 @@ from rasa.nlu.test import substitute_labels
 from rasa.nlu.training_data import Message
 from rasa.nlu.training_data import TrainingData
 
-import utils.backend as backend
+from bothub.utils.backend import backend
 
 logger = logging.getLogger(__name__)
 
@@ -405,7 +405,7 @@ def evaluate_update(repository_version, repository_authorization, interpreter_ma
         )
 
     test_data = TrainingData(training_examples=training_examples)
-    interpreter = interpreter_manager.get_intepreter(
+    interpreter = interpreter_manager.get_interpreter(
         repository_version, repository_authorization, rasa_version, use_cache=False
     )
 

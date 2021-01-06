@@ -3,8 +3,11 @@ import uuid
 import base64
 import os
 from unittest.mock import patch
+import sys
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from nlu_worker.task.parse import parse_text
+from bothub.nlu_worker.task.parse import parse_text
+from bothub.nlu_worker.interpreter_manager import InterpreterManager
 
 
 class TestParseTask(unittest.TestCase):
@@ -16,6 +19,7 @@ class TestParseTask(unittest.TestCase):
             "repository_authorization_user_id": 303,
         }
         self.local_path = os.getcwd()
+        self.interpreter_manager = InterpreterManager()
 
     # change directory to /tests
     # change directory to /tests
@@ -50,6 +54,7 @@ class TestParseTask(unittest.TestCase):
         parse_text(
             self.current_update.get("current_version_id"),
             self.repository_authorization,
+            self.interpreter_manager,
             "ok",
         )
 
@@ -71,6 +76,7 @@ class TestParseTask(unittest.TestCase):
         parse_text(
             self.current_update.get("current_version_id"),
             self.repository_authorization,
+            self.interpreter_manager,
             "ok",
             True,
         )
