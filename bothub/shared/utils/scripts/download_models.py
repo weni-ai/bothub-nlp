@@ -17,10 +17,7 @@ from decouple import config
 from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
-from collections import OrderedDict
-from transformers.file_utils import TF2_WEIGHTS_NAME, WEIGHTS_NAME, hf_bucket_url
-from bothub.utils.pipeline_components.registry import (
-    model_weights_defaults,
+from bothub.shared.utils.pipeline_components.registry import (
     from_pt_dict,
     model_download_url,
     model_config_url,
@@ -141,7 +138,6 @@ def download_bert(model_name):
     config_url = model_config_url.get(model_name)
 
     logger.info("downloading bert")
-
     model_file_name = "pytorch_model.bin" if from_pt else "tf_model.h5"
     download_file(model_url, posixpath.join(model_dir, model_file_name))
     download_file(config_url, posixpath.join(model_dir, "config.json"))
