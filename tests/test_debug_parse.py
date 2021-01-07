@@ -5,6 +5,9 @@ import base64
 import os
 from unittest.mock import patch
 
+import sys
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from bothub.nlu_worker.task.debug_parse import debug_parse_text
 from bothub.nlu_worker.interpreter_manager import InterpreterManager
 

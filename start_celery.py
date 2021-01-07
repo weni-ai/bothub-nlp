@@ -11,7 +11,7 @@ subprocess.run(
         "-O",
         "fair",
         "--workdir",
-        "bothub",
+        ".",
         "-A",
         "celery_app",
         "-c",

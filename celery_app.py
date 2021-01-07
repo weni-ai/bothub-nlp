@@ -11,20 +11,20 @@ from bothub_nlp_celery.tasks import (
     TASK_NLU_WORD_SUGGESTION_TEXT,
 )
 
-from utils.backend import backend
+from bothub.utils.backend import backend
 
-from nlu_worker.task.parse import parse_text
-from nlu_worker.task.debug_parse import debug_parse_text
-from nlu_worker.task.sentence_suggestion import sentence_suggestion_text
-from nlu_worker.task.word_suggestion import word_suggestion_text
-from nlu_worker.task.intent_sentence_suggestion import intent_sentence_suggestion_text
-from nlu_worker.task.words_distribution import words_distribution_text
-from nlu_worker.task.evaluate import evaluate_update
+from bothub.nlu_worker.task.parse import parse_text
+from bothub.nlu_worker.task.debug_parse import debug_parse_text
+from bothub.nlu_worker.task.sentence_suggestion import sentence_suggestion_text
+from bothub.nlu_worker.task.word_suggestion import word_suggestion_text
+from bothub.nlu_worker.task.intent_sentence_suggestion import intent_sentence_suggestion_text
+from bothub.nlu_worker.task.words_distribution import words_distribution_text
+from bothub.nlu_worker.task.evaluate import evaluate_update
 
-from shared.evaluate_crossval import evaluate_crossval_update
-from shared.train import train_update
+from bothub.shared.evaluate_crossval import evaluate_crossval_update
+from bothub.shared.train import train_update
 
-from nlu_worker.interpreter_manager import InterpreterManager
+from bothub.nlu_worker.interpreter_manager import InterpreterManager
 
 interpreter_manager = InterpreterManager()
 

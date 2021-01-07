@@ -83,7 +83,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
                 model_weights_defaults[self.model_name], cache_dir=None
             )
             self.model = model_class_dict[self.model_name].from_pretrained(
-                'nlu_worker/' + self.model_name, cache_dir=None,
+                'bothub/nlu_worker/' + self.model_name, cache_dir=None,
                 from_pt=from_pt_dict.get(self.model_name, False)
             )
 
