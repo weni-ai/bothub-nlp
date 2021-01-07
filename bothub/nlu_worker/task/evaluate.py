@@ -17,7 +17,7 @@ from rasa.nlu.test import substitute_labels
 from rasa.nlu.training_data import Message
 from rasa.nlu.training_data import TrainingData
 
-from bothub.utils.backend import backend
+from bothub.shared.utils.backend import backend
 
 logger = logging.getLogger(__name__)
 

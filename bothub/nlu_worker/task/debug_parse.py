@@ -5,7 +5,7 @@ from lime.lime_text import LimeTextExplainer
 from rasa.nlu.test import remove_pretrained_extractors
 from rasa.nlu import __version__ as rasa_version
 
-from bothub.utils.backend import backend
+from bothub.shared.utils.backend import backend
 
 
 class DebugSentenceLime:

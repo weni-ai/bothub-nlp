@@ -41,7 +41,8 @@ class CustomInterpreter(Interpreter):
         for i in range(len(metadata['pipeline'])):
             component_name = metadata['pipeline'][i]['class']
             if 'bothub_nlp_rasa_utils' in component_name:
-                metadata['pipeline'][i]['class'] = component_name.replace('bothub_nlp_rasa_utils', 'bothub.utils', 1)
+                metadata['pipeline'][i]['class'] = component_name.replace('bothub_nlp_rasa_utils',
+                                                                          'bothub.shared.utils', 1)
 
         model_metadata = Metadata(metadata, model_dir)
 

@@ -6,11 +6,11 @@ from rasa.nlu.model import Trainer
 from rasa.nlu.training_data import Message, TrainingData
 from rasa.nlu.components import ComponentBuilder
 
-from bothub.utils.poke_logging import PokeLogging
-from bothub.utils.backend import backend
-from bothub.utils.examples_request import get_examples_request
-from bothub.utils.persistor import BothubPersistor
-from bothub.utils.pipeline_builder import get_rasa_nlu_config
+from bothub.shared.utils.poke_logging import PokeLogging
+from bothub.shared.utils.backend import backend
+from bothub.shared.utils.examples_request import get_examples_request
+from bothub.shared.utils.persistor import BothubPersistor
+from bothub.shared.utils.pipeline_builder import get_rasa_nlu_config
 
 logger = logging.getLogger(__name__)
 

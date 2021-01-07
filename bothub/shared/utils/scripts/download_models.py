@@ -1,3 +1,9 @@
+"""
+Script to download language models on demand
+Usage example:
+!python download_models.py pt_br-BERT
+"""
+
 #!/usr/bin/env python
 import os
 import sys
@@ -126,7 +132,8 @@ def download_file(url, file_name):
 
 
 def download_bert(model_name):
-    model_dir = posixpath.join("nlu_worker", model_name)
+    # model_dir = posixpath.join("bothub", "nlu_worker", model_name)
+    model_dir = model_name
     os.makedirs(model_dir, exist_ok=True)
 
     from_pt = from_pt_dict.get(model_name, False)
