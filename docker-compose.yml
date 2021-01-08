@@ -10,9 +10,9 @@ services:
     image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-nlp-nlu-worker}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: nlp.Dockerfile
       args:
-        DOWNLOAD_SPACY_MODELS: ${DOWNLOAD_SPACY_MODELS_ON_DOCKER_BUILD}
+        DOWNLOAD_MODELS: xx-SPACY
     depends_on:
       - bothub-nlp-celery-redis
     networks:
@@ -36,9 +36,9 @@ services:
     image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-ai-plataform}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: aiplataform.Dockerfile
       args:
-        DOWNLOAD_SPACY_MODELS: ${DOWNLOAD_SPACY_MODELS_ON_DOCKER_BUILD}
+        DOWNLOAD_MODELS: xx-SPACY
     networks:
       - default
     environment:

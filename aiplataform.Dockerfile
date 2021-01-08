@@ -92,29 +92,13 @@ RUN pip3 install --find-links=/wheels -r requirements.txt
 
 COPY . .
 
-#RUN git clone --branch master --depth 1 --single-branch \
-#    https://github.com/bothub-it/spacy-lang-models \
-#    spacy-langs \
-#    && python3.6 link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
-#    && python3.6 link_lang_spacy.py mn ./spacy-langs/mn/ \
-#    && python3.6 link_lang_spacy.py ha ./spacy-langs/ha/ \
-#    && python3.6 link_lang_spacy.py ka ./spacy-langs/ka/ \
-#    && python3.6 link_lang_spacy.py kk ./spacy-langs/kk/ \
-#    && python3.6 link_lang_spacy.py sw ./spacy-langs/sw/ \
-#    && python3.6 link_lang_spacy.py az ./spacy-langs/az/ \
-#    && python3.6 link_lang_spacy.py be ./spacy-langs/be/ \
-#    && python3.6 link_lang_spacy.py bs ./spacy-langs/bs/ \
-#    && python3.6 link_lang_spacy.py ky ./spacy-langs/ky/ \
-#    && python3.6 link_lang_spacy.py mk ./spacy-langs/mk/ \
-#    && python3.6 link_lang_spacy.py uz ./spacy-langs/uz/
-
 ARG DOWNLOAD_MODELS
 #Install torch with cuda 10.1
 RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
         pip3 install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html && \
-        python3.6 download_models.py ${DOWNLOAD_MODELS}; \
+        python3.6 bothub/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     elif [ ${DOWNLOAD_MODELS} ]; then \
-        python3.6 download_models.py ${DOWNLOAD_MODELS}; \
+        python3.6 bothub/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
 ENTRYPOINT ["python3.6", "aiplataform_app.py"]
