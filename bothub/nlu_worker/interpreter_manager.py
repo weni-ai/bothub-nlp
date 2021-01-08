@@ -1,13 +1,15 @@
 from rasa.nlu import components
 from tempfile import mkdtemp
 
-from bothub.utils.persistor import BothubPersistor
-from bothub.utils.backend import backend
-from bothub.utils.rasa_components.custom_interpreter import CustomInterpreter
+from bothub.shared.utils.persistor import BothubPersistor
+from bothub.shared.utils.backend import backend
+from bothub.shared.utils.rasa_components.custom_interpreter import CustomInterpreter
 
 
 class InterpreterManager:
-    interpreters = {}
+
+    def __init__(self):
+        self.interpreters = {}
 
     def get_interpreter(
         self, repository_version, repository_authorization, rasa_version, use_cache=True
@@ -23,10 +25,10 @@ class InterpreterManager:
         )
         last_training = f"{update_request.get('total_training_end')}"
 
-        # try to fetch cache
+        # tries to fetch cache
         cached_retrieved = self.interpreters.get(repository_name)
         if cached_retrieved and use_cache:
-            # return cache only if it's the same training
+            # returns cache only if it's the same training
             if cached_retrieved["last_training"] == last_training:
                 return cached_retrieved["interpreter_data"]
 
@@ -52,7 +54,7 @@ class InterpreterManager:
 
         return interpreter
 
-    def parse_interpreter(
+    def get_interpreter_parse(
         self, text, repository_version, repository_authorization, rasa_version, use_cache
     ):
         interpreter = self.get_interpreter(

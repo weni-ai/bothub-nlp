@@ -11,7 +11,7 @@ from bothub_nlp_celery.tasks import (
     TASK_NLU_WORD_SUGGESTION_TEXT,
 )
 
-from bothub.utils.backend import backend
+from bothub.shared.utils.backend import backend
 
 from bothub.nlu_worker.task.parse import parse_text
 from bothub.nlu_worker.task.debug_parse import debug_parse_text

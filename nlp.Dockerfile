@@ -46,23 +46,11 @@ RUN pip install -U pip setuptools
 
 RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
-COPY . .
-
-#RUN git clone --branch master --depth 1 --single-branch \
-#    https://github.com/Ilhasoft/spacy-lang-models \
-#    spacy-langs \
-#    && python3.6 scripts/link_lang_spacy.py pt_br ./spacy-langs/pt_br/ \
-#    && python3.6 scripts/link_lang_spacy.py mn ./spacy-langs/mn/ \
-#    && python3.6 scripts/link_lang_spacy.py ha ./spacy-langs/ha/ \
-#    && python3.6 scripts/link_lang_spacy.py ka ./spacy-langs/ka/ \
-#    && python3.6 scripts/link_lang_spacy.py kk ./spacy-langs/kk/ \
-#    && python3.6 scripts/link_lang_spacy.py sw ./spacy-langs/sw/ \
-#    && python3.6 scripts/link_lang_spacy.py az ./spacy-langs/az/ \
-#    && python3.6 scripts/link_lang_spacy.py be ./spacy-langs/be/ \
-#    && python3.6 scripts/link_lang_spacy.py bs ./spacy-langs/bs/ \
-#    && python3.6 scripts/link_lang_spacy.py ky ./spacy-langs/ky/ \
-#    && python3.6 scripts/link_lang_spacy.py mk ./spacy-langs/mk/ \
-#    && python3.6 scripts/link_lang_spacy.py uz ./spacy-langs/uz/
+COPY bothub/nlu_worker ${WORKDIR}/bothub/nlu_worker
+COPY bothub/shared ${WORKDIR}/bothub/shared
+COPY bothub/__init__.py ${WORKDIR}/bothub
+COPY start_celery.py .
+COPY celery_app.py .
 
 ARG DOWNLOAD_MODELS
 #Install torch with cuda 10.1
@@ -71,7 +59,7 @@ RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
     fi
 
 RUN if [ ${DOWNLOAD_MODELS} ]; then \
-        python3.6 scripts/download_models.py ${DOWNLOAD_MODELS}; \
+        python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
-ENTRYPOINT [ "celery", "worker", "-A", "bothub_nlp_nlu_worker.celery_app", "-c", "1", "-l", "INFO", "-E" ]
+ENTRYPOINT [  "celery", "worker", "--autoscale", "1,1", "-O", "fair", "--workdir", ".", "-A", "celery_app", "-c", "5", "-l", "INFO", "-E", "--pool", "threads" ]

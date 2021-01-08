@@ -1,6 +1,6 @@
 from collections import Counter, OrderedDict
 
-from bothub.utils.examples_request import get_examples_request
+from bothub.shared.utils.examples_request import get_examples_request
 
 
 def words_distribution_text(repository_version, language, repository_authorization):

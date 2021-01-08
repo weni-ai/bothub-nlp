@@ -1,3 +1,9 @@
+"""
+Script to download language models on demand
+Usage example:
+!python download_models.py pt_br-BERT
+"""
+
 #!/usr/bin/env python
 import os
 import sys
@@ -11,12 +17,9 @@ from decouple import config
 from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
-from collections import OrderedDict
-from transformers.file_utils import TF2_WEIGHTS_NAME, WEIGHTS_NAME, hf_bucket_url
 
-sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-from bothub.utils.pipeline_components.registry import (
-    model_weights_defaults,
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+from bothub.shared.utils.rasa_components.registry import (
     from_pt_dict,
     model_download_url,
     model_config_url,
@@ -128,7 +131,8 @@ def download_file(url, file_name):
 
 
 def download_bert(model_name):
-    model_dir = posixpath.join("nlu_worker", model_name)
+    # model_dir = posixpath.join("bothub", "nlu_worker", model_name)
+    model_dir = model_name
     os.makedirs(model_dir, exist_ok=True)
 
     from_pt = from_pt_dict.get(model_name, False)
@@ -136,7 +140,6 @@ def download_bert(model_name):
     config_url = model_config_url.get(model_name)
 
     logger.info("downloading bert")
-
     model_file_name = "pytorch_model.bin" if from_pt else "tf_model.h5"
     download_file(model_url, posixpath.join(model_dir, model_file_name))
     download_file(config_url, posixpath.join(model_dir, "config.json"))

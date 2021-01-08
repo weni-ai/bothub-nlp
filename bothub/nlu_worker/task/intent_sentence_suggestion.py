@@ -4,7 +4,7 @@ from bothub_nlp_celery.app import nlp_language
 import random
 import numpy as np
 
-from bothub.utils.examples_request import get_examples_request
+from bothub.shared.utils.examples_request import get_examples_request
 
 
 class SentenceSuggestion:

@@ -1,4 +1,4 @@
-from bothub.utils.backend import backend
+from bothub.shared.utils.backend import backend
 
 
 def get_examples_request(update_id, repository_authorization):  # pragma: no cover
