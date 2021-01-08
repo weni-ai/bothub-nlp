@@ -96,9 +96,9 @@ ARG DOWNLOAD_MODELS
 #Install torch with cuda 10.1
 RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
         pip3 install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html && \
-        python3.6 bothub/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
+        python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     elif [ ${DOWNLOAD_MODELS} ]; then \
-        python3.6 bothub/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
+        python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
 ENTRYPOINT ["python3.6", "aiplataform_app.py"]
