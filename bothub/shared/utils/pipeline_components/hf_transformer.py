@@ -2,28 +2,11 @@ import logging
 from typing import Any, Dict, List, Text, Tuple, Optional
 
 from rasa.nlu.tokenizers.whitespace_tokenizer import WhitespaceTokenizer
-from rasa.nlu.components import Component
-from rasa.nlu.config import RasaNLUModelConfig
-from rasa.nlu.training_data import Message, TrainingData
-from rasa.nlu.tokenizers.tokenizer import Token
-import rasa.utils.train_utils as train_utils
 import numpy as np
 
 from rasa.nlu.utils.hugging_face.hf_transformers import HFTransformersNLP
 
-from rasa.nlu.constants import (
-    TEXT,
-    LANGUAGE_MODEL_DOCS,
-    DENSE_FEATURIZABLE_ATTRIBUTES,
-    TOKEN_IDS,
-    TOKENS,
-    SENTENCE_FEATURES,
-    SEQUENCE_FEATURES,
-)
-
 logger = logging.getLogger(__name__)
-
-from bothub_nlp_celery import settings
 
 
 class HFTransformersNLPCustom(HFTransformersNLP):
@@ -43,7 +26,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
     def _load_model(self) -> None:
         """Try loading the model"""
 
-        from .registry import (
+        from bothub.shared.utils.rasa_components.registry import (
             model_class_dict,
             model_weights_defaults,
             model_tokenizer_dict,
@@ -87,8 +70,6 @@ class HFTransformersNLPCustom(HFTransformersNLP):
                 from_pt=from_pt_dict.get(self.model_name, False)
             )
 
-        from pprint import pprint
-
         # Use a universal pad token since all transformer architectures do not have a
         # consistent token. Instead of pad_token_id we use unk_token_id because
         # pad_token_id is not set for all architectures. We can't add a new token as
@@ -107,7 +88,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
         Returns:
             Augmented list of token ids for each example in the batch.
         """
-        from .registry import (
+        from bothub.shared.utils.rasa_components.registry import (
             model_special_tokens_pre_processors,
         )
 
@@ -129,7 +110,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
         Returns:
             Cleaned up token ids and token strings.
         """
-        from .registry import model_tokens_cleaners
+        from bothub.shared.utils.rasa_components.registry import model_tokens_cleaners
 
         return model_tokens_cleaners[self.model_name](split_token_ids, token_strings)
 
@@ -143,7 +124,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
             Sentence and sequence level representations.
         """
 
-        from .registry import (
+        from bothub.shared.utils.rasa_components.registry import (
             model_embeddings_post_processors,
         )
 

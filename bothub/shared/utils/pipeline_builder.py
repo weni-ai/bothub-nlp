@@ -1,7 +1,7 @@
 from rasa.nlu.config import RasaNLUModelConfig
 from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings
-from .pipeline_components.registry import language_to_model
+from bothub.shared.utils.rasa_components.registry import language_to_model
 
 
 def add_spacy_nlp():

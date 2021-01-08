@@ -17,7 +17,9 @@ from decouple import config
 from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
-from bothub.shared.utils.pipeline_components.registry import (
+
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+from bothub.shared.utils.rasa_components.registry import (
     from_pt_dict,
     model_download_url,
     model_config_url,
