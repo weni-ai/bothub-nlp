@@ -32,11 +32,11 @@ services:
       - BOTHUB_ENGINE_URL=${BOTHUB_ENGINE_URL:-https://api.bothub.it}
       - BOTHUB_NLP_LANGUAGE_QUEUE=${BOTHUB_NLP_LANGUAGE_QUEUE:-en}
       - BOTHUB_NLP_SERVICE_WORKER=${BOTHUB_NLP_SERVICE_WORKER:-true}
-  bothub-ai-plataform:
-    image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-ai-plataform}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
+  bothub-ai-platform:
+    image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-ai-platform}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
-      dockerfile: aiplataform.Dockerfile
+      dockerfile: aiplatform.Dockerfile
       args:
         DOWNLOAD_MODELS: xx-SPACY
     networks:

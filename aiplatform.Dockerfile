@@ -78,7 +78,7 @@ RUN apt-get install -y ttf-mscorefonts-installer \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY aiplataform_requirements.txt .
+COPY aiplatform_requirements.txt .
 
 FROM base as builder
 
@@ -101,4 +101,4 @@ RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
         python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
-ENTRYPOINT ["python3.6", "aiplataform_app.py"]
+ENTRYPOINT ["python3.6", "aiplatform_app.py"]
