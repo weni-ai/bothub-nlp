@@ -35,7 +35,7 @@ from rasa.nlu.training_data import Message, TrainingData
 from bothub.shared.utils.backend import backend
 from bothub.shared.utils.pipeline_builder import get_rasa_nlu_config
 from bothub.shared.utils.poke_logging import PokeLogging
-from bothub.shared.utils.examples_request import get_examples_request
+from bothub.shared.utils.helpers import get_examples_request
 
 logger = logging.getLogger(__name__)
 
