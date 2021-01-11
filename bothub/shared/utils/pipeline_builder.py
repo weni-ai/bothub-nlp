@@ -1,6 +1,6 @@
 from rasa.nlu.config import RasaNLUModelConfig
-from bothub_nlp_celery.utils import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings
+from bothub.shared.utils.helpers import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub.shared.utils.rasa_components.registry import language_to_model
 
 
