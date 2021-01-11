@@ -82,13 +82,13 @@ COPY aiplataform_requirements.txt .
 
 FROM base as builder
 
-RUN pip3 wheel --wheel-dir=/wheels -r aiplataform_requirements.txt
+RUN pip3 wheel --wheel-dir=/wheels -r aiplatform_requirements.txt
 
 FROM base
 
 COPY --from=builder /wheels /wheels
 
-RUN pip3 install --find-links=/wheels -r aiplataform_requirements.txt
+RUN pip3 install --find-links=/wheels -r aiplatform_requirements.txt
 
 COPY . .
 
