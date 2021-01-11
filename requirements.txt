@@ -200,10 +200,7 @@ Werkzeug==1.0.0
 wrapt==1.12.1
 yarl==1.4.2
 zipp==3.1.0
-
 rasa==1.10.6
 transformers==2.11.0
 emoji==0.6.0
 recognizers-text-suite
-
-tensorflow-gpu==2.1.2
