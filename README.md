@@ -9,6 +9,8 @@ Check the [main Bothub project repository](https://github.com/Ilhasoft/bothub).
 
 ### bothub-nlp-nlu-worker
 
+### bothub-nlp-ai-platform
+
 ## Packages
 
 ### bothub-nlp (python 3.6)
@@ -61,4 +63,4 @@ You need to set --build-arg when you are building docker-compose
 
 | Argument | Type | Default | Description |
 |--|--|--|--|
-| DOWNLOAD_MODELS | ```string```|  ```en:en_core_web_md``` | Set supported languages. Separe languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]:[LANGUAGE_LOCATION]```.
+| DOWNLOAD_MODELS | ```string```|  ```en-BERT``` | Set supported languages. Separe languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]-[LANGUAGE_MODEL]```.

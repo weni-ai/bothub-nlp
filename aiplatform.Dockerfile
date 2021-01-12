@@ -78,7 +78,7 @@ RUN apt-get install -y ttf-mscorefonts-installer \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY aiplatform_requirements.txt .
+COPY ai_platform/aiplatform_requirements.txt .
 
 FROM base as builder
 
@@ -90,15 +90,19 @@ COPY --from=builder /wheels /wheels
 
 RUN pip3 install --find-links=/wheels -r aiplatform_requirements.txt
 
-COPY . .
+COPY ai_platform/aiplatform_app.py .
+COPY bothub/shared /home/root/app/bothub/shared
+COPY bothub/__init__.py /home/root/app/bothub
 
 ARG DOWNLOAD_MODELS
 #Install torch with cuda 10.1
 RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
-        pip3 install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html && \
-        python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
-    elif [ ${DOWNLOAD_MODELS} ]; then \
+        pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html; \
+    fi
+
+RUN if [ ${DOWNLOAD_MODELS} ]; then \
         python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
+
 
 ENTRYPOINT ["python3.6", "aiplatform_app.py"]
