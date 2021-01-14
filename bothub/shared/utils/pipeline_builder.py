@@ -1,221 +1,212 @@
-from rasa.nlu.config import RasaNLUModelConfig
-from bothub_nlp_celery import settings
 from bothub.shared.utils.helpers import ALGORITHM_TO_LANGUAGE_MODEL
+from bothub_nlp_celery import settings
 from bothub.shared.utils.rasa_components.registry import language_to_model
+from rasa.nlu.config import RasaNLUModelConfig
 
 
-def add_spacy_nlp():
-    return {"name": "bothub.shared.utils.pipeline_components.spacy_nlp.SpacyNLP"}
+class PipelineBuilder:
 
+    def __init__(self, update):
+        self.language = update.get("language")
+        self.algorithm = update.get('algorithm')
+        self.use_name_entities = update.get('use_name_entities')
+        self.use_competing_intents = update.get('use_competing_intents')
+        self.use_analyze_char = update.get('use_analyze_char')
+        self.prebuilt_entities = update.get('prebuilt_entities', [])
+        self.model = self._build_model_requirements()
+        self.pipeline = self._build_pipeline()
 
-def add_whitespace_tokenizer():
-    return {"name": "WhitespaceTokenizer"}
+    def _add_spacy_nlp(self):
+        return {"name": "bothub.shared.utils.pipeline_components.spacy_nlp.SpacyNLP"}
 
+    def _add_whitespace_tokenizer(self):
+        return {"name": "WhitespaceTokenizer"}
 
-def add_preprocessing(update):
-    return {
-        "name": "bothub.shared.utils.pipeline_components.preprocessing.Preprocessing",
-        "language": update.get("language"),
-    }
+    def _add_preprocessing(self):
+        return {
+            "name": "bothub.shared.utils.pipeline_components.preprocessing.Preprocessing",
+            "language": self.language,
+        }
 
+    def _add_regex_entity_extractor(self):
+        return {
+            "name": "bothub.shared.utils.pipeline_components.regex_entity_extractor.RegexEntityExtractorCustom",
+        }
 
-def add_regex_featurizer():
-    return {
-        "name": "bothub.shared.utils.pipeline_components.regex_featurizer.RegexFeaturizerCustom",
-        "case_sensitive": False
-    }
+    def _add_countvectors_featurizer(self):
+        featurizers = []
 
+        if self.use_analyze_char:
+            featurizers.append(
+                {
+                    "name": "CountVectorsFeaturizer",
+                    "analyzer": "char_wb",
+                    "min_ngram": 3,
+                    "max_ngram": 3
+                }
+            )
 
-def add_regex_entity_extractor():
-    return {
-        "name": "bothub.shared.utils.pipeline_components.regex_entity_extractor.RegexEntityExtractorCustom",
-    }
-
-
-def add_countvectors_featurizer(update):
-    featurizers = []
-
-    if update.get("use_analyze_char"):
         featurizers.append(
             {
+                "name": "CountVectorsFeaturizer",
+                "token_pattern": r'(?u)\b\w+\b'
+            }
+        )
+
+        return featurizers
+
+    def _add_legacy_countvectors_featurizer(self):
+        if self.use_analyze_char:
+            return {
                 "name": "CountVectorsFeaturizer",
                 "analyzer": "char_wb",
                 "min_ngram": 3,
                 "max_ngram": 3
             }
-        )
-
-    featurizers.append(
-        {
-            "name": "CountVectorsFeaturizer",
-            "token_pattern": r'(?u)\b\w+\b'
-        }
-    )
-
-    return featurizers
-
-
-def add_legacy_countvectors_featurizer(update):
-    if update.get("use_analyze_char"):
-        return {
-            "name": "CountVectorsFeaturizer",
-            "analyzer": "char_wb",
-            "min_ngram": 3,
-            "max_ngram": 3
-        }
-    else:
-        return {
-            "name": "CountVectorsFeaturizer",
-            "token_pattern": r'(?u)\b\w+\b'
-        }
-
-
-def add_microsoft_entity_extractor(update):
-    return {
-        "name": "bothub.shared.utils.pipeline_components.microsoft_recognizers_extractor.MicrosoftRecognizersExtractor",
-        "dimensions": update['prebuilt_entities'],
-        "language": update.get('language')
-    }
-
-
-def add_embedding_intent_classifier():
-    return {
-        "name": "bothub.shared.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
-        "hidden_layers_sizes": {"text": [256, 128]},
-        "number_of_transformer_layers": 0,
-        "weight_sparsity": 0,
-        "intent_classification": True,
-        "entity_recognition": True,
-        "use_masked_language_model": False,
-        "BILOU_flag": False,
-    }
-
-
-def add_diet_classifier(epochs=300, bert=False):
-    model = {
-        "name": "bothub.shared.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
-        "entity_recognition": True,
-        "BILOU_flag": False,
-        "epochs": epochs
-    }
-
-    if bert:
-        model["hidden_layer_sizes"] = {"text": [256, 64]}
-
-    return model
-
-
-def legacy_internal_config(update):
-    pipeline = [
-        add_whitespace_tokenizer(),  # Tokenizer
-        add_legacy_countvectors_featurizer(update),  # Featurizer
-        add_embedding_intent_classifier(),  # Intent Classifier
-    ]
-    return pipeline
-
-
-def legacy_external_config(update):
-    pipeline = [
-        {"name": "SpacyTokenizer"},  # Tokenizer
-        {"name": "SpacyFeaturizer"},  # Spacy Featurizer
-        add_legacy_countvectors_featurizer(update),  # Bag of Words Featurizer
-        add_embedding_intent_classifier(),  # intent classifier
-    ]
-    return pipeline
-
-
-def transformer_network_diet_config(update):
-    pipeline = [add_whitespace_tokenizer()]
-
-    # pipeline.append(add_regex_entity_extractor())
-    # if update.get('prebuilt_entities'):
-    #     pipeline.append(add_microsoft_entity_extractor(update))  # Microsoft Entity Extractor)
-    pipeline.extend(add_countvectors_featurizer(update))  # Bag of Words Featurizer
-    pipeline.append(add_diet_classifier(epochs=150))  # Intent Classifier
-
-    return pipeline
-
-
-def transformer_network_diet_word_embedding_config(update):
-    pipeline = [
-        {"name": "SpacyTokenizer"},  # Tokenizer
-        {"name": "SpacyFeaturizer"},  # Spacy Featurizer
-    ]
-    pipeline.extend(add_countvectors_featurizer(update))  # Bag of Words Featurizer
-    pipeline.append(add_diet_classifier(epochs=200))  # Intent Classifier
-
-    return pipeline
-
-
-def transformer_network_diet_bert_config(update):
-    pipeline = [
-        {  # NLP
-            "name": "bothub.shared.utils.pipeline_components.hf_transformer.HFTransformersNLPCustom",
-            "model_name": language_to_model.get(update.get("language"), 'bert_multilang'),
-        },
-        {  # Tokenizer
-            "name": "bothub.shared.utils.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
-            "intent_tokenization_flag": False,
-            "intent_split_symbol": "_",
-        },
-        {  # Bert Featurizer
-            "name": "bothub.shared.utils.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
-        },
-    ]
-    # pipeline.append(add_regex_entity_extractor())
-    # if update.get('prebuilt_entities'):
-    #     pipeline.append(add_microsoft_entity_extractor(update))  # Microsoft Entity Extractor)
-
-    pipeline.extend(add_countvectors_featurizer(update))  # Bag of Words Featurizers
-    pipeline.append(add_diet_classifier(epochs=100, bert=True))  # Intent Classifier
-
-    return pipeline
-
-
-def get_rasa_nlu_config(update):
-    pipeline = []
-
-    # algorithm = choose_best_algorithm(update.get("language"))
-    algorithm = update.get('algorithm')
-    language = update.get('language')
-
-    model = ALGORITHM_TO_LANGUAGE_MODEL[algorithm]
-    if model == 'SPACY' and language not in settings.SPACY_LANGUAGES:
-        if algorithm == 'neural_network_external':
-            algorithm = "neural_network_internal"
         else:
-            algorithm = "transformer_network_diet"
+            return {
+                "name": "CountVectorsFeaturizer",
+                "token_pattern": r'(?u)\b\w+\b'
+            }
 
-    pipeline.append(add_preprocessing(update))
-
-    if (update.get(
-            "use_name_entities") and algorithm != 'transformer_network_diet_bert' and language in settings.SPACY_LANGUAGES) or algorithm in [
-        'neural_network_external', 'transformer_network_diet_word_embedding']:
-        pipeline.append(add_spacy_nlp())
-
-    if algorithm == "neural_network_internal":
-        pipeline.extend(legacy_internal_config(update))
-    elif algorithm == "neural_network_external":
-        pipeline.extend(legacy_external_config(update))
-    elif algorithm == "transformer_network_diet_bert":
-        pipeline.extend(transformer_network_diet_bert_config(update))
-    elif algorithm == "transformer_network_diet_word_embedding":
-        pipeline.extend(transformer_network_diet_word_embedding_config(update))
-    else:
-        pipeline.extend(transformer_network_diet_config(update))
-
-    if update.get(
-            "use_name_entities") and algorithm != 'transformer_network_diet_bert' and language in settings.SPACY_LANGUAGES:
-        pipeline.append({"name": "SpacyEntityExtractor"})
-
-    import json
-    print(f"New pipeline:")
-    for component in pipeline:
-        print(json.dumps(component, indent=2))
-
-    return RasaNLUModelConfig(
-        {
-            "language": update.get("language"),
-            "pipeline": pipeline
+    def _add_microsoft_entity_extractor(self):
+        return {
+            "name": "bothub.shared.utils.pipeline_components.microsoft_recognizers_extractor.MicrosoftRecognizersExtractor",
+            "dimensions": self.prebuilt_entities,
+            "language": self.language
         }
-    )
+
+    def _add_embedding_intent_classifier(self):
+        return {
+            "name": "bothub.shared.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
+            "hidden_layers_sizes": {"text": [256, 128]},
+            "number_of_transformer_layers": 0,
+            "weight_sparsity": 0,
+            "intent_classification": True,
+            "entity_recognition": True,
+            "use_masked_language_model": False,
+            "BILOU_flag": False,
+        }
+
+    def _add_diet_classifier(self, epochs=300, bert=False):
+        model = {
+            "name": "bothub.shared.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
+            "entity_recognition": True,
+            "BILOU_flag": False,
+            "epochs": epochs
+        }
+
+        if bert:
+            model["hidden_layer_sizes"] = {"text": [256, 64]}
+
+        return model
+
+    def _legacy_internal_config(self):
+        partial_pipeline = [
+            self._add_whitespace_tokenizer(),  # Tokenizer
+            self._add_legacy_countvectors_featurizer(),  # Featurizer
+            self._add_embedding_intent_classifier(),  # Intent Classifier
+        ]
+        return partial_pipeline
+
+    def _legacy_external_config(self):
+        partial_pipeline = [
+            {"name": "SpacyTokenizer"},  # Tokenizer
+            {"name": "SpacyFeaturizer"},  # Spacy Featurizer
+            self._add_legacy_countvectors_featurizer(),  # Bag of Words Featurizer
+            self._add_embedding_intent_classifier(),  # intent classifier
+        ]
+        return partial_pipeline
+
+    def _transformer_network_diet_config(self):
+        partial_pipeline = [self._add_whitespace_tokenizer()]
+
+        # partial_pipeline.append(add_regex_entity_extractor())
+        # if self.prebuilt_entities:
+        #     partial_pipeline.append(add_microsoft_entity_extractor(update))  # Microsoft Entity Extractor)
+        partial_pipeline.extend(self._add_countvectors_featurizer())  # Bag of Words Featurizer
+        partial_pipeline.append(self._add_diet_classifier(epochs=150))  # Intent Classifier
+
+        return partial_pipeline
+
+    def _transformer_network_diet_word_embedding_config(self):
+        partial_pipeline = [
+            {"name": "SpacyTokenizer"},  # Tokenizer
+            {"name": "SpacyFeaturizer"},  # Spacy Featurizer
+        ]
+        partial_pipeline.extend(self._add_countvectors_featurizer())  # Bag of Words Featurizer
+        partial_pipeline.append(self._add_diet_classifier(epochs=200))  # Intent Classifier
+
+        return partial_pipeline
+
+    def _transformer_network_diet_bert_config(self):
+        partial_pipeline = [
+            {  # NLP
+                "name": "bothub.shared.utils.pipeline_components.hf_transformer.HFTransformersNLPCustom",
+                "model_name": language_to_model.get(self.language, 'bert_multilang'),
+            },
+            {  # Tokenizer
+                "name": "bothub.shared.utils.pipeline_components.lm_tokenizer.LanguageModelTokenizerCustom",
+                "intent_tokenization_flag": False,
+                "intent_split_symbol": "_",
+            },
+            {  # Bert Featurizer
+                "name": "bothub.shared.utils.pipeline_components.lm_featurizer.LanguageModelFeaturizerCustom"
+            },
+        ]
+        # partial_pipeline.append(add_regex_entity_extractor())
+        # if self.prebuilt_entities:
+        #     partial_pipeline.append(add_microsoft_entity_extractor(update))  # Microsoft Entity Extractor)
+
+        partial_pipeline.extend(self._add_countvectors_featurizer())  # Bag of Words Featurizers
+        partial_pipeline.append(self._add_diet_classifier(epochs=100, bert=True))  # Intent Classifier
+
+        return partial_pipeline
+
+    def _build_model_requirements(self):
+        model = ALGORITHM_TO_LANGUAGE_MODEL[self.algorithm]
+        if model == 'SPACY' and self.language not in settings.SPACY_LANGUAGES:
+            model = None
+            if self.algorithm == 'neural_network_external':
+                self.algorithm = "neural_network_internal"
+            else:
+                self.algorithm = "transformer_network_diet"
+
+        return model
+
+    def _build_pipeline(self):
+        pipeline = [self._add_preprocessing()]
+
+        if (self.use_name_entities and self.algorithm != 'transformer_network_diet_bert' and self.language in settings.SPACY_LANGUAGES) or self.algorithm in [
+            'neural_network_external', 'transformer_network_diet_word_embedding']:
+            pipeline.append(self._add_spacy_nlp())
+
+        if self.algorithm == "neural_network_internal":
+            pipeline.extend(self._legacy_internal_config())
+        elif self.algorithm == "neural_network_external":
+            pipeline.extend(self._legacy_external_config())
+        elif self.algorithm == "transformer_network_diet_bert":
+            pipeline.extend(self._transformer_network_diet_bert_config())
+        elif self.algorithm == "transformer_network_diet_word_embedding":
+            pipeline.extend(self._transformer_network_diet_word_embedding_config())
+        else:
+            pipeline.extend(self._transformer_network_diet_config())
+
+        if self.use_name_entities and self.algorithm != 'transformer_network_diet_bert' and self.language in settings.SPACY_LANGUAGES:
+            pipeline.append({"name": "SpacyEntityExtractor"})
+
+        return pipeline
+
+    def print_pipeline(self):
+        import json
+        print(f"Pipeline Config:")
+        for component in self.pipeline:
+            print(json.dumps(component, indent=2))
+
+    def get_nlu_model(self):
+        return RasaNLUModelConfig(
+            {
+                "language": self.language,
+                "pipeline": self.pipeline
+            }
+        )

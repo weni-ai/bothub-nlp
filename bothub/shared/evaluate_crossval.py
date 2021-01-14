@@ -33,7 +33,7 @@ from rasa.nlu.test import (
 )
 from rasa.nlu.training_data import Message, TrainingData
 from bothub.shared.utils.backend import backend
-from bothub.shared.utils.pipeline_builder import get_rasa_nlu_config
+from bothub.shared.utils.pipeline_builder import PipelineBuilder
 from bothub.shared.utils.poke_logging import PokeLogging
 from bothub.shared.utils.helpers import get_examples_request
 
@@ -423,7 +423,9 @@ def evaluate_crossval_update(repository_version, by, repository_authorization, f
                 )
 
             data = TrainingData(training_examples=examples)
-            rasa_nlu_config = get_rasa_nlu_config(update_request)
+            pipeline_builder = PipelineBuilder(update_request)
+            pipeline_builder.print_pipeline()
+            rasa_nlu_config = pipeline_builder.get_nlu_model()
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
 
             result = {
@@ -557,4 +559,3 @@ def evaluate_crossval_update(repository_version, by, repository_authorization, f
             backend().request_backend_traininglog_nlu(
                 repository_version, pl.getvalue(), repository_authorization
             )
-

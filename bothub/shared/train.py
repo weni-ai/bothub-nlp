@@ -10,7 +10,7 @@ from bothub.shared.utils.poke_logging import PokeLogging
 from bothub.shared.utils.backend import backend
 from bothub.shared.utils.helpers import get_examples_request
 from bothub.shared.utils.persistor import BothubPersistor
-from bothub.shared.utils.pipeline_builder import get_rasa_nlu_config
+from bothub.shared.utils.pipeline_builder import PipelineBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ def load_lookup_tables(update_request):
         runtime_path = os.path.dirname(os.path.abspath(__file__))
         entities = intersection(update_request.get("prebuilt_entities"), supported_lookup_table_entities)
         for entity in entities:
-            file_path = os.path.join(runtime_path, 'lookup_tables', language, entity+'.txt')
+            file_path = os.path.join(runtime_path, 'lookup_tables', language, entity + '.txt')
             # Check if lookup_table exists
             if os.path.exists(file_path):
                 lookup_tables.append(
@@ -85,7 +85,9 @@ def train_update(repository_version, by, repository_authorization, from_queue='c
             lookup_tables = load_lookup_tables(update_request)
             print("Loaded lookup_tables: " + str(lookup_tables))
 
-            rasa_nlu_config = get_rasa_nlu_config(update_request)
+            pipeline_builder = PipelineBuilder(update_request)
+            pipeline_builder.print_pipeline()
+            rasa_nlu_config = pipeline_builder.get_nlu_model()
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
             training_data = TrainingData(
                 training_examples=examples,
