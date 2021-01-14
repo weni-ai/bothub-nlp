@@ -56,6 +56,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
 
         try:
             from bothub_nlp_celery.app import nlp_language
+
             self.tokenizer, self.model = nlp_language
         except TypeError:
             logger.info(
@@ -66,8 +67,9 @@ class HFTransformersNLPCustom(HFTransformersNLP):
                 model_weights_defaults[self.model_name], cache_dir=None
             )
             self.model = model_class_dict[self.model_name].from_pretrained(
-                self.model_name, cache_dir=None,
-                from_pt=from_pt_dict.get(self.model_name, False)
+                self.model_name,
+                cache_dir=None,
+                from_pt=from_pt_dict.get(self.model_name, False),
             )
 
         # Use a universal pad token since all transformer architectures do not have a
@@ -80,7 +82,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
         logger.debug(f"Loaded Tokenizer and Model for {self.model_name}")
 
     def _add_lm_specific_special_tokens(
-            self, token_ids: List[List[int]]
+        self, token_ids: List[List[int]]
     ) -> List[List[int]]:
         """Add language model specific special tokens which were used during their training.
         Args:
@@ -99,7 +101,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
         return augmented_tokens
 
     def _lm_specific_token_cleanup(
-            self, split_token_ids: List[int], token_strings: List[Text]
+        self, split_token_ids: List[int], token_strings: List[Text]
     ) -> Tuple[List[int], List[Text]]:
         """Clean up special chars added by tokenizers of language models.
         Many language models add a special char in front/back of (some) words. We clean up those chars as they are not
@@ -115,7 +117,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
         return model_tokens_cleaners[self.model_name](split_token_ids, token_strings)
 
     def _post_process_sequence_embeddings(
-            self, sequence_embeddings: np.ndarray
+        self, sequence_embeddings: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Compute sentence level representations and sequence level representations for relevant tokens.
         Args:

@@ -488,5 +488,5 @@ def evaluate_update(repository_version, repository_authorization, interpreter_ma
     return {
         "id": evaluate_result.get("evaluate_id"),
         "version": evaluate_result.get("evaluate_version"),
-        "cross_validation": False
+        "cross_validation": False,
     }

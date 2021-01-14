@@ -72,17 +72,19 @@ def _generate_lookup_regex(lookup_table: Dict[Text, Union[Text, List[Text]]]) ->
 
     # sanitize the regex, escape special characters
     preprocessor = PreprocessingBase()
-    elements_sanitized = [re.escape(preprocessor.preprocess(e)) if not e.startswith('regex ')
-                          else e.split('regex ')[1]
-                          for e in elements_to_regex]
-
+    elements_sanitized = [
+        re.escape(preprocessor.preprocess(e))
+        if not e.startswith("regex ")
+        else e.split("regex ")[1]
+        for e in elements_to_regex
+    ]
 
     # regex matching elements with word boundaries on either side
     return "(\\b" + "\\b|\\b".join(elements_sanitized) + "\\b)"
 
 
 def _convert_lookup_tables_to_regex(
-        training_data: TrainingData, use_only_entities: bool = False
+    training_data: TrainingData, use_only_entities: bool = False
 ) -> List[Dict[Text, Text]]:
     """Convert the lookup tables from the training data to regex patterns.
     Args:
@@ -108,7 +110,7 @@ def _convert_lookup_tables_to_regex(
 
 
 def _collect_regex_features(
-        training_data: TrainingData, use_only_entities: bool = False
+    training_data: TrainingData, use_only_entities: bool = False
 ) -> List[Dict[Text, Text]]:
     """Get regex features from training data.
 
@@ -131,10 +133,10 @@ def _collect_regex_features(
 
 
 def extract_patterns(
-        training_data: TrainingData,
-        use_lookup_tables: bool = True,
-        use_regexes: bool = True,
-        use_only_entities: bool = False,
+    training_data: TrainingData,
+    use_lookup_tables: bool = True,
+    use_regexes: bool = True,
+    use_only_entities: bool = False,
 ) -> List[Dict[Text, Text]]:
     """Extract a list of patterns from the training data.
 
@@ -180,9 +182,9 @@ class RegexEntityExtractorCustom(EntityExtractor):
     }
 
     def __init__(
-            self,
-            component_config: Optional[Dict[Text, Any]] = None,
-            patterns: Optional[List[Dict[Text, Text]]] = None,
+        self,
+        component_config: Optional[Dict[Text, Any]] = None,
+        patterns: Optional[List[Dict[Text, Text]]] = None,
     ):
         super(RegexEntityExtractorCustom, self).__init__(component_config)
 
@@ -190,10 +192,10 @@ class RegexEntityExtractorCustom(EntityExtractor):
         self.patterns = patterns or []
 
     def train(
-            self,
-            training_data: TrainingData,
-            config: Optional[RasaNLUModelConfig] = None,
-            **kwargs: Any,
+        self,
+        training_data: TrainingData,
+        config: Optional[RasaNLUModelConfig] = None,
+        **kwargs: Any,
     ) -> None:
         self.patterns = extract_patterns(
             training_data,
@@ -242,8 +244,8 @@ class RegexEntityExtractorCustom(EntityExtractor):
                         ENTITY_ATTRIBUTE_START: start_index,
                         ENTITY_ATTRIBUTE_END: end_index,
                         ENTITY_ATTRIBUTE_VALUE: message.get(TEXT)[
-                                                start_index:end_index
-                                                ],
+                            start_index:end_index
+                        ],
                     }
                 )
 
@@ -251,12 +253,12 @@ class RegexEntityExtractorCustom(EntityExtractor):
 
     @classmethod
     def load(
-            cls,
-            meta: Dict[Text, Any],
-            model_dir: Optional[Text] = None,
-            model_metadata: Optional[Metadata] = None,
-            cached_component: Optional["RegexEntityExtractor"] = None,
-            **kwargs: Any,
+        cls,
+        meta: Dict[Text, Any],
+        model_dir: Optional[Text] = None,
+        model_metadata: Optional[Metadata] = None,
+        cached_component: Optional["RegexEntityExtractor"] = None,
+        **kwargs: Any,
     ) -> "RegexEntityExtractorCustom":
 
         file_name = meta.get("file")

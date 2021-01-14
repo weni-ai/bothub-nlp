@@ -1,28 +1,15 @@
 import rasa.utils.common as common_utils
 from rasa.nlu.classifiers.diet_classifier import DIETClassifier
-from typing import Any, Dict, List, Text, Tuple, Optional
 from rasa.constants import DOCS_URL_TRAINING_DATA_NLU
 from rasa.nlu.training_data import TrainingData
-from rasa.nlu.tokenizers.tokenizer import Token
-from rasa.nlu.components import Component
 from rasa.nlu.constants import (
-    EXTRACTOR,
     ENTITIES,
     TOKENS_NAMES,
     TEXT,
-    NO_ENTITY_TAG,
-    ENTITY_ATTRIBUTE_TYPE,
-    ENTITY_ATTRIBUTE_GROUP,
-    ENTITY_ATTRIBUTE_ROLE,
-    ENTITY_ATTRIBUTE_VALUE,
-    ENTITY_ATTRIBUTE_CONFIDENCE_TYPE,
-    ENTITY_ATTRIBUTE_CONFIDENCE_ROLE,
-    ENTITY_ATTRIBUTE_CONFIDENCE_GROUP,
     ENTITY_ATTRIBUTE_START,
     ENTITY_ATTRIBUTE_END,
     INTENT,
 )
-from rasa.nlu.training_data import Message
 
 
 class DIETClassifierCustom(DIETClassifier):

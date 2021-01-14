@@ -1,4 +1,3 @@
-import re
 from typing import Any, Optional, Text, Dict, List, Type
 
 from rasa.nlu.components import Component
@@ -24,13 +23,9 @@ class Preprocessing(Component):
     # and should be able to create reasonable results with the defaults.
     defaults = {"language": None}
 
-    def __init__(
-            self,
-            component_config: Optional[Dict[Text, Any]] = None,
-    ) -> None:
+    def __init__(self, component_config: Optional[Dict[Text, Any]] = None) -> None:
         super(Preprocessing, self).__init__(component_config)
         self.language = self.component_config["language"]
-
 
     @classmethod
     def create(
@@ -48,8 +43,8 @@ class Preprocessing(Component):
             curr_ent = sorted_entities[i]
             next_ent = sorted_entities[i + 1]
             if (
-                    next_ent["start"] < curr_ent["end"]
-                    and next_ent["entity"] != curr_ent["entity"]
+                next_ent["start"] < curr_ent["end"]
+                and next_ent["entity"] != curr_ent["entity"]
             ):
                 return True
         return False
@@ -60,9 +55,21 @@ class Preprocessing(Component):
         for i in range(len(entities)):
             overlap = False
             for j in range(len(entities)):
-                if i != j and (entities[i]['start'] >= entities[j]['start'] and entities[i]['end'] <= entities[j]['end']):
+                if i != j and (
+                    entities[i]["start"] >= entities[j]["start"]
+                    and entities[i]["end"] <= entities[j]["end"]
+                ):
                     overlap = True
-                elif i != j and ((entities[i]['end'] > entities[j]['start'] and entities[i]['start'] < entities[j]['end']) and not (entities[j]['start'] >= entities[i]['start'] and entities[j]['end'] <= entities[i]['end'])):
+                elif i != j and (
+                    (
+                        entities[i]["end"] > entities[j]["start"]
+                        and entities[i]["start"] < entities[j]["end"]
+                    )
+                    and not (
+                        entities[j]["start"] >= entities[i]["start"]
+                        and entities[j]["end"] <= entities[i]["end"]
+                    )
+                ):
                     overlap = True
             if not overlap:
                 new_entities.append(entities[i])
@@ -83,8 +90,12 @@ class Preprocessing(Component):
         for idx in range(size):
             example = training_data.training_examples[idx - subtract_idx]
 
-            if 'entities' in example.data and self.do_entities_overlap(example.data['entities']):
-                example.data['entities'] = self.remove_overlapping_entities(example.data['entities'])
+            if "entities" in example.data and self.do_entities_overlap(
+                example.data["entities"]
+            ):
+                example.data["entities"] = self.remove_overlapping_entities(
+                    example.data["entities"]
+                )
 
             example_text = example.text
             example_text = PREPROCESS_FACTORY.preprocess(example_text)

@@ -4,10 +4,9 @@ from .preprocessing_base import PreprocessingBase
 
 
 class PreprocessingEnglish(PreprocessingInterface):
-
     def preprocess(self, phrase: str = None):
 
-        if phrase == None:
+        if phrase is None:
             return
 
         phrase = PreprocessingBase().preprocess(phrase)

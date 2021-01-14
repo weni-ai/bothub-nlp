@@ -5,10 +5,9 @@ import re
 
 
 class PreprocessingPortuguese(PreprocessingInterface):
-
     def preprocess(self, phrase: str = None):
 
-        if phrase == None:
+        if phrase is None:
             return
 
         phrase = PreprocessingBase().preprocess(phrase)
@@ -25,7 +24,7 @@ class PreprocessingPortuguese(PreprocessingInterface):
             "bom dia": r"\b(bd)\b",
             "falou": r"\b(f(a*)l(o*)(w|u)+(s*))\b",
             "valeu": r"\b(v(a*)l(e*)(w|u)+(s*))\b",
-            "tranquilo": r"\b(tranks)\b"
+            "tranquilo": r"\b(tranks)\b",
         }
 
         for word in contractions.keys():

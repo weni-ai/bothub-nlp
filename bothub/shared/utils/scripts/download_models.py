@@ -4,7 +4,7 @@ Usage example:
 !python download_models.py pt_br-BERT
 """
 
-#!/usr/bin/env python
+# !/usr/bin/env python
 import os
 import sys
 import subprocess
@@ -18,7 +18,9 @@ from spacy.cli import download
 from spacy.cli import link
 from spacy.util import get_package_path
 
-sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..')))
+sys.path.insert(
+    1, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+)
 from bothub.shared.utils.rasa_components.registry import (
     from_pt_dict,
     model_download_url,
@@ -114,10 +116,7 @@ lang_to_model = {
     "kk": {
         "SPACY": "pip+kk_bothub_sm:https://s3.amazonaws.com/bothub-models/spacy-2.1.9/kk_bothub_sm-1.0.0.zip"
     },
-    "xx": {
-        "SPACY": "xx",
-        "BERT": "bert_multilang"
-    },
+    "xx": {"SPACY": "xx", "BERT": "bert_multilang"},
 }
 
 

@@ -3,15 +3,15 @@ import logging
 import uuid
 
 from _collections import defaultdict
+from typing import List, Text, Set
 
 from rasa.nlu.model import Trainer
 from rasa.nlu.components import ComponentBuilder
-from rasa.nlu import __version__ as rasa_version
+
 from rasa.nlu.test import (
     merge_labels,
     _targets_predictions_from,
     remove_empty_intent_examples,
-    get_eval_data,
     align_all_entity_predictions,
     combine_result,
     plot_confusion_matrix,
@@ -20,7 +20,7 @@ from rasa.nlu.test import (
     get_entity_extractors,
     plot_attribute_confidences,
     generate_folds,
-    _contains_entity_labels
+    _contains_entity_labels,
 )
 
 from rasa.nlu.test import (
@@ -50,7 +50,7 @@ excluded_itens = [
 
 
 def collect_incorrect_entity_predictions(
-        entity_results, merged_predictions, merged_targets
+    entity_results, merged_predictions, merged_targets
 ):
     errors = []
     offset = 0
@@ -73,9 +73,9 @@ def collect_incorrect_entity_predictions(
 def is_start_end_in_list(entity, predicted_entities):
     for predicted_entity in predicted_entities:
         if (
-                entity.get("start") == predicted_entity.get("start")
-                and entity.get("end") == predicted_entity.get("end")
-                and entity.get("value") == predicted_entity.get("value")
+            entity.get("start") == predicted_entity.get("start")
+            and entity.get("end") == predicted_entity.get("end")
+            and entity.get("value") == predicted_entity.get("value")
         ):
             return predicted_entity
     return False
@@ -84,10 +84,10 @@ def is_start_end_in_list(entity, predicted_entities):
 def is_entity_in_predicted(entity, predicted_entities, return_predicted=False):
     for predicted_entity in predicted_entities:
         if (
-                entity.get("start") == predicted_entity.get("start")
-                and entity.get("end") == predicted_entity.get("end")
-                and entity.get("value") == predicted_entity.get("value")
-                and entity.get("entity") == predicted_entity.get("entity")
+            entity.get("start") == predicted_entity.get("start")
+            and entity.get("end") == predicted_entity.get("end")
+            and entity.get("value") == predicted_entity.get("value")
+            and entity.get("entity") == predicted_entity.get("entity")
         ):
             if return_predicted:
                 return predicted_entity, True
@@ -108,15 +108,15 @@ def is_false_success(sentence_eval):
 
 
 def collect_successful_entity_predictions(
-        entity_results, merged_predictions, merged_targets
+    entity_results, merged_predictions, merged_targets
 ):
     successes = []
     offset = 0
     for entity_result in entity_results:
         for i in range(offset, offset + len(entity_result.tokens)):
             if (
-                    merged_targets[i] == merged_predictions[i]
-                    and merged_targets[i] != "no_entity"
+                merged_targets[i] == merged_predictions[i]
+                and merged_targets[i] != "no_entity"
             ):
                 successes.append(
                     {
@@ -345,7 +345,7 @@ def entity_rasa_nlu_data(entity, evaluate):  # pragma: no cover
     return {
         "start": entity.start,
         "end": entity.end,
-        "value": evaluate.text[entity.start: entity.end],
+        "value": evaluate.text[entity.start : entity.end],
         "entity": entity.entity.value,
     }
 
@@ -381,7 +381,7 @@ def get_formatted_log(merged_logs):
 
             for predicted_entity in predicted_entities:
                 if not is_start_end_in_list(
-                        predicted_entity, merged_log.get("true_entities")
+                    predicted_entity, merged_log.get("true_entities")
                 ) and not is_start_end_in_list(
                     predicted_entity, merged_log["swapped_error_entities"]
                 ):
@@ -403,7 +403,9 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
     return merged_logs
 
 
-def evaluate_crossval_update(repository_version, by, repository_authorization, from_queue='celery'):
+def evaluate_crossval_update(
+    repository_version, by, repository_authorization, from_queue="celery"
+):
     update_request = backend().request_backend_start_training_nlu(
         repository_version, by, repository_authorization, from_queue
     )
@@ -438,12 +440,18 @@ def evaluate_crossval_update(repository_version, by, repository_authorization, f
             intent_test_metrics: IntentMetrics = defaultdict(list)
             entity_train_metrics: EntityMetrics = defaultdict(lambda: defaultdict(list))
             entity_test_metrics: EntityMetrics = defaultdict(lambda: defaultdict(list))
-            response_selection_train_metrics: ResponseSelectionMetrics = defaultdict(list)
-            response_selection_test_metrics: ResponseSelectionMetrics = defaultdict(list)
+            response_selection_train_metrics: ResponseSelectionMetrics = defaultdict(
+                list
+            )
+            response_selection_test_metrics: ResponseSelectionMetrics = defaultdict(
+                list
+            )
 
             intent_results: List[IntentEvaluationResult] = []
             entity_results: List[EntityEvaluationResult] = []
-            response_selection_test_results: List[ResponseSelectionEvaluationResult] = ([])
+            response_selection_test_results: List[ResponseSelectionEvaluationResult] = (
+                []
+            )
             entity_evaluation_possible = False
             extractors: Set[Text] = set()
 
@@ -473,8 +481,8 @@ def evaluate_crossval_update(repository_version, by, repository_authorization, f
                 if not extractors:
                     extractors = get_entity_extractors(interpreter)
                     entity_evaluation_possible = (
-                            entity_evaluation_possible
-                            or _contains_entity_labels(entity_results)
+                        entity_evaluation_possible
+                        or _contains_entity_labels(entity_results)
                     )
 
             if intent_results:
@@ -482,7 +490,9 @@ def evaluate_crossval_update(repository_version, by, repository_authorization, f
 
             if entity_results:
                 extractors = get_entity_extractors(interpreter)
-                result["entity_evaluation"] = evaluate_entities(entity_results, extractors)
+                result["entity_evaluation"] = evaluate_entities(
+                    entity_results, extractors
+                )
 
             intent_evaluation = result.get("intent_evaluation")
             entity_evaluation = result.get("entity_evaluation")
@@ -546,7 +556,7 @@ def evaluate_crossval_update(repository_version, by, repository_authorization, f
             return {
                 "id": evaluate_result.get("evaluate_id"),
                 "version": evaluate_result.get("evaluate_version"),
-                "cross_validation": True
+                "cross_validation": True,
             }
 
         except Exception as e:

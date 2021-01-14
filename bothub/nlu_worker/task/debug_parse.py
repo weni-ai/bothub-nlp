@@ -155,7 +155,11 @@ def n_samples_by_sentence_lenght(sentence):
 
 
 def debug_parse_text(
-    repository_version, repository_authorization, interpreter_manager, text, use_cache=True
+    repository_version,
+    repository_authorization,
+    interpreter_manager,
+    text,
+    use_cache=True,
 ):
     interpreter = interpreter_manager.get_interpreter(
         repository_version, repository_authorization, rasa_version, use_cache

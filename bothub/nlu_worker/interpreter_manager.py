@@ -7,7 +7,6 @@ from bothub.shared.utils.rasa_components.custom_interpreter import CustomInterpr
 
 
 class InterpreterManager:
-
     def __init__(self):
         self.interpreters = {}
 
@@ -20,8 +19,7 @@ class InterpreterManager:
         )
 
         repository_name = (
-            f"{update_request.get('version_id')}_"
-            f"{update_request.get('language')}"
+            f"{update_request.get('version_id')}_" f"{update_request.get('language')}"
         )
         last_training = f"{update_request.get('total_training_end')}"
 
@@ -49,13 +47,18 @@ class InterpreterManager:
         if use_cache:
             self.interpreters[repository_name] = {
                 "last_training": last_training,
-                "interpreter_data": interpreter
+                "interpreter_data": interpreter,
             }
 
         return interpreter
 
     def get_interpreter_parse(
-        self, text, repository_version, repository_authorization, rasa_version, use_cache
+        self,
+        text,
+        repository_version,
+        repository_authorization,
+        rasa_version,
+        use_cache,
     ):
         interpreter = self.get_interpreter(
             repository_version, repository_authorization, rasa_version, use_cache

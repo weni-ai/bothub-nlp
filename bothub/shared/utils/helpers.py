@@ -42,10 +42,7 @@ def get_algorithm_info():
     # Sorted by priority
     # last element -> default algorithm
     return [
-        {
-            "name": "transformer_network_diet_bert",
-            "supported_languages": ["all"],
-        },
+        {"name": "transformer_network_diet_bert", "supported_languages": ["all"]},
         {"name": "transformer_network_diet_word_embedding", "supported_languages": []},
         {"name": "transformer_network_diet", "supported_languages": ["all"]},
     ]

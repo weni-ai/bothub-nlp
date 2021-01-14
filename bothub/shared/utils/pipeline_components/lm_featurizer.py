@@ -4,7 +4,6 @@ from rasa.nlu.components import Component
 
 
 class LanguageModelFeaturizerCustom(LanguageModelFeaturizer):
-
     @classmethod
     def required_components(cls) -> List[Type[Component]]:
         return []
