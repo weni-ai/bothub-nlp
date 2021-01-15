@@ -513,6 +513,7 @@ def evaluate_crossval_update(
                     "entityprecision": entity_evaluation.get("precision"),
                     "entityf1_score": entity_evaluation.get("f1_score"),
                     "entityaccuracy": entity_evaluation.get("accuracy"),
+                    "cross_validation": True
                 },
                 repository_authorization,
             )
