@@ -38,7 +38,7 @@ lang_to_model = {
     "es": {"SPACY": "es_core_news_md"},
     "fr": {"SPACY": "fr_core_news_md"},
     "ru": {
-        "SPACY": "pip+ru_vectors_web_md:https://bothub-nlp-models.s3.amazonaws.com/ru-spacy/ru_vectors_web_md.zip"
+        "SPACY": "pip+ru_vectors_web_md:https://bothub-nlp-models.s3.amazonaws.com/ru-spacy/ru_vectors_web_md-1.1.0.tar.gz"
     },
     "xx": {"SPACY": "xx", "BERT": "bert_multilang"},
 }

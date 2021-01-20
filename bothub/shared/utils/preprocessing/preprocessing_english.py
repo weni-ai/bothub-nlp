@@ -210,6 +210,7 @@ class PreprocessingEnglish(PreprocessingInterface):
             ":anger_symbol:": "hit",  # 💢
         }
 
+        # TODO: keyerror unexisting emogi ex : :worried_face:
         regex_emoji = r":[A-Za-z0-9\-_]+:"
         emojis = re.findall(regex_emoji, phrase)
         for emoji in emojis:
