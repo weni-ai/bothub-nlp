@@ -4,7 +4,7 @@ from rasa.nlu.components import Component
 from rasa.nlu.config import RasaNLUModelConfig
 from rasa.nlu.training_data import Message, TrainingData
 
-from ..preprocessing.preprocessing_factory import PreprocessingFactory
+from bothub.shared.utils.preprocessing.preprocessing_base import PreprocessingBase
 
 
 class Preprocessing(Component):
@@ -85,7 +85,7 @@ class Preprocessing(Component):
         not_repeated_phrases = set()
         size = len(training_data.training_examples)
         subtract_idx = 0
-        PREPROCESS_FACTORY = PreprocessingFactory().get_preprocess(self.language)
+        language_preprocessor = PreprocessingBase().factory(self.language)
 
         for idx in range(size):
             example = training_data.training_examples[idx - subtract_idx]
@@ -97,8 +97,7 @@ class Preprocessing(Component):
                     example.data["entities"]
                 )
 
-            example_text = example.text
-            example_text = PREPROCESS_FACTORY.preprocess(example_text)
+            example_text = language_preprocessor.preprocess(example.text)
 
             if example_text in not_repeated_phrases:
                 # remove example at this index from training_examples
@@ -110,12 +109,6 @@ class Preprocessing(Component):
 
     def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
-        APOSTROPHE_OPTIONS = ["'", "`"]
 
-        # remove apostrophe from the phrase (important be first than s_regex regex)
-        for APOSTROPHE in APOSTROPHE_OPTIONS:
-            message.text = message.text.replace(APOSTROPHE, "")
-
-        PREPROCESS_FACTORY = PreprocessingFactory().get_preprocess(self.language)
-
-        message.text = PREPROCESS_FACTORY.preprocess(message.text)
+        language_preprocessor = PreprocessingBase().factory(self.language)
+        message.text = language_preprocessor.preprocess(message.text)

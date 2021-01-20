@@ -1,17 +1,68 @@
-from .preprocessing_interface import PreprocessingInterface
+import logging
 from unidecode import unidecode
 import emoji
+import re
 
-# -*- coding: utf-8 -*-
-
-
-def de_emojify(phrase):
-    phrase = emoji.demojize(phrase)
-    return phrase
+logger = logging.getLogger(__name__)
 
 
-class PreprocessingBase(PreprocessingInterface):
+class PreprocessingBase(object):
+    emoji_contractions = {}
+
+    @staticmethod
+    def factory(language: str = None):
+        try:
+            if language == "en":
+                from bothub.shared.utils.preprocessing.preprocessing_english import PreprocessingEnglish
+                return PreprocessingEnglish()
+            elif language == "pt_br":
+                from bothub.shared.utils.preprocessing.preprocessing_portuguese import PreprocessingPortuguese
+                return PreprocessingPortuguese()
+            else:
+                return PreprocessingBase()
+
+        except AssertionError as e:
+            logger.exception(e)
+
+        return None
+
     def preprocess(self, phrase: str = None):
+        phrase = self.default_preprocessing(phrase)
+        phrase = self.emoji_handling(phrase)
+        return phrase
+
+    @staticmethod
+    def default_preprocessing(phrase: str = None):
+
+        if phrase is None:
+            raise ValueError
+
+        # remove apostrophe from the phrase (important be first than s_regex regex)
+        for APOSTROPHE in ["'", "`"]:
+            phrase = phrase.replace(APOSTROPHE, "")
+
         # removing accent and lowercasing characters
-        phrase = de_emojify(phrase)
-        return unidecode(phrase.lower())
+        phrase = unidecode(phrase.lower())
+
+        return phrase
+
+    @staticmethod
+    def extract_emoji_text(code):
+        code = code[1:len(code) - 1]
+        text = ' '.join(code.split('_'))
+        return text
+
+    def emoji_handling(self, phrase: str = None):
+        # turn emojis into text codes
+        phrase = emoji.demojize(phrase)
+
+        regex_emoji = r":[A-Za-z0-9\-_]+:"
+        emoji_codes = re.findall(regex_emoji, phrase)
+        for code in emoji_codes:
+            try:
+                phrase = re.sub(code, self.emoji_contractions[code], phrase)
+            except KeyError:
+                phrase = re.sub(code, self.extract_emoji_text(code), phrase)
+
+        print(phrase + ' @@@@@')
+        return phrase
