@@ -161,7 +161,6 @@ class PreprocessingPortuguese(PreprocessingBase):
     }
 
     def preprocess(self, phrase: str = None):
-        print(phrase + '!!!!!!!')
         phrase = self.default_preprocessing(phrase)
 
         contractions = {

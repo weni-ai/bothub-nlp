@@ -64,5 +64,4 @@ class PreprocessingBase(object):
             except KeyError:
                 phrase = re.sub(code, self.extract_emoji_text(code), phrase)
 
-        print(phrase + ' @@@@@')
         return phrase
