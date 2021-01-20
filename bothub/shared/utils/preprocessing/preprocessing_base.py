@@ -11,6 +11,11 @@ class PreprocessingBase(object):
 
     @staticmethod
     def factory(language: str = None):
+        """
+        Implements Factory Method
+        :param language: Language
+        :return: Preprocessing Class respective to its language
+        """
         try:
             if language == "en":
                 from bothub.shared.utils.preprocessing.preprocessing_english import PreprocessingEnglish
