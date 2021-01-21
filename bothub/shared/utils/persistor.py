@@ -43,17 +43,12 @@ class BothubPersistor(Persistor):
         with open(tarname, "rb") as tar_file:
             data = tar_file.read()
 
-            print(len(data))
-
-            save_request = self.backend().send_training_backend_nlu_persistor(
+            self.backend().send_training_backend_nlu_persistor(
                 self.repository_version,
                 data,
                 self.repository_authorization,
                 self.rasa_version,
             )
-
-            print(self.backend().__dict__)
-            print(save_request)
 
     def retrieve(self, model_name, target_path):
         tar_name = self._tar_name(model_name)
