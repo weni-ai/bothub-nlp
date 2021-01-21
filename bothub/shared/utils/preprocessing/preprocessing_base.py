@@ -9,28 +9,6 @@ logger = logging.getLogger(__name__)
 class PreprocessingBase(object):
     emoji_contractions = {}
 
-    @staticmethod
-    def factory(language: str = None):
-        """
-        Implements Factory Method
-        :param language: Language
-        :return: Preprocessing Class respective to its language
-        """
-        try:
-            if language == "en":
-                from bothub.shared.utils.preprocessing.preprocessing_english import PreprocessingEnglish
-                return PreprocessingEnglish()
-            elif language == "pt_br":
-                from bothub.shared.utils.preprocessing.preprocessing_portuguese import PreprocessingPortuguese
-                return PreprocessingPortuguese()
-            else:
-                return PreprocessingBase()
-
-        except AssertionError as e:
-            logger.exception(e)
-
-        return None
-
     def preprocess(self, phrase: str = None):
         phrase = self.default_preprocessing(phrase)
         phrase = self.emoji_handling(phrase)

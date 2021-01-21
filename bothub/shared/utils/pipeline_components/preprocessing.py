@@ -4,7 +4,7 @@ from rasa.nlu.components import Component
 from rasa.nlu.config import RasaNLUModelConfig
 from rasa.nlu.training_data import Message, TrainingData
 
-from bothub.shared.utils.preprocessing.preprocessing_base import PreprocessingBase
+from bothub.shared.utils.preprocessing.preprocessing_factory import PreprocessingFactory
 
 
 class Preprocessing(Component):
@@ -85,7 +85,7 @@ class Preprocessing(Component):
         not_repeated_phrases = set()
         size = len(training_data.training_examples)
         subtract_idx = 0
-        language_preprocessor = PreprocessingBase().factory(self.language)
+        language_preprocessor = PreprocessingFactory().factory(self.language)
 
         for idx in range(size):
             example = training_data.training_examples[idx - subtract_idx]
@@ -110,5 +110,5 @@ class Preprocessing(Component):
     def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
 
-        language_preprocessor = PreprocessingBase().factory(self.language)
+        language_preprocessor = PreprocessingFactory().factory(self.language)
         message.text = language_preprocessor.preprocess(message.text)
