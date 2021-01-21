@@ -3,7 +3,7 @@ import os
 import emoji
 
 import sys
-sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..')))
 
 from bothub.shared.utils.preprocessing.preprocessing_factory import PreprocessingFactory
 from bothub.shared.utils.preprocessing.preprocessing_base import PreprocessingBase

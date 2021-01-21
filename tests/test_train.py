@@ -25,20 +25,12 @@ class TestTrainTask(TestCase):
             "repository_authorization_user_id": 303,
         }
 
-        # change directory to load /models
-        # change directory to /tests
-        try:
-            os.chdir("bothub_nlp_worker")
-        except Exception:
-            pass
-        try:
-            os.chdir("nlu_worker")
-        except Exception:
-            pass
+        # change directory to load bert /bert_english
 
-        cur_dir = os.getcwd().split("/")[-1]
-        if cur_dir == "tests":
+        list_dir = os.listdir()
+        while 'bert_english' not in list_dir:
             os.chdir("../")
+            list_dir = os.listdir()
         print("Current Working Directory ", os.getcwd())
 
     @patch(

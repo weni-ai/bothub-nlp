@@ -23,14 +23,6 @@ class TestEvaluateTask(unittest.TestCase):
 
     # change directory to /tests
     try:
-        os.chdir("bothub_nlp_worker")
-    except Exception:
-        pass
-    try:
-        os.chdir("nlu_worker")
-    except Exception:
-        pass
-    try:
         os.chdir("tests")
     except Exception:
         pass

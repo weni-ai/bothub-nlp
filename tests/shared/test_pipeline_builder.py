@@ -2,7 +2,7 @@ import unittest
 import os
 
 import sys
-sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..')))
 
 from bothub.shared.utils.pipeline_builder import PipelineBuilder
 from rasa.nlu.registry import class_from_module_path
@@ -11,7 +11,7 @@ from rasa.nlu.registry import class_from_module_path
 class TestPipelineBuilder(unittest.TestCase):
     def setUp(self, *args):
         self.update = {
-            'language': 'pt_br',
+            'language': 'en',
             'repository_version': 47,
             'repository_uuid': '1d8e0d6f-1941-42a3-84c5-788706c7072e',
             'intent': [4, 5],
@@ -22,6 +22,11 @@ class TestPipelineBuilder(unittest.TestCase):
             'total_training_end': 0
         }
         self.pipeline_builder = PipelineBuilder(self.update)
+
+        list_dir = os.listdir()
+        while 'bert_english' not in list_dir:
+            os.chdir("../")
+            list_dir = os.listdir()
 
     def test__add_spacy_nlp(self):
         component_name = self.pipeline_builder._add_spacy_nlp().get('name')
