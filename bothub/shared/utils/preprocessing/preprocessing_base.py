@@ -10,8 +10,8 @@ class PreprocessingBase(object):
     emoji_contractions = {}
 
     def preprocess(self, phrase: str = None):
-        phrase = self.default_preprocessing(phrase)
         phrase = self.emoji_handling(phrase)
+        phrase = self.default_preprocessing(phrase)
         return phrase
 
     @staticmethod
@@ -31,6 +31,13 @@ class PreprocessingBase(object):
 
     @staticmethod
     def extract_emoji_text(code):
+        """
+        :param code: is a emoji_code string ex:  :smile_face:
+        :return: "smile face"
+        """
+        if code is None or code[0] != ':' or code[-1] != ':':
+            raise ValueError
+
         code = code[1:len(code) - 1]
         text = ' '.join(code.split('_'))
         return text

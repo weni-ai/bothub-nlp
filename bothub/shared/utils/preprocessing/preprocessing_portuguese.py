@@ -161,6 +161,7 @@ class PreprocessingPortuguese(PreprocessingBase):
     }
 
     def preprocess(self, phrase: str = None):
+        phrase = self.emoji_handling(phrase)
         phrase = self.default_preprocessing(phrase)
 
         contractions = {
@@ -180,7 +181,5 @@ class PreprocessingPortuguese(PreprocessingBase):
 
         for word in contractions.keys():
             phrase = re.sub(contractions[word], word, phrase)
-
-        phrase = self.emoji_handling(phrase)
 
         return phrase

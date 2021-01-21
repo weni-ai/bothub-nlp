@@ -161,6 +161,7 @@ class PreprocessingEnglish(PreprocessingBase):
     }
 
     def preprocess(self, phrase: str = None):
+        phrase = self.emoji_handling(phrase)
         phrase = self.default_preprocessing(phrase)
 
         # set regex for "mkt":
@@ -205,7 +206,6 @@ class PreprocessingEnglish(PreprocessingBase):
         # replace regex by NOT_WORD
         phrase = re.sub(not_regex, NOT_WORD, phrase)
 
-        phrase = self.emoji_handling(phrase)
 
         return phrase
 
