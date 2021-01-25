@@ -7,7 +7,7 @@ import numpy as np
 from bothub.shared.utils.helpers import get_examples_request
 
 
-class SentenceSuggestion:
+class IntentSentenceSuggestion:
     def __init__(self):
         self.nlp = nlp_language
         self.to_replace_tags = ["VERB", "NOUN", "ADJ", "ADV", "INTJ", "PROPN"]
@@ -169,9 +169,12 @@ def intent_sentence_suggestion_text(
 
     similar_sentences = []
     for sentence in intent_sentences:
-        sentences = SentenceSuggestion().get_suggestions(
+        sentences = IntentSentenceSuggestion().get_suggestions(
             sentence, percentage_to_replace, n
         )
         similar_sentences.extend(sentences)
+
+    # remove intent_sentences that are in similar_sentences
+    similar_sentences = list(set(similar_sentences) - set(intent_sentences))
 
     return OrderedDict([("intent", intent), ("suggested_sentences", similar_sentences)])
