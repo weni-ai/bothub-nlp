@@ -27,6 +27,7 @@ def intent_sentence_suggestion_text(
     sentences = get_examples_request(repository_version, repository_authorization)
     intent_sentences = get_intent_sentences(sentences, intent)
     intent_sentences_sample = random.sample(intent_sentences, min(n, len(intent_sentences)))
+    factor = n/len(intent_sentences_sample)
 
     suggested_sentences = []
     count = 0
@@ -34,7 +35,7 @@ def intent_sentence_suggestion_text(
         if count > n or count >= len(intent_sentences_sample):
             break
         generated_sentences = SentenceSuggestion().get_suggestions(
-            intent_sentences_sample[count], percentage_to_replace, random.randint(2, 4)
+            intent_sentences_sample[count], percentage_to_replace, random.randint(int(1*factor), int(3*factor))
         )
         for generated_sentence in generated_sentences:
             if generated_sentence not in intent_sentences:
