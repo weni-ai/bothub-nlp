@@ -24,23 +24,23 @@ def intent_sentence_suggestion_text(
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
 
-    examples_list = get_examples_request(repository_version, repository_authorization)
-    intent_sentences = get_intent_sentences(examples_list, intent)
-    intent_sentences = random.sample(intent_sentences, min(n, len(intent_sentences)))
+    sentences = get_examples_request(repository_version, repository_authorization)
+    intent_sentences = get_intent_sentences(sentences, intent)
+    intent_sentences_sample = random.sample(intent_sentences, min(n, len(intent_sentences)))
 
-    similar_sentences = []
+    suggested_sentences = []
     count = 0
-    while len(similar_sentences) < n:
-        if count > n or count >= len(intent_sentences):
+    while len(suggested_sentences) < n:
+        if count > n or count >= len(intent_sentences_sample):
             break
-        sentences = SentenceSuggestion().get_suggestions(
-            intent_sentences[count], percentage_to_replace, random.randint(2, 4)
+        generated_sentences = SentenceSuggestion().get_suggestions(
+            intent_sentences_sample[count], percentage_to_replace, random.randint(2, 4)
         )
-        similar_sentences.extend(sentences)
+        for generated_sentence in generated_sentences:
+            if generated_sentence not in intent_sentences:
+                suggested_sentences.append(generated_sentence)
         count += 1
 
-    similar_sentences = similar_sentences[:n]
-    # remove intent_sentences that are in similar_sentences
-    similar_sentences = list(set(similar_sentences) - set(intent_sentences))
+    suggested_sentences = suggested_sentences[:n]
 
-    return OrderedDict([("intent", intent), ("suggested_sentences", similar_sentences)])
+    return OrderedDict([("intent", intent), ("suggested_sentences", suggested_sentences)])
