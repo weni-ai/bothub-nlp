@@ -166,9 +166,10 @@ def intent_sentence_suggestion_text(
 
     examples_list = get_examples_request(repository_version, repository_authorization)
     intent_sentences = get_intent_sentences(examples_list, intent)
+    random.shuffle(intent_sentences)
 
     similar_sentences = []
-    for sentence in intent_sentences:
+    for sentence in intent_sentences[:10]:
         sentences = IntentSentenceSuggestion().get_suggestions(
             sentence, percentage_to_replace, n
         )
