@@ -3,7 +3,7 @@ from tempfile import mkdtemp
 
 from bothub.shared.utils.persistor import BothubPersistor
 from bothub.shared.utils.backend import backend
-from bothub.shared.utils.rasa_components.custom_interpreter import CustomInterpreter
+from bothub.shared.utils.rasa_components.bothub_interpreter import BothubInterpreter
 
 
 class InterpreterManager:
@@ -36,7 +36,7 @@ class InterpreterManager:
         model_directory = mkdtemp()
         persistor.retrieve(str(update_request.get("repository_uuid")), model_directory)
 
-        interpreter = CustomInterpreter(
+        interpreter = BothubInterpreter(
             None, {"language": update_request.get("language")}
         )
         interpreter = interpreter.load(
@@ -51,16 +51,3 @@ class InterpreterManager:
             }
 
         return interpreter
-
-    def get_interpreter_parse(
-        self,
-        text,
-        repository_version,
-        repository_authorization,
-        rasa_version,
-        use_cache,
-    ):
-        interpreter = self.get_interpreter(
-            repository_version, repository_authorization, rasa_version, use_cache
-        )
-        return interpreter.parse(text)
