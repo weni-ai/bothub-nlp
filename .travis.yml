@@ -12,9 +12,9 @@ env:
     - BOTHUB_NLP_LANGUAGE_QUEUE="en"
     - BOTHUB_NLP_SERVICE_WORKER=true
 before_script:
-  - python scripts/download_models.py en-BERT
+  - python bothub/shared/utils/scripts/download_models.py en-BERT
 script:
   - flake8
-  - travis_wait coverage run -m unittest discover bothub_nlp_nlu_worker/tests
+  - travis_wait coverage run -m unittest discover tests
 after_success:
   - coveralls
