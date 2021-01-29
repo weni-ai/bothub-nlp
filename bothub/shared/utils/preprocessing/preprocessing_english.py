@@ -206,7 +206,4 @@ class PreprocessingEnglish(PreprocessingBase):
         # replace regex by NOT_WORD
         phrase = re.sub(not_regex, NOT_WORD, phrase)
 
-
         return phrase
-
-
