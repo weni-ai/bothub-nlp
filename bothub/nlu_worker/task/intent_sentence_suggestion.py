@@ -40,9 +40,9 @@ def intent_sentence_suggestion_text(
             intent_sentences_sample[count], percentage_to_replace, random.randint(int(1 * factor), int(3 * factor))
         )
         for generated_sentence in generated_sentences:
-            generated_sentence = preprocessor.preprocess(generated_sentence)
-            if generated_sentence not in intent_sentences:
-                suggested_sentences.append(generated_sentence)
+            preprocessed_sentence = preprocessor.preprocess(generated_sentence)
+            if preprocessed_sentence not in intent_sentences:
+                suggested_sentences.append(preprocessed_sentence)
         count += 1
 
     suggested_sentences = suggested_sentences[:n]
