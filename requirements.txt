@@ -104,7 +104,7 @@ opencv-python==4.2.0.32
 opt-einsum==3.2.1
 packaging==20.0
 pika==1.1.0
-Pillow==7.0.0
+Pillow==7.1.0
 plac==0.9.6
 preshed==2.0.1
 promise==2.3
