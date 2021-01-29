@@ -1,6 +1,7 @@
 absl-py==0.9.0
 aiofiles==0.4.0
 aiohttp==3.6.2
+amqp==2.5.2
 appdirs==1.4.3
 APScheduler==3.6.3
 astor==0.8.1
@@ -10,9 +11,8 @@ attrs==19.3.0
 billiard==3.6.3.0
 black==19.3b0
 blis==0.2.4
-git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.30
+git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.31
 git+https://github.com/bothub-it/bothub-backend.git@1.0.13
-git+https://github.com/bothub-it/bothub-nlp-rasa-utils.git@1.1.32
 boto3==1.12.25
 botocore==1.15.25
 bz2file==0.98
@@ -84,6 +84,7 @@ Keras-Applications==1.0.8
 Keras-Preprocessing==1.1.0
 kfac==0.2.0
 kiwisolver==1.1.0
+kombu==4.6.7
 lime==0.1.1.36
 Markdown==3.2.1
 MarkupSafe==1.1.1
@@ -96,10 +97,12 @@ multidict==4.7.5
 murmurhash==1.0.2
 networkx==2.4
 nltk==3.4.5
+numpy==1.18.1
 oauth2client==4.1.3
 oauthlib==3.1.0
 opencv-python==4.2.0.32
 opt-einsum==3.2.1
+packaging==20.0
 pika==1.1.0
 Pillow==7.0.0
 plac==0.9.6
@@ -127,6 +130,7 @@ PySocks==1.7.1
 pythainlp==2.1.4
 python-crfsuite==0.9.7
 python-dateutil==2.8.1
+python-decouple==3.3
 python-engineio==3.11.2
 python-socketio==4.4.0
 python-telegram-bot==11.1.0
@@ -135,7 +139,9 @@ PyWavelets==1.1.1
 PyYAML==5.3.1
 questionary==1.5.1
 redis==3.4.1
-requests
+requests==2.23.0
+requests-oauthlib==1.3.0
+requests-toolbelt==0.9.1
 rfc3986==1.3.2
 rocketchat-API==0.6.36
 rsa==4.0
@@ -194,3 +200,7 @@ Werkzeug==1.0.0
 wrapt==1.12.1
 yarl==1.4.2
 zipp==3.1.0
+rasa==1.10.6
+transformers==2.11.0
+emoji==0.6.0
+recognizers-text-suite
