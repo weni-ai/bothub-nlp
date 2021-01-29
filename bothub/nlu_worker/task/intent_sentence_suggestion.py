@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from bothub_nlp_celery.app import nlp_language
+from bothub.shared.utils.preprocessing.preprocessing_factory import PreprocessingFactory
 
 import random
-import numpy as np
 
 from .sentence_suggestion import SentenceSuggestion
 from bothub.shared.utils.helpers import get_examples_request
@@ -27,7 +27,9 @@ def intent_sentence_suggestion_text(
     sentences = get_examples_request(repository_version, repository_authorization)
     intent_sentences = get_intent_sentences(sentences, intent)
     intent_sentences_sample = random.sample(intent_sentences, min(n, len(intent_sentences)))
-    factor = n/len(intent_sentences_sample)
+    factor = n / len(intent_sentences_sample)
+
+    preprocessor = PreprocessingFactory().factory()
 
     suggested_sentences = []
     count = 0
@@ -35,9 +37,10 @@ def intent_sentence_suggestion_text(
         if count > n or count >= len(intent_sentences_sample):
             break
         generated_sentences = SentenceSuggestion().get_suggestions(
-            intent_sentences_sample[count], percentage_to_replace, random.randint(int(1*factor), int(3*factor))
+            intent_sentences_sample[count], percentage_to_replace, random.randint(int(1 * factor), int(3 * factor))
         )
         for generated_sentence in generated_sentences:
+            generated_sentence = preprocessor.preprocess(generated_sentence)
             if generated_sentence not in intent_sentences:
                 suggested_sentences.append(generated_sentence)
         count += 1
