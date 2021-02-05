@@ -2,7 +2,7 @@ import unittest
 import os
 
 import sys
-sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..','..')))
+sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from bothub.shared.utils.pipeline_builder import PipelineBuilder
 from rasa.nlu.registry import class_from_module_path

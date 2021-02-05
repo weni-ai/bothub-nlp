@@ -16,7 +16,7 @@ class DebugSentenceLime:
         )
         self.intention_names = intention_names
 
-    def parse(self, text_list):
+    def classifier(self, text_list):
         result_list = []
         for text in text_list:
             result_json = self.interpreter.parse(text)
@@ -56,7 +56,7 @@ class DebugSentenceLime:
         labels = list(range(len(self.intention_names)))  # List
         try:
             exp = explainer.explain_instance(
-                text, self.parse, num_features=6, labels=labels, num_samples=num_samples
+                text, self.classifier, num_features=6, labels=labels, num_samples=num_samples
             )
         except ValueError:
             labels = []
@@ -78,7 +78,7 @@ class DebugSentenceLime:
         explainer = LimeTextExplainer(class_names=self.intention_names)
         labels = list(range(len(self.intention_names)))  # List
         exp = explainer.explain_instance(
-            text, self.parse, num_features=6, labels=labels, num_samples=num_samples
+            text, self.classifier, num_features=6, labels=labels, num_samples=num_samples
         )
         result_per_intent = {}
         for intent in self.intention_names:
