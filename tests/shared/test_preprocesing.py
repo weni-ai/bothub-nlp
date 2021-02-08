@@ -13,19 +13,18 @@ from bothub.shared.utils.preprocessing.preprocessing_portuguese import Preproces
 
 class TestPipelineBuilder(unittest.TestCase):
     def setUp(self, *args):
-        self.preprocess_factory = PreprocessingFactory()
-        self.base = self.preprocess_factory.factory()
-        self.portuguese = self.preprocess_factory.factory('pt_br')
-        self.english = self.preprocess_factory.factory('en')
+        self.base = PreprocessingFactory().factory()
+        self.portuguese = PreprocessingFactory('pt_br').factory()
+        self.english = PreprocessingFactory('en').factory()
 
     def test__factory(self):
-        base = PreprocessingFactory.factory()
+        base = PreprocessingFactory().factory()
         self.assertIsInstance(base, PreprocessingBase)
-        base = PreprocessingFactory.factory('unexisting_language')
+        base = PreprocessingFactory('unexisting_language').factory()
         self.assertIsInstance(base, PreprocessingBase)
-        portuguese = PreprocessingFactory.factory('pt_br')
+        portuguese = PreprocessingFactory('pt_br').factory()
         self.assertIsInstance(portuguese, PreprocessingPortuguese)
-        english = PreprocessingFactory.factory('en')
+        english = PreprocessingFactory('en').factory()
         self.assertIsInstance(english, PreprocessingEnglish)
 
     def test__default_preprocessing(self):

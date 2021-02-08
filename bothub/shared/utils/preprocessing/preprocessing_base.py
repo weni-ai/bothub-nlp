@@ -9,13 +9,15 @@ logger = logging.getLogger(__name__)
 class PreprocessingBase(object):
     emoji_contractions = {}
 
+    def __init__(self, remove_accent=True):
+        self.remove_accent = remove_accent
+
     def preprocess(self, phrase: str = None):
         phrase = self.emoji_handling(phrase)
         phrase = self.default_preprocessing(phrase)
         return phrase
 
-    @staticmethod
-    def default_preprocessing(phrase: str = None):
+    def default_preprocessing(self, phrase: str = None):
 
         if phrase is None:
             raise ValueError
@@ -24,8 +26,11 @@ class PreprocessingBase(object):
         for APOSTROPHE in ["'", "`"]:
             phrase = phrase.replace(APOSTROPHE, "")
 
-        # removing accent and lowercasing characters
-        phrase = unidecode(phrase.lower())
+        # lowercasing characters
+        phrase = phrase.lower()
+
+        if self.remove_accent:
+            phrase = unidecode(phrase)
 
         return phrase
 

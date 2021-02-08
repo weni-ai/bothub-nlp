@@ -160,6 +160,9 @@ class PreprocessingEnglish(PreprocessingBase):
         ":anger_symbol:": "hit",  # 💢
     }
 
+    def __init__(self, remove_accent=True):
+        super(PreprocessingEnglish, self).__init__(remove_accent=remove_accent)
+
     def preprocess(self, phrase: str = None):
         phrase = self.emoji_handling(phrase)
         phrase = self.default_preprocessing(phrase)
