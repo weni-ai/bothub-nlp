@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from bothub_nlp_celery.app import nlp_language
+from bothub.shared.utils.preprocessing.preprocessing_factory import PreprocessingFactory
 import numpy as np
 
 
@@ -66,6 +67,10 @@ def word_suggestion_text(text, n):
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
 
+    preprocessor = PreprocessingFactory(remove_accent=False).factory()
+    text = preprocessor.preprocess(text)
     similar_words = WordSuggestion().most_similar(text, topn=n)
-    print(similar_words)
+    preprocessor = PreprocessingFactory(remove_accent=True).factory()
+    similar_words = [(preprocessor.preprocess(word[0]), word[1]) for word in similar_words]
+
     return OrderedDict([("text", text), ("similar_words", similar_words)])

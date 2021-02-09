@@ -8,20 +8,22 @@ logger = logging.getLogger(__name__)
 
 class PreprocessingFactory(object):
 
-    @staticmethod
-    def factory(language: str = None):
+    def __init__(self, language=None, remove_accent=True):
+        self.language = language
+        self.remove_accent = remove_accent
+
+    def factory(self):
         """
         Implements Factory Method
-        :param language: Language
         :return: Preprocessing Class respective to its language
         """
         try:
-            if language == "en":
-                return PreprocessingEnglish()
-            elif language == "pt_br":
-                return PreprocessingPortuguese()
+            if self.language == "en":
+                return PreprocessingEnglish(self.remove_accent)
+            elif self.language == "pt_br":
+                return PreprocessingPortuguese(self.remove_accent)
             else:
-                return PreprocessingBase()
+                return PreprocessingBase(self.remove_accent)
 
         except AssertionError as e:
             logger.exception(e)

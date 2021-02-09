@@ -12,9 +12,9 @@ ALGORITHM_TO_LANGUAGE_MODEL = {
 }
 
 
-def get_examples_request(update_id, repository_authorization):  # pragma: no cover
+def get_examples_request(update_id, repository_authorization, intent=""):  # pragma: no cover
     start_examples = backend().request_backend_get_examples(
-        update_id, False, None, repository_authorization
+        update_id, False, None, repository_authorization, intent=intent
     )
 
     examples = start_examples.get("results")

@@ -13,19 +13,18 @@ from bothub.shared.utils.preprocessing.preprocessing_portuguese import Preproces
 
 class TestPipelineBuilder(unittest.TestCase):
     def setUp(self, *args):
-        self.preprocess_factory = PreprocessingFactory()
-        self.base = self.preprocess_factory.factory()
-        self.portuguese = self.preprocess_factory.factory('pt_br')
-        self.english = self.preprocess_factory.factory('en')
+        self.base = PreprocessingFactory().factory()
+        self.portuguese = PreprocessingFactory('pt_br').factory()
+        self.english = PreprocessingFactory('en').factory()
 
     def test__factory(self):
-        base = PreprocessingFactory.factory()
+        base = PreprocessingFactory().factory()
         self.assertIsInstance(base, PreprocessingBase)
-        base = PreprocessingFactory.factory('unexisting_language')
+        base = PreprocessingFactory('unexisting_language').factory()
         self.assertIsInstance(base, PreprocessingBase)
-        portuguese = PreprocessingFactory.factory('pt_br')
+        portuguese = PreprocessingFactory('pt_br').factory()
         self.assertIsInstance(portuguese, PreprocessingPortuguese)
-        english = PreprocessingFactory.factory('en')
+        english = PreprocessingFactory('en').factory()
         self.assertIsInstance(english, PreprocessingEnglish)
 
     def test__default_preprocessing(self):
@@ -57,6 +56,14 @@ class TestPipelineBuilder(unittest.TestCase):
 
     def test__preprocess(self):
         phrase = "i'`m GOING não tô é the gym 😂"
+
         self.assertEqual(self.base.preprocess(phrase), "im going nao to e the gym face with tears of joy")
         self.assertEqual(self.portuguese.preprocess(phrase), "im going nao estou e the gym hahaha")
         self.assertEqual(self.english.preprocess(phrase), "im going nao to e the gym hahaha")
+
+        preprocess = PreprocessingFactory(remove_accent=False).factory()
+        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym face with tears of joy")
+        preprocess = PreprocessingFactory('pt_br', remove_accent=False).factory()
+        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
+        preprocess = PreprocessingFactory('en', remove_accent=False).factory()
+        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
