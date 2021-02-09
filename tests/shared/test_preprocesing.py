@@ -56,6 +56,14 @@ class TestPipelineBuilder(unittest.TestCase):
 
     def test__preprocess(self):
         phrase = "i'`m GOING não tô é the gym 😂"
+
         self.assertEqual(self.base.preprocess(phrase), "im going nao to e the gym face with tears of joy")
         self.assertEqual(self.portuguese.preprocess(phrase), "im going nao estou e the gym hahaha")
         self.assertEqual(self.english.preprocess(phrase), "im going nao to e the gym hahaha")
+
+        preprocess = PreprocessingFactory(remove_accent=False).factory()
+        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym face with tears of joy")
+        preprocess = PreprocessingFactory('pt_br', remove_accent=False).factory()
+        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
+        preprocess = PreprocessingFactory('en', remove_accent=False).factory()
+        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
