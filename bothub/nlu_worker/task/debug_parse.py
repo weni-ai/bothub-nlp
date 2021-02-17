@@ -151,9 +151,9 @@ def format_debug_parse_output(result_per_word, r):
 
 def n_samples_by_sentence_lenght(sentence):
     word_count = len(sentence.split(" "))
-    n_samples = 2 ** word_count
-    if n_samples > 1024:
-        n_samples = 1024
+    n_samples = int(1.8 ** word_count)
+    if n_samples > 128:
+        n_samples = 128
     return n_samples
 
 
