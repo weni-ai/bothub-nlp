@@ -81,6 +81,7 @@ def celery_train_update(repository_version, by_id, repository_authorization):
         repository_authorization=repository_authorization,
         task_id=celery_app.current_task.request.id,
         from_queue=1,
+        type_processing=0,
     )
     return train_update(repository_version, by_id, repository_authorization)
 
