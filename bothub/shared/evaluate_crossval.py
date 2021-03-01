@@ -253,7 +253,7 @@ def evaluate_intents(intent_results):  # pragma: no cover
     }
 
 
-def plot_and_save_charts(update, intent_results):  # pragma: no cover
+def plot_and_save_charts(update, intent_results, aws_bucket_authentication):  # pragma: no cover
     import io
     import boto3
     import matplotlib as mpl
@@ -266,10 +266,10 @@ def plot_and_save_charts(update, intent_results):  # pragma: no cover
     from botocore.exceptions import ClientError
     from decouple import config
 
-    aws_access_key_id = config("BOTHUB_NLP_AWS_ACCESS_KEY_ID", default="")
-    aws_secret_access_key = config("BOTHUB_NLP_AWS_SECRET_ACCESS_KEY", default="")
-    aws_bucket_name = config("BOTHUB_NLP_AWS_S3_BUCKET_NAME", default="")
-    aws_region_name = config("BOTHUB_NLP_AWS_REGION_NAME", "us-east-1")
+    aws_access_key_id = aws_bucket_authentication.get("BOTHUB_NLP_AWS_ACCESS_KEY_ID")
+    aws_secret_access_key = aws_bucket_authentication.get("BOTHUB_NLP_AWS_SECRET_ACCESS_KEY")
+    aws_bucket_name = aws_bucket_authentication.get("BOTHUB_NLP_AWS_S3_BUCKET_NAME")
+    aws_region_name = aws_bucket_authentication.get("BOTHUB_NLP_AWS_REGION_NAME")
 
     confmat_url = ""
     intent_hist_url = ""
@@ -390,10 +390,14 @@ def get_formatted_log(merged_logs):
 
 
 def merge_intent_entity_log(intent_evaluation, entity_evaluation):
-    intent_logs = intent_evaluation.get("log", [])
-    entity_logs = entity_evaluation.get("log", [])
-    merged_logs = []
+    intent_logs = []
+    entity_logs = []
+    if intent_evaluation:
+        intent_logs = intent_evaluation.get("log", [])
+    if entity_evaluation:
+        entity_logs = entity_evaluation.get("log", [])
 
+    merged_logs = []
     for intent_log in intent_logs:
         for entity_log in entity_logs:
             if intent_log.get("text") == entity_log.get("text"):
@@ -404,7 +408,7 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
 
 
 def evaluate_crossval_update(
-    repository_version, by, repository_authorization, from_queue="celery"
+    repository_version, by, repository_authorization, aws_bucket_authentication, from_queue="celery"
 ):
     update_request = backend().request_backend_start_training_nlu(
         repository_version, by, repository_authorization, from_queue
@@ -500,7 +504,7 @@ def evaluate_crossval_update(
             merged_logs = merge_intent_entity_log(intent_evaluation, entity_evaluation)
             log = get_formatted_log(merged_logs)
 
-            charts = plot_and_save_charts(repository_version, intent_results)
+            charts = plot_and_save_charts(repository_version, intent_results, aws_bucket_authentication)
             evaluate_result = backend().request_backend_create_evaluate_results(
                 {
                     "repository_version": repository_version,

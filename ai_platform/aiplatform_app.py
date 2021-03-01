@@ -7,34 +7,27 @@ from bothub.shared.evaluate_crossval import (
 
 
 if __name__ == "__main__":
-    PARSER = argparse.ArgumentParser()
-
-    # Input Arguments
-    PARSER.add_argument(
-        "--operation", help='What operation will be done, "train" or "evaluate"'
+    from settings import (
+        operation,
+        repository_version,
+        by_id,
+        repository_authorization,
+        aws_bucket_authentication
     )
-    PARSER.add_argument(
-        "--repository-version", help="The version of repository.", type=int
-    )
-    PARSER.add_argument("--by-id", help=".", type=int)
-    PARSER.add_argument(
-        "--repository-authorization", help="Repository authorization string."
-    )
-
-    ARGUMENTS, _ = PARSER.parse_known_args()
 
     # Run the job
-    if ARGUMENTS.operation == "train":
+    if operation == "train":
         train(
-            ARGUMENTS.repository_version,
-            ARGUMENTS.by_id,
-            ARGUMENTS.repository_authorization,
+            repository_version,
+            by_id,
+            repository_authorization,
             from_queue="ai-platform",
         )
-    elif ARGUMENTS.operation == "evaluate":
+    elif operation == "evaluate":
         evaluate_crossval(
-            ARGUMENTS.repository_version,
-            ARGUMENTS.by_id,
-            ARGUMENTS.repository_authorization,
+            repository_version,
+            by_id,
+            repository_authorization,
+            aws_bucket_authentication,
             from_queue="ai-platform",
         )
