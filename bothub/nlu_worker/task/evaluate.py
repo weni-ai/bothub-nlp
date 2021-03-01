@@ -390,17 +390,17 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
 
 
 def evaluate_update(repository_version, repository_authorization, interpreter_manager):
-    evaluations = backend().request_backend_start_evaluation(
+    evaluation_data = backend().request_backend_start_evaluation(
         repository_version, repository_authorization
     )
     training_examples = []
 
-    for evaluate in evaluations:
+    for sentence in evaluation_data:
         training_examples.append(
             Message.build(
-                text=evaluate.get("text"),
-                intent=evaluate.get("intent"),
-                entities=evaluate.get("entities"),
+                text=sentence.get("text"),
+                intent=sentence.get("intent"),
+                entities=sentence.get("entities"),
             )
         )
 

@@ -8,12 +8,8 @@ from .sentence_suggestion import SentenceSuggestion
 from bothub.shared.utils.helpers import get_examples_request
 
 
-def get_intent_sentences(examples_list, intent):
-    intent_sentences = []
-    for example in examples_list:
-        if example.get("intent") == intent:
-            intent_sentences.append(example.get("text"))
-    return intent_sentences
+class NonexistentIntentError(Exception):
+    pass
 
 
 def intent_sentence_suggestion_text(
@@ -24,8 +20,9 @@ def intent_sentence_suggestion_text(
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
 
-    sentences = get_examples_request(repository_version, repository_authorization, intent=intent)
-    intent_sentences = get_intent_sentences(sentences, intent)
+    intent_sentences = get_examples_request(repository_version, repository_authorization, intent=intent)
+    if len(intent_sentences) == 0:
+        raise NonexistentIntentError()
     intent_sentences_sample = random.sample(intent_sentences, min(n, len(intent_sentences)))
     factor = n / len(intent_sentences_sample)
 
