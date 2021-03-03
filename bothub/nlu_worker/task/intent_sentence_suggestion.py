@@ -21,6 +21,7 @@ def intent_sentence_suggestion_text(
         return "language not supported for this feature"
 
     intent_sentences = get_examples_request(repository_version, repository_authorization, intent=intent)
+    intent_sentences = [el['text'] for el in intent_sentences]
     if len(intent_sentences) == 0:
         raise NonexistentIntentError()
     intent_sentences_sample = random.sample(intent_sentences, min(n, len(intent_sentences)))
