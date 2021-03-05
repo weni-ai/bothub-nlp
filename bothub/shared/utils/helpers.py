@@ -13,10 +13,27 @@ ALGORITHM_TO_LANGUAGE_MODEL = {
 
 
 def get_examples_request(update_id, repository_authorization, intent=""):  # pragma: no cover
-    request = backend().request_backend_get_examples(
-        update_id, repository_authorization, intent=intent
+
+    start_examples = backend().request_backend_get_examples(
+        update_id, None, repository_authorization, intent=intent
     )
-    examples = request.get("results")
+
+    examples = start_examples.get("results")
+    page = start_examples.get("next")
+
+    if page:
+        while True:
+            request_examples_page = backend().request_backend_get_examples(
+                update_id, page, repository_authorization, intent=intent
+            )
+
+            examples += request_examples_page.get("results")
+
+            if request_examples_page.get("next") is None:
+                break
+
+            page = request_examples_page.get("next")
+
     return examples
 
 
