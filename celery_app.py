@@ -92,7 +92,7 @@ def celery_evaluate_update(
 ):
     if cross_validation:
         return evaluate_crossval_update(
-            repository_version, by_id, repository_authorization
+            repository_version, by_id, repository_authorization, aws_bucket_authentication={}
         )
     return evaluate_update(
         repository_version, repository_authorization, interpreter_manager
