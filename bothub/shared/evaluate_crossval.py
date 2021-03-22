@@ -526,7 +526,7 @@ def evaluate_crossval_update(
             entity_reports = entity_evaluation.get("report", {})
 
             for intent_key in intent_reports.keys():
-                if intent_key and intent_key not in excluded_itens:
+                if intent_key not in excluded_itens:
                     intent = intent_reports.get(intent_key)
 
                     backend().request_backend_create_evaluate_results_intent(
@@ -541,8 +541,15 @@ def evaluate_crossval_update(
                         repository_authorization,
                     )
 
+            # remove group entities when entities returned as "<entity>.<group_entity>"
             for entity_key in entity_reports.keys():
-                if entity_key and entity_key not in excluded_itens:  # pragma: no cover
+                if '.' in entity_key:
+                    new_entity_key = entity_key.split('.')[0]
+                    entity_reports[new_entity_key] = entity_reports[entity_key]
+                    entity_reports.pop(entity_key, None)
+
+            for entity_key in entity_reports.keys():
+                if entity_key not in excluded_itens:  # pragma: no cover
                     entity = entity_reports.get(entity_key)
 
                     backend().request_backend_create_evaluate_results_score(
