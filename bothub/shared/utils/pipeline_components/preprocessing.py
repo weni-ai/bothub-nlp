@@ -97,18 +97,18 @@ class Preprocessing(Component):
                     example.data["entities"]
                 )
 
-            example_text = language_preprocessor.preprocess(example.text)
+            example = language_preprocessor.training_preprocess(example)
 
-            if example_text in not_repeated_phrases:
+            if example.text in not_repeated_phrases:
                 # remove example at this index from training_examples
                 training_data.training_examples.pop(idx - subtract_idx)
                 subtract_idx += 1
             else:
-                not_repeated_phrases.add(example_text)
-                training_data.training_examples[idx - subtract_idx].text = example_text
+                not_repeated_phrases.add(example.text)
+                training_data.training_examples[idx - subtract_idx].text = example.text
 
     def process(self, message: Message, **kwargs: Any) -> None:
         """Process an incoming message."""
 
         language_preprocessor = PreprocessingFactory(self.language).factory()
-        message.text = language_preprocessor.preprocess(message.text)
+        message.text = language_preprocessor.parse_preprocess(message.text)

@@ -12,17 +12,53 @@ class PreprocessingBase(object):
     def __init__(self, remove_accent=True):
         self.remove_accent = remove_accent
 
-    def preprocess(self, phrase: str = None):
+    def parse_preprocess(self, phrase: str = None):
         phrase = self.emoji_handling(phrase)
         phrase = self.default_preprocessing(phrase)
         return phrase
 
-    def default_preprocessing(self, phrase: str = None):
+    def training_preprocess(self, example):
+        phrase = example.text
+        entities = example.data.get('entities')
+
+        phrase = self.emoji_handling(phrase)
+        phrase, entities = self.default_preprocessing(phrase, entities, True)
+
+        example.text = phrase
+        example.data['entities'] = entities
+
+        return example
+
+    @staticmethod
+    def handle_entities(phrase, entities):
+        # Remove apostrophe from the phrase (important to do before s_regex regex)
+        positions = []  # mark removal positions
+        for i, char in enumerate(phrase):
+            if char in ["'", "`"]:
+                positions.append(i)
+
+        for pos in positions:
+            # check if before or in entity
+            for entity in entities:
+                if pos < entity.get('end'):
+                    entity['end'] -= 1
+                if pos < entity.get('start'):
+                    entity['start'] -= 1
+
+        for entity in entities:
+            for APOSTROPHE in ["'", "`"]:
+                entity['value'] = entity['value'].replace(APOSTROPHE, "")
+
+        return entities
+
+    def default_preprocessing(self, phrase: str = None, entities=None, is_training=False):
 
         if phrase is None:
             raise ValueError
 
-        # remove apostrophe from the phrase (important be first than s_regex regex)
+        if entities:
+            entities = self.handle_entities(phrase, entities)
+
         for APOSTROPHE in ["'", "`"]:
             phrase = phrase.replace(APOSTROPHE, "")
 
@@ -32,7 +68,10 @@ class PreprocessingBase(object):
         if self.remove_accent:
             phrase = unidecode(phrase)
 
-        return phrase
+        if is_training:
+            return phrase, entities
+        else:
+            return phrase
 
     @staticmethod
     def extract_emoji_text(code):

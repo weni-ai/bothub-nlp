@@ -41,6 +41,45 @@ class TestPipelineBuilder(unittest.TestCase):
 
         self.assertRaises(ValueError, self.base.default_preprocessing, None)
 
+        phrase = "i'`m GOING não tô é the 'gym"
+        expected = "im going nao to e the gym"
+        entities = [
+            {
+                "start": 0,
+                "end": 4,
+                "value": "i'`m",
+                "entity": "me"
+            },
+            {
+                "start": 24,
+                "end": 28,
+                "value": "'gym",
+                "entity": "gym"
+            },
+        ]
+        expected_entities = [
+            {
+                "start": 0,
+                "end": 2,
+                "value": "im",
+                "entity": "me"
+            },
+            {
+                "start": 22,
+                "end": 25,
+                "value": "gym",
+                "entity": "gym"
+            },
+        ]
+        self.assertEqual(
+            self.base.default_preprocessing(phrase, entities, is_training=True),
+            (expected, expected_entities)
+        )
+        self.assertEqual(
+            self.base.default_preprocessing(phrase, None, is_training=True),
+            (expected, None)
+        )
+
     def test__extract_emoji_text(self):
         emoji_code = ':smile_face:'
         emoji_text = 'smile face'
@@ -63,16 +102,16 @@ class TestPipelineBuilder(unittest.TestCase):
     def test__preprocess(self):
         phrase = "i'`m GOING não tô é the gym 😂"
 
-        self.assertEqual(self.base.preprocess(phrase), "im going nao to e the gym face with tears of joy")
-        self.assertEqual(self.portuguese.preprocess(phrase), "im going nao estou e the gym hahaha")
-        self.assertEqual(self.english.preprocess(phrase), "im going nao to e the gym hahaha")
-        self.assertEqual(self.spanish.preprocess(phrase), "im going nao to e the gym hahaha")
+        self.assertEqual(self.base.parse_preprocess(phrase), "im going nao to e the gym face with tears of joy")
+        self.assertEqual(self.portuguese.parse_preprocess(phrase), "im going nao estou e the gym hahaha")
+        self.assertEqual(self.english.parse_preprocess(phrase), "im going nao to e the gym hahaha")
+        self.assertEqual(self.spanish.parse_preprocess(phrase), "im going nao to e the gym hahaha")
 
         preprocess = PreprocessingFactory(remove_accent=False).factory()
-        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym face with tears of joy")
+        self.assertEqual(preprocess.parse_preprocess(phrase), "im going não tô é the gym face with tears of joy")
         preprocess = PreprocessingFactory('pt_br', remove_accent=False).factory()
-        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
+        self.assertEqual(preprocess.parse_preprocess(phrase), "im going não tô é the gym hahaha")
         preprocess = PreprocessingFactory('en', remove_accent=False).factory()
-        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
+        self.assertEqual(preprocess.parse_preprocess(phrase), "im going não tô é the gym hahaha")
         preprocess = PreprocessingFactory('es', remove_accent=False).factory()
-        self.assertEqual(preprocess.preprocess(phrase), "im going não tô é the gym hahaha")
+        self.assertEqual(preprocess.parse_preprocess(phrase), "im going não tô é the gym hahaha")
