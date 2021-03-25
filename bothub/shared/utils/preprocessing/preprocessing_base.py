@@ -8,33 +8,34 @@ logger = logging.getLogger(__name__)
 
 class PreprocessingBase(object):
     emoji_contractions = {}
+    apostrophes = ["'", "`", "’"]
 
     def __init__(self, remove_accent=True):
         self.remove_accent = remove_accent
 
-    def parse_preprocess(self, phrase: str = None):
-        phrase = self.emoji_handling(phrase)
-        phrase = self.default_preprocessing(phrase)
-        return phrase
+    # def parse_preprocess(self, phrase: str = None):
+    #     phrase = self.emoji_handling(phrase)
+    #     phrase = self.default_preprocessing(phrase)
+    #     return phrase
 
-    def training_preprocess(self, example):
+    def preprocess(self, example):
         phrase = example.text
         entities = example.data.get('entities')
 
         phrase = self.emoji_handling(phrase)
-        phrase, entities = self.default_preprocessing(phrase, entities, True)
+        phrase, entities = self.default_preprocessing(phrase, entities)
 
         example.text = phrase
-        example.data['entities'] = entities
+        if entities:
+            example.data['entities'] = entities
 
         return example
 
-    @staticmethod
-    def handle_entities(phrase, entities):
+    def _handle_entities(self, phrase, entities):
         # Remove apostrophe from the phrase (important to do before s_regex regex)
         positions = []  # mark removal positions
         for i, char in enumerate(phrase):
-            if char in ["'", "`"]:
+            if char in self.apostrophes:
                 positions.append(i)
 
         for pos in positions:
@@ -46,32 +47,35 @@ class PreprocessingBase(object):
                     entity['start'] -= 1
 
         for entity in entities:
-            for APOSTROPHE in ["'", "`"]:
-                entity['value'] = entity['value'].replace(APOSTROPHE, "")
+            for apostrophe in self.apostrophes:
+                entity['value'] = entity['value'].replace(apostrophe, "")
 
         return entities
 
-    def default_preprocessing(self, phrase: str = None, entities=None, is_training=False):
+    def default_preprocessing(self, phrase: str = None, entities=None):
 
         if phrase is None:
             raise ValueError
 
         if entities:
-            entities = self.handle_entities(phrase, entities)
+            entities = self._handle_entities(phrase, entities)
 
-        for APOSTROPHE in ["'", "`"]:
-            phrase = phrase.replace(APOSTROPHE, "")
+        for apostrophe in self.apostrophes:
+            phrase = phrase.replace(apostrophe, "")
 
         # lowercasing characters
         phrase = phrase.lower()
+        if entities:
+            for entity in entities:
+                entity['value'] = entity['value'].lower()
 
         if self.remove_accent:
             phrase = unidecode(phrase)
+            if entities:
+                for entity in entities:
+                    entity['value'] = unidecode(entity['value'])
 
-        if is_training:
-            return phrase, entities
-        else:
-            return phrase
+        return phrase, entities
 
     @staticmethod
     def extract_emoji_text(code):

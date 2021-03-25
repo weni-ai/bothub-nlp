@@ -97,7 +97,7 @@ class Preprocessing(Component):
                     example.data["entities"]
                 )
 
-            example = language_preprocessor.training_preprocess(example)
+            example = language_preprocessor.preprocess(example)
 
             if example.text in not_repeated_phrases:
                 # remove example at this index from training_examples
@@ -111,4 +111,6 @@ class Preprocessing(Component):
         """Process an incoming message."""
 
         language_preprocessor = PreprocessingFactory(self.language).factory()
-        message.text = language_preprocessor.parse_preprocess(message.text)
+        _message = language_preprocessor.preprocess(message)
+        message.text = _message.text
+        message.data = _message.data
