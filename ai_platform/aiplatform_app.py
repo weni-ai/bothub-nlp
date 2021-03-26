@@ -5,29 +5,28 @@ from bothub.shared.evaluate_crossval import (
     evaluate_crossval_update as evaluate_crossval,
 )
 
-
 if __name__ == "__main__":
     from settings import (
         operation,
-        repository_version,
+        repository_version_language,
         by_id,
         repository_authorization,
-        aws_bucket_authentication
+        aws_bucket_authentication,
+        language
     )
 
     # Run the job
     if operation == "train":
         train(
-            repository_version,
+            repository_version_language,
             by_id,
             repository_authorization,
             from_queue="ai-platform",
         )
     elif operation == "evaluate":
         evaluate_crossval(
-            repository_version,
-            by_id,
+            repository_version_language,
             repository_authorization,
             aws_bucket_authentication,
-            from_queue="ai-platform",
+            language
         )

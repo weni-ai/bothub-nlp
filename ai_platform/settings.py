@@ -15,6 +15,9 @@ PARSER.add_argument(
 PARSER.add_argument(
     "--repository-authorization", help="Repository authorization string."
 )
+PARSER.add_argument(
+    "--AIPLATFORM_LANGUAGE_QUEUE", type=str, default=""
+)
 
 PARSER.add_argument(
     "--BOTHUB_NLP_AWS_S3_BUCKET_NAME", type=str, default=""
@@ -35,9 +38,10 @@ PARSER.add_argument(
 ARGUMENTS, _ = PARSER.parse_known_args()
 
 operation = ARGUMENTS.operation
-repository_version = ARGUMENTS.repository_version
+repository_version_language = ARGUMENTS.repository_version
 by_id = ARGUMENTS.by_id
 repository_authorization = ARGUMENTS.repository_authorization
+language = ARGUMENTS.AIPLATFORM_LANGUAGE_QUEUE
 
 aws_bucket_authentication = {
     "BOTHUB_NLP_AWS_S3_BUCKET_NAME": ARGUMENTS.BOTHUB_NLP_AWS_S3_BUCKET_NAME,

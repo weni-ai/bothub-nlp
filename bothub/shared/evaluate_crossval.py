@@ -409,11 +409,9 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
 
 
 def evaluate_crossval_update(
-    repository_version_language, by, repository_authorization, aws_bucket_authentication, language='en', from_queue="celery"
+    repository_version_language, repository_authorization, aws_bucket_authentication, language
 ):
-    update_request = backend().request_backend_start_training_nlu(
-        repository_version_language, by, repository_authorization, from_queue
-    )
+    update_request = backend().request_backend_get_current_configuration(repository_authorization)
     examples_list = get_examples_request(repository_version_language, repository_authorization)
 
     with PokeLogging() as pl:
