@@ -183,7 +183,7 @@ class TestPipelineBuilder(unittest.TestCase):
             with self.assertRaises(KeyError):
                 _ = preprocessor.preprocess(message).data['entities']
 
-    def test__test(self):
+    def test_example(self):
         example = {
             "text": "The new coronavirus doesn\u2019t affect young people.",
             "intent": "myth",
@@ -212,3 +212,11 @@ class TestPipelineBuilder(unittest.TestCase):
         result2 = PreprocessingFactory('en', remove_accent=False).factory().preprocess(Message(text=example['text']))
 
         self.assertEqual(result.text, result2.text)
+
+    def test__preprocess_text(self):
+        phrase = "i'`m GOING não tô é the gym"
+        expected = "im going nao to e the gym"
+        self.assertEqual(self.base.preprocess_text(phrase), expected)
+        self.assertEqual(self.portuguese.preprocess_text(phrase), expected)
+        self.assertEqual(self.english.preprocess_text(phrase), expected)
+        self.assertEqual(self.spanish.preprocess_text(phrase), expected)

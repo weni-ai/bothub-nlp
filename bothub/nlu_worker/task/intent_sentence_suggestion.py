@@ -36,12 +36,12 @@ def intent_sentence_suggestion_text(
         if count > n or count >= len(intent_sentences_sample):
             break
         generated_sentences = SentenceSuggestion().get_suggestions(
-            preprocessor1.preprocess(intent_sentences_sample[count]),
+            preprocessor1.preprocess_text(intent_sentences_sample[count]),
             percentage_to_replace,
             random.randint(int(1 * factor), int(3 * factor))
         )
         for generated_sentence in generated_sentences:
-            preprocessed_sentence = preprocessor2.preprocess(generated_sentence)
+            preprocessed_sentence = preprocessor2.preprocess_text(generated_sentence)
             if preprocessed_sentence not in intent_sentences:
                 suggested_sentences.append(preprocessed_sentence)
         count += 1

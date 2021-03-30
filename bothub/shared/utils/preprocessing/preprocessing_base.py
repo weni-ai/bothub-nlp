@@ -2,6 +2,7 @@ import logging
 from unidecode import unidecode
 import emoji
 import re
+from rasa.nlu.training_data import Message
 
 logger = logging.getLogger(__name__)
 
@@ -13,12 +14,12 @@ class PreprocessingBase(object):
     def __init__(self, remove_accent=True):
         self.remove_accent = remove_accent
 
-    # def parse_preprocess(self, phrase: str = None):
-    #     phrase = self.emoji_handling(phrase)
-    #     phrase = self.default_preprocessing(phrase)
-    #     return phrase
+    def preprocess_text(self, phrase: str) -> str:
+        phrase = self.emoji_handling(phrase)
+        phrase, _ = self.default_preprocessing(phrase)
+        return phrase
 
-    def preprocess(self, example):
+    def preprocess(self, example: Message) -> Message:
         phrase = example.text
         entities = example.data.get('entities')
 

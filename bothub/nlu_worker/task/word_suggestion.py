@@ -68,9 +68,9 @@ def word_suggestion_text(text, n):
         return "language not supported for this feature"
 
     preprocessor = PreprocessingFactory(remove_accent=False).factory()
-    text = preprocessor.preprocess(text)
+    text = preprocessor.preprocess_text(text)
     similar_words = WordSuggestion().most_similar(text, topn=n)
     preprocessor = PreprocessingFactory(remove_accent=True).factory()
-    similar_words = [(preprocessor.preprocess(word[0]), word[1]) for word in similar_words]
+    similar_words = [(preprocessor.preprocess_text(word[0]), word[1]) for word in similar_words]
 
     return OrderedDict([("text", text), ("similar_words", similar_words)])
