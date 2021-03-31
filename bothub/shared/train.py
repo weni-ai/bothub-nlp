@@ -83,22 +83,22 @@ def train_update(
                     )
                 )
 
-            update_request["prebuilt_entities"] = [
-                "number",
-                "ordinal",
-                "age",
-                "currency",
-                "dimension",
-                "temperature",
-                "datetime",
-                "phone_number",
-                "email",
-                "country",
-                "cep",
-                "cpf",
-                "brand",
-            ]
-            lookup_tables = load_lookup_tables(update_request)
+            # update_request["prebuilt_entities"] = [
+            #     "number",
+            #     "ordinal",
+            #     "age",
+            #     "currency",
+            #     "dimension",
+            #     "temperature",
+            #     "datetime",
+            #     "phone_number",
+            #     "email",
+            #     "country",
+            #     "cep",
+            #     "cpf",
+            #     "brand",
+            # ]
+            lookup_tables = None  # load_lookup_tables(update_request)
             print("Loaded lookup_tables: " + str(lookup_tables))
 
             pipeline_builder = PipelineBuilder(update_request)
