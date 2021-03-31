@@ -2,6 +2,9 @@ import json
 import logging
 import uuid
 
+from collections import namedtuple
+
+from typing import Tuple, List
 from rasa.nlu import __version__ as rasa_version
 from rasa.nlu.test import get_entity_extractors, plot_attribute_confidences
 from rasa.nlu.test import get_evaluation_metrics
@@ -9,13 +12,16 @@ from rasa.nlu.test import (
     merge_labels,
     _targets_predictions_from,
     remove_empty_intent_examples,
-    get_eval_data,
+    is_intent_classifier_present,
     align_all_entity_predictions,
+    is_entity_extractor_present
 )
 from rasa.nlu.test import plot_confusion_matrix
 from rasa.nlu.test import substitute_labels
 from rasa.nlu.training_data import Message
 from rasa.nlu.training_data import TrainingData
+from rasa.nlu.model import Interpreter
+from tqdm import tqdm
 
 from bothub.shared.utils.backend import backend
 
@@ -235,7 +241,7 @@ def evaluate_intents(intent_results):  # pragma: no cover
     }
 
 
-def plot_and_save_charts(update, intent_results):  # pragma: no cover
+def plot_and_save_charts(update, intent_results, repository_intents):  # pragma: no cover
     import io
     import boto3
     import matplotlib as mpl
@@ -267,8 +273,8 @@ def plot_and_save_charts(update, intent_results):  # pragma: no cover
             intent_results, "intent_target", "intent_prediction"
         )
 
-        cnf_matrix = confusion_matrix(targets, predictions)
-        labels = unique_labels(targets, predictions)
+        cnf_matrix = confusion_matrix(targets, predictions, labels=sorted(repository_intents))
+        labels = unique_labels(targets, predictions, repository_intents)
         plot_confusion_matrix(
             cnf_matrix, classes=labels, title="Intent Confusion matrix"
         )
@@ -389,10 +395,81 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
     return merged_logs
 
 
-def evaluate_update(repository_version, repository_authorization, interpreter_manager):
-    evaluation_data = backend().request_backend_start_evaluation(
-        repository_version, repository_authorization
+IntentEvaluationResult = namedtuple(
+    "IntentEvaluationResult", "intent_target intent_prediction message confidence"
+)
+
+EntityEvaluationResult = namedtuple(
+    "EntityEvaluationResult", "entity_targets entity_predictions tokens message"
+)
+
+
+def get_eval_data(
+    interpreter: Interpreter, test_data: TrainingData
+) -> Tuple[
+    List[IntentEvaluationResult],
+    List[EntityEvaluationResult],
+]:  # pragma: no cover
+    """Runs the model for the test set and extracts targets and predictions.
+
+    Returns intent results (intent targets and predictions, the original
+    messages and the confidences of the predictions), as well as entity
+    results(entity_targets, entity_predictions, and tokens)."""
+
+    logger.info("Running model for predictions:")
+
+    intent_results, entity_results = [], []
+
+    intent_labels = [e.get("intent") for e in test_data.intent_examples]
+
+    should_eval_intents = (
+        is_intent_classifier_present(interpreter) and len(set(intent_labels)) >= 1
     )
+
+    should_eval_entities = is_entity_extractor_present(interpreter)
+
+    for example in tqdm(test_data.training_examples):
+        result = interpreter.parse(example.text, only_output_properties=False)
+
+        if should_eval_intents:
+            intent_prediction = result.get("intent", {}) or {}
+            intent_results.append(
+                IntentEvaluationResult(
+                    example.get("intent", ""),
+                    intent_prediction.get("name"),
+                    result.get("text", {}),
+                    intent_prediction.get("confidence"),
+                )
+            )
+
+        if should_eval_entities:
+            entity_results.append(
+                EntityEvaluationResult(
+                    example.get("entities", []),
+                    result.get("entities", []),
+                    result.get("tokens", []),
+                    result.get("text", ""),
+                )
+            )
+
+    return intent_results, entity_results
+
+
+def evaluate_update(
+    repository_version_id,
+    repository_version_language_id,
+    repository_authorization,
+    interpreter_manager,
+    language
+):
+    evaluation_data = backend().request_backend_start_evaluation(
+        repository_version_language_id, repository_authorization
+    )
+
+    repository_intents = backend().request_backend_info(
+        repository_authorization, language=language, repository_version=repository_version_id
+    ).get("intents")
+
     training_examples = []
 
     for sentence in evaluation_data:
@@ -405,8 +482,11 @@ def evaluate_update(repository_version, repository_authorization, interpreter_ma
         )
 
     test_data = TrainingData(training_examples=training_examples)
+    test_data.MIN_EXAMPLES_PER_ENTITY = 1
+    test_data.MIN_EXAMPLES_PER_INTENT = 1
+
     interpreter = interpreter_manager.get_interpreter(
-        repository_version, repository_authorization, rasa_version, use_cache=False
+        repository_version_language_id, repository_authorization, rasa_version, use_cache=False
     )
 
     result = {
@@ -415,9 +495,7 @@ def evaluate_update(repository_version, repository_authorization, interpreter_ma
         "response_selection_evaluation": None,
     }
 
-    intent_results, response_selection_results, entity_results, = get_eval_data(
-        interpreter, test_data
-    )
+    intent_results, entity_results, = get_eval_data(interpreter, test_data)
 
     if intent_results:
         result["intent_evaluation"] = evaluate_intents(intent_results)
@@ -432,10 +510,10 @@ def evaluate_update(repository_version, repository_authorization, interpreter_ma
     merged_logs = merge_intent_entity_log(intent_evaluation, entity_evaluation)
     log = get_formatted_log(merged_logs)
 
-    charts = plot_and_save_charts(repository_version, intent_results)
+    charts = plot_and_save_charts(repository_version_language_id, intent_results, repository_intents)
     evaluate_result = backend().request_backend_create_evaluate_results(
         {
-            "repository_version": repository_version,
+            "repository_version": repository_version_language_id,
             "matrix_chart": charts.get("matrix_chart"),
             "confidence_chart": charts.get("confidence_chart"),
             "log": json.dumps(log),
@@ -476,7 +554,7 @@ def evaluate_update(repository_version, repository_authorization, interpreter_ma
             backend().request_backend_create_evaluate_results_score(
                 {
                     "evaluate_id": evaluate_result.get("evaluate_id"),
-                    "repository_version": repository_version,
+                    "repository_version": repository_version_language_id,
                     "precision": entity.get("precision"),
                     "recall": entity.get("recall"),
                     "f1_score": entity.get("f1-score"),

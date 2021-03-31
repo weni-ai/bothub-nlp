@@ -88,14 +88,14 @@ def celery_train_update(repository_version, by_id, repository_authorization):
 
 @celery_app.task(name=TASK_NLU_EVALUATE_UPDATE)
 def celery_evaluate_update(
-    repository_version, repository_authorization, cross_validation, language
+    repository_version_id, repository_version_language_id, repository_authorization, cross_validation, language
 ):
     if cross_validation:  # dev only
         return evaluate_crossval_update(
-            repository_version, repository_authorization, {}, language
+            repository_version_language_id, repository_authorization, {}, language
         )
     return evaluate_update(
-        repository_version, repository_authorization, interpreter_manager
+        repository_version_id, repository_version_language_id, repository_authorization, interpreter_manager, language
     )
 
 
