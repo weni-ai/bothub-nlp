@@ -46,11 +46,14 @@ def load_lookup_tables(update_request):
 
 
 def train_update(
-    repository_version, by, repository_authorization, from_queue="celery"
+    repository_version_language_id, by_user, repository_authorization, from_queue="celery"
 ):  # pragma: no cover
+
     update_request = backend().request_backend_start_training_nlu(
-        repository_version, by, repository_authorization, from_queue
+        repository_version_language_id, by_user, repository_authorization, from_queue
     )
+    import json
+    print(json.dumps(update_request, indent=2))
 
     """ update_request (v2/repository/preprocessing/authorization/train/start_training/) signature:
     {
@@ -68,7 +71,7 @@ def train_update(
     # TODO: update_request must include list of
     #       lookup_tables the user choose to use in webapp
 
-    examples_list = get_examples_request(repository_version, repository_authorization)
+    examples_list = get_examples_request(repository_version_language_id, repository_authorization)
 
     with PokeLogging() as pl:
         try:
@@ -112,7 +115,7 @@ def train_update(
             trainer.train(training_data)
 
             persistor = BothubPersistor(
-                repository_version, repository_authorization, rasa_version
+                repository_version_language_id, repository_authorization, rasa_version
             )
             trainer.persist(
                 mkdtemp(),
@@ -124,10 +127,10 @@ def train_update(
         except Exception as e:
             logger.exception(e)
             backend().request_backend_trainfail_nlu(
-                repository_version, repository_authorization
+                repository_version_language_id, repository_authorization
             )
             raise e
         finally:
             backend().request_backend_traininglog_nlu(
-                repository_version, pl.getvalue(), repository_authorization
+                repository_version_language_id, pl.getvalue(), repository_authorization
             )
