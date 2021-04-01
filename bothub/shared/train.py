@@ -52,8 +52,6 @@ def train_update(
     update_request = backend().request_backend_start_training_nlu(
         repository_version_language_id, by_user, repository_authorization, from_queue
     )
-    import json
-    print(json.dumps(update_request, indent=2))
 
     """ update_request (v2/repository/preprocessing/authorization/train/start_training/) signature:
     {
