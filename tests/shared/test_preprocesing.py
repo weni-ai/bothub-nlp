@@ -13,7 +13,7 @@ from bothub.shared.utils.preprocessing.preprocessing_spanish import Preprocessin
 from rasa.nlu.training_data import Message
 
 
-class TestPipelineBuilder(unittest.TestCase):
+class TestPreprocessing(unittest.TestCase):
     def setUp(self, *args):
         self.base = PreprocessingFactory().factory()
         self.portuguese = PreprocessingFactory('pt_br').factory()
