@@ -20,31 +20,6 @@ def intersection(lst1, lst2):
     return lst3
 
 
-def load_lookup_tables(update_request):
-    lookup_tables = []
-    language = update_request.get("language")
-    supported_lookup_table_entities = ["country", "cep", "cpf", "brand"]
-
-    # Try to load lookup_tables
-    if update_request.get("prebuilt_entities"):
-        # TODO: load lookup tables from backend instead of this (locally)
-        runtime_path = os.path.dirname(os.path.abspath(__file__))
-        entities = intersection(
-            update_request.get("prebuilt_entities"), supported_lookup_table_entities
-        )
-        for entity in entities:
-            file_path = os.path.join(
-                runtime_path, "lookup_tables", language, entity + ".txt"
-            )
-            # Check if lookup_table exists
-            if os.path.exists(file_path):
-                lookup_tables.append({"name": entity, "elements": file_path})
-            else:
-                print("Not found lookup_table in path: " + file_path)
-
-    return lookup_tables
-
-
 def train_update(
     repository_version_language_id, by_user, repository_authorization, from_queue="celery"
 ):  # pragma: no cover
@@ -52,22 +27,6 @@ def train_update(
     update_request = backend().request_backend_start_training_nlu(
         repository_version_language_id, by_user, repository_authorization, from_queue
     )
-
-    """ update_request (v2/repository/preprocessing/authorization/train/start_training/) signature:
-    {
-        'language': 'pt_br',
-        'repository_version': 47,
-        'repository_uuid': '1d8e0d6f-1941-42a3-84c5-788706c7072e',
-        'intent': [4, 5],
-        'algorithm': 'transformer_network_diet_bert',
-        'use_name_entities': False,
-        'use_competing_intents': False,
-        'use_analyze_char': False,
-        'total_training_end': 0
-    }
-    """
-    # TODO: update_request must include list of
-    #       lookup_tables the user choose to use in webapp
 
     examples_list = get_examples_request(repository_version_language_id, repository_authorization)
 
@@ -84,30 +43,12 @@ def train_update(
                     )
                 )
 
-            # update_request["prebuilt_entities"] = [
-            #     "number",
-            #     "ordinal",
-            #     "age",
-            #     "currency",
-            #     "dimension",
-            #     "temperature",
-            #     "datetime",
-            #     "phone_number",
-            #     "email",
-            #     "country",
-            #     "cep",
-            #     "cpf",
-            #     "brand",
-            # ]
-            lookup_tables = None  # load_lookup_tables(update_request)
-            print("Loaded lookup_tables: " + str(lookup_tables))
-
             pipeline_builder = PipelineBuilder(update_request)
             pipeline_builder.print_pipeline()
             rasa_nlu_config = pipeline_builder.get_nlu_model()
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
             training_data = TrainingData(
-                training_examples=examples, lookup_tables=lookup_tables
+                training_examples=examples, lookup_tables=None
             )
 
             trainer.train(training_data)
