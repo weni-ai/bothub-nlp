@@ -118,9 +118,9 @@ def minimal_entity(entity, self_flag=False):  # pragma: no cover
     return out
 
 
-def get_intention_list(repository_authorization, repository_version):
+def get_intention_list(repository_authorization, repository_version_language_id):
     info = backend().request_backend_info(
-        repository_authorization, repository_version=repository_version
+        repository_authorization, repository_version_language_id=repository_version_language_id
     )
     return info.get("intents", [])
 
@@ -156,18 +156,18 @@ def n_samples_by_sentence_lenght(sentence):
 
 
 def debug_parse_text(
-    repository_version,
+    repository_version_language_id,
     repository_authorization,
     interpreter_manager,
     text,
     use_cache=True,
 ):
     interpreter = interpreter_manager.get_interpreter(
-        repository_version, repository_authorization, rasa_version, use_cache
+        repository_version_language_id, repository_authorization, rasa_version, use_cache
     )
     r = interpreter.parse(text)
 
-    intention_names = get_intention_list(repository_authorization, repository_version)
+    intention_names = get_intention_list(repository_authorization, repository_version_language_id)
     result_per_word = DebugSentenceLime(
         interpreter, intention_names
     ).get_result_per_word(text, n_samples_by_sentence_lenght(text))

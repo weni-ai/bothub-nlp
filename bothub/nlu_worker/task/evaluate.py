@@ -467,7 +467,7 @@ def evaluate_update(
     )
 
     repository_intents = backend().request_backend_info(
-        repository_authorization, language=language, repository_version=repository_version_id
+        repository_authorization, repository_version_language_id=repository_version_language_id
     ).get("intents")
 
     training_examples = []
