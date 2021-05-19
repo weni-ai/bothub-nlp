@@ -90,7 +90,7 @@ def celery_train_update(repository_version, by_id, repository_authorization):
 def celery_evaluate_update(
     repository_version_id, repository_version_language_id, repository_authorization, cross_validation, language
 ):
-    if cross_validation:  # dev only
+    if cross_validation:
         return evaluate_crossval_update(
             repository_version_language_id, repository_authorization, {}, language
         )
