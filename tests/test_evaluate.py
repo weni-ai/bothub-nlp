@@ -14,11 +14,14 @@ from bothub.nlu_worker.interpreter_manager import InterpreterManager
 class TestEvaluateTask(unittest.TestCase):
     def setUp(self, *args):
         self.repository_authorization = uuid.uuid4()
+        self.repository_version = 1
         self.current_update = {
             "ready_for_train": True,
+            "repository_version": 2,
             "current_version_id": 6647,
             "repository_authorization_user_id": 303,
         }
+        self.language = "pt_br"
         self.interpreter_manager = InterpreterManager()
 
     # change directory to /tests
@@ -226,6 +229,10 @@ class TestEvaluateTask(unittest.TestCase):
         },
     )
     @patch(
+        "bothub_backend.bothub.BothubBackend.request_backend_info",
+        return_value={"intents": ['affirmative', 'negative', 'doubt', 'bias']},
+    )
+    @patch(
         "bothub_backend.bothub.BothubBackend.request_backend_create_evaluate_results",
         return_value={"evaluate_id": 1787, "evaluate_version": 189},
     )
@@ -239,9 +246,11 @@ class TestEvaluateTask(unittest.TestCase):
     )
     def test_evaluate_ok(self, *args):
         result = evaluate_update(
+            self.repository_version,
             self.current_update.get("repository_version"),
             self.repository_authorization,
             self.interpreter_manager,
+            self.language
         )
 
         self.assertEqual(1787, result.get("id"))

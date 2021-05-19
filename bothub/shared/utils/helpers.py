@@ -12,9 +12,10 @@ ALGORITHM_TO_LANGUAGE_MODEL = {
 }
 
 
-def get_examples_request(update_id, repository_authorization):  # pragma: no cover
+def get_examples_request(repository_version_language, repository_authorization, intent=""):  # pragma: no cover
+
     start_examples = backend().request_backend_get_examples(
-        update_id, False, None, repository_authorization
+        repository_version_language, None, repository_authorization, intent=intent
     )
 
     examples = start_examples.get("results")
@@ -23,7 +24,32 @@ def get_examples_request(update_id, repository_authorization):  # pragma: no cov
     if page:
         while True:
             request_examples_page = backend().request_backend_get_examples(
-                update_id, True, page, repository_authorization
+                repository_version_language, page, repository_authorization, intent=intent
+            )
+
+            examples += request_examples_page.get("results")
+
+            if request_examples_page.get("next") is None:
+                break
+
+            page = request_examples_page.get("next")
+
+    return examples
+
+
+def examples_request(repository_authorization, language, repository_version):  # pragma: no cover
+
+    start_examples = backend().request_backend_examples(
+        repository_authorization, language, repository_version, page=None
+    )
+
+    examples = start_examples.get("results")
+    page = start_examples.get("next")
+
+    if page:
+        while True:
+            request_examples_page = backend().request_backend_get_examples(
+                repository_authorization, language, repository_version, page=page
             )
 
             examples += request_examples_page.get("results")

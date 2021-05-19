@@ -3,7 +3,7 @@ import logging
 import uuid
 
 from _collections import defaultdict
-from typing import List, Text, Set
+from typing import List, Text, Set, Iterator, Tuple
 
 from rasa.nlu.model import Trainer
 from rasa.nlu.components import ComponentBuilder
@@ -36,6 +36,7 @@ from bothub.shared.utils.backend import backend
 from bothub.shared.utils.pipeline_builder import PipelineBuilder
 from bothub.shared.utils.poke_logging import PokeLogging
 from bothub.shared.utils.helpers import get_examples_request
+from bothub.shared.utils.preprocessing.preprocessing_factory import PreprocessingFactory
 
 logger = logging.getLogger(__name__)
 
@@ -253,7 +254,7 @@ def evaluate_intents(intent_results):  # pragma: no cover
     }
 
 
-def plot_and_save_charts(update, intent_results):  # pragma: no cover
+def plot_and_save_charts(update, intent_results, aws_bucket_authentication):  # pragma: no cover
     import io
     import boto3
     import matplotlib as mpl
@@ -266,10 +267,10 @@ def plot_and_save_charts(update, intent_results):  # pragma: no cover
     from botocore.exceptions import ClientError
     from decouple import config
 
-    aws_access_key_id = config("BOTHUB_NLP_AWS_ACCESS_KEY_ID", default="")
-    aws_secret_access_key = config("BOTHUB_NLP_AWS_SECRET_ACCESS_KEY", default="")
-    aws_bucket_name = config("BOTHUB_NLP_AWS_S3_BUCKET_NAME", default="")
-    aws_region_name = config("BOTHUB_NLP_AWS_REGION_NAME", "us-east-1")
+    aws_access_key_id = aws_bucket_authentication.get("BOTHUB_NLP_AWS_ACCESS_KEY_ID")
+    aws_secret_access_key = aws_bucket_authentication.get("BOTHUB_NLP_AWS_SECRET_ACCESS_KEY")
+    aws_bucket_name = aws_bucket_authentication.get("BOTHUB_NLP_AWS_S3_BUCKET_NAME")
+    aws_region_name = aws_bucket_authentication.get("BOTHUB_NLP_AWS_REGION_NAME")
 
     confmat_url = ""
     intent_hist_url = ""
@@ -390,10 +391,14 @@ def get_formatted_log(merged_logs):
 
 
 def merge_intent_entity_log(intent_evaluation, entity_evaluation):
-    intent_logs = intent_evaluation.get("log", [])
-    entity_logs = entity_evaluation.get("log", [])
-    merged_logs = []
+    intent_logs = []
+    entity_logs = []
+    if intent_evaluation:
+        intent_logs = intent_evaluation.get("log", [])
+    if entity_evaluation:
+        entity_logs = entity_evaluation.get("log", [])
 
+    merged_logs = []
     for intent_log in intent_logs:
         for entity_log in entity_logs:
             if intent_log.get("text") == entity_log.get("text"):
@@ -404,12 +409,10 @@ def merge_intent_entity_log(intent_evaluation, entity_evaluation):
 
 
 def evaluate_crossval_update(
-    repository_version, by, repository_authorization, from_queue="celery"
+    repository_version_language, repository_authorization, aws_bucket_authentication, language
 ):
-    update_request = backend().request_backend_start_training_nlu(
-        repository_version, by, repository_authorization, from_queue
-    )
-    examples_list = get_examples_request(repository_version, repository_authorization)
+    update_request = backend().request_backend_get_current_configuration(repository_authorization)
+    examples_list = get_examples_request(repository_version_language, repository_authorization)
 
     with PokeLogging() as pl:
         try:
@@ -436,13 +439,8 @@ def evaluate_crossval_update(
                 "response_selection_evaluation": None,
             }
 
-            intent_train_metrics: IntentMetrics = defaultdict(list)
             intent_test_metrics: IntentMetrics = defaultdict(list)
-            entity_train_metrics: EntityMetrics = defaultdict(lambda: defaultdict(list))
             entity_test_metrics: EntityMetrics = defaultdict(lambda: defaultdict(list))
-            response_selection_train_metrics: ResponseSelectionMetrics = defaultdict(
-                list
-            )
             response_selection_test_metrics: ResponseSelectionMetrics = defaultdict(
                 list
             )
@@ -455,17 +453,14 @@ def evaluate_crossval_update(
             entity_evaluation_possible = False
             extractors: Set[Text] = set()
 
+            language_preprocessor = PreprocessingFactory(language).factory()
+
             for train, test in generate_folds(3, data):
+
                 interpreter = trainer.train(train)
 
-                # calculate train accuracy
-                combine_result(
-                    intent_train_metrics,
-                    entity_train_metrics,
-                    response_selection_train_metrics,
-                    interpreter,
-                    train,
-                )
+                test.training_examples = [language_preprocessor.preprocess(x) for x in test.training_examples]
+
                 # calculate test accuracy
                 combine_result(
                     intent_test_metrics,
@@ -500,10 +495,10 @@ def evaluate_crossval_update(
             merged_logs = merge_intent_entity_log(intent_evaluation, entity_evaluation)
             log = get_formatted_log(merged_logs)
 
-            charts = plot_and_save_charts(repository_version, intent_results)
+            charts = plot_and_save_charts(repository_version_language, intent_results, aws_bucket_authentication)
             evaluate_result = backend().request_backend_create_evaluate_results(
                 {
-                    "repository_version": repository_version,
+                    "repository_version": repository_version_language,
                     "matrix_chart": charts.get("matrix_chart"),
                     "confidence_chart": charts.get("confidence_chart"),
                     "log": json.dumps(log),
@@ -522,7 +517,7 @@ def evaluate_crossval_update(
             entity_reports = entity_evaluation.get("report", {})
 
             for intent_key in intent_reports.keys():
-                if intent_key and intent_key not in excluded_itens:
+                if intent_key not in excluded_itens:
                     intent = intent_reports.get(intent_key)
 
                     backend().request_backend_create_evaluate_results_intent(
@@ -537,14 +532,21 @@ def evaluate_crossval_update(
                         repository_authorization,
                     )
 
+            # remove group entities when entities returned as "<entity>.<group_entity>"
             for entity_key in entity_reports.keys():
-                if entity_key and entity_key not in excluded_itens:  # pragma: no cover
+                if '.' in entity_key:
+                    new_entity_key = entity_key.split('.')[0]
+                    entity_reports[new_entity_key] = entity_reports[entity_key]
+                    entity_reports.pop(entity_key, None)
+
+            for entity_key in entity_reports.keys():
+                if entity_key not in excluded_itens:  # pragma: no cover
                     entity = entity_reports.get(entity_key)
 
                     backend().request_backend_create_evaluate_results_score(
                         {
                             "evaluate_id": evaluate_result.get("evaluate_id"),
-                            "repository_version": repository_version,
+                            "repository_version": repository_version_language,
                             "precision": entity.get("precision"),
                             "recall": entity.get("recall"),
                             "f1_score": entity.get("f1-score"),
@@ -562,11 +564,5 @@ def evaluate_crossval_update(
 
         except Exception as e:
             logger.exception(e)
-            backend().request_backend_trainfail_nlu(
-                repository_version, repository_authorization
-            )
             raise e
-        finally:
-            backend().request_backend_traininglog_nlu(
-                repository_version, pl.getvalue(), repository_authorization
-            )
+
