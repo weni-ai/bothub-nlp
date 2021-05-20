@@ -91,6 +91,7 @@ COPY --from=builder /wheels /wheels
 RUN pip3 install --find-links=/wheels -r aiplatform_requirements.txt
 
 COPY ai_platform/aiplatform_app.py .
+COPY ai_platform/settings.py .
 COPY bothub/shared /home/root/app/bothub/shared
 COPY bothub/__init__.py /home/root/app/bothub
 

@@ -8,12 +8,8 @@ from .sentence_suggestion import SentenceSuggestion
 from bothub.shared.utils.helpers import get_examples_request
 
 
-def get_intent_sentences(examples_list, intent):
-    intent_sentences = []
-    for example in examples_list:
-        if example.get("intent") == intent:
-            intent_sentences.append(example.get("text"))
-    return intent_sentences
+class NonexistentIntentError(Exception):
+    pass
 
 
 def intent_sentence_suggestion_text(
@@ -24,12 +20,15 @@ def intent_sentence_suggestion_text(
     if nlp_language.vocab.vectors_length == 0:
         return "language not supported for this feature"
 
-    sentences = get_examples_request(repository_version, repository_authorization)
-    intent_sentences = get_intent_sentences(sentences, intent)
+    intent_sentences = get_examples_request(repository_version, repository_authorization, intent=intent)
+    intent_sentences = [el['text'] for el in intent_sentences]
+    if len(intent_sentences) == 0:
+        raise NonexistentIntentError()
     intent_sentences_sample = random.sample(intent_sentences, min(n, len(intent_sentences)))
     factor = n / len(intent_sentences_sample)
 
-    preprocessor = PreprocessingFactory().factory()
+    preprocessor1 = PreprocessingFactory(remove_accent=False).factory()
+    preprocessor2 = PreprocessingFactory(remove_accent=True).factory()
 
     suggested_sentences = []
     count = 0
@@ -37,10 +36,12 @@ def intent_sentence_suggestion_text(
         if count > n or count >= len(intent_sentences_sample):
             break
         generated_sentences = SentenceSuggestion().get_suggestions(
-            intent_sentences_sample[count], percentage_to_replace, random.randint(int(1 * factor), int(3 * factor))
+            preprocessor1.preprocess_text(intent_sentences_sample[count]),
+            percentage_to_replace,
+            random.randint(int(1 * factor), int(3 * factor))
         )
         for generated_sentence in generated_sentences:
-            preprocessed_sentence = preprocessor.preprocess(generated_sentence)
+            preprocessed_sentence = preprocessor2.preprocess_text(generated_sentence)
             if preprocessed_sentence not in intent_sentences:
                 suggested_sentences.append(preprocessed_sentence)
         count += 1

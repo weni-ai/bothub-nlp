@@ -2,32 +2,81 @@ import logging
 from unidecode import unidecode
 import emoji
 import re
+from rasa.nlu.training_data import Message
 
 logger = logging.getLogger(__name__)
 
 
 class PreprocessingBase(object):
     emoji_contractions = {}
+    apostrophes = ["'", "`", "’"]
 
-    def preprocess(self, phrase: str = None):
+    def __init__(self, remove_accent=True):
+        self.remove_accent = remove_accent
+
+    def preprocess_text(self, phrase: str) -> str:
         phrase = self.emoji_handling(phrase)
-        phrase = self.default_preprocessing(phrase)
+        phrase, _ = self.default_preprocessing(phrase)
         return phrase
 
-    @staticmethod
-    def default_preprocessing(phrase: str = None):
+    def preprocess(self, example: Message) -> Message:
+        phrase = example.text
+        entities = example.data.get('entities')
+
+        phrase = self.emoji_handling(phrase)
+        phrase, entities = self.default_preprocessing(phrase, entities)
+
+        example.text = phrase
+        if entities:
+            example.data['entities'] = entities
+
+        return example
+
+    def _handle_entities(self, phrase, entities):
+        # Remove apostrophe from the phrase (important to do before s_regex regex)
+        positions = []  # mark removal positions
+        for i, char in enumerate(phrase):
+            if char in self.apostrophes:
+                positions.append(i)
+
+        for pos in positions:
+            # check if before or in entity
+            for entity in entities:
+                if pos < entity.get('end'):
+                    entity['end'] -= 1
+                if pos < entity.get('start'):
+                    entity['start'] -= 1
+
+        for entity in entities:
+            for apostrophe in self.apostrophes:
+                entity['value'] = entity['value'].replace(apostrophe, "")
+
+        return entities
+
+    def default_preprocessing(self, phrase: str = None, entities=None):
 
         if phrase is None:
             raise ValueError
 
-        # remove apostrophe from the phrase (important be first than s_regex regex)
-        for APOSTROPHE in ["'", "`"]:
-            phrase = phrase.replace(APOSTROPHE, "")
+        if entities:
+            entities = self._handle_entities(phrase, entities)
 
-        # removing accent and lowercasing characters
-        phrase = unidecode(phrase.lower())
+        for apostrophe in self.apostrophes:
+            phrase = phrase.replace(apostrophe, "")
 
-        return phrase
+        # lowercasing characters
+        phrase = phrase.lower()
+        if entities:
+            for entity in entities:
+                entity['value'] = entity['value'].lower()
+
+        if self.remove_accent:
+            phrase = unidecode(phrase)
+            if entities:
+                for entity in entities:
+                    entity['value'] = unidecode(entity['value'])
+
+        return phrase, entities
 
     @staticmethod
     def extract_emoji_text(code):
