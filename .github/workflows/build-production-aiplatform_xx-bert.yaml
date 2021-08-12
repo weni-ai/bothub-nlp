@@ -1,4 +1,4 @@
-name: Build production worker NLP - xx-BERT
+name: Build production Worker NLP - xx-BERT
 on:
   push:
     tags:

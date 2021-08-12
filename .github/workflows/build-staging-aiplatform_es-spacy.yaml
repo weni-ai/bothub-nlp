@@ -1,4 +1,4 @@
-name: Build staging worker NLP - es-SPACY
+name: Build staging Worker NLP - es-SPACY
 on:
   push:
     tags:

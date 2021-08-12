@@ -1,4 +1,4 @@
-name: Build develop worker NLP - es-SPACY
+name: Build develop Worker NLP - es-SPACY
 on:
   push:
     tags:
