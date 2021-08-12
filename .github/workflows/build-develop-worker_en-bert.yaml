@@ -1,4 +1,4 @@
-name: Build develop worker NLP - en-BERT
+name: Build develop Worker NLP - en-BERT
 on:
   push:
     tags:
