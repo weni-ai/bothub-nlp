@@ -18,7 +18,7 @@ jobs:
       - name: Set output
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Login to DockerHub
+      - name: Login to GCR
         uses: docker/login-action@v1
         with:
           registry: gcr.io
@@ -28,10 +28,13 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          username: _json_key
+          password: ${{ secrets.GCR_JSON_KEY }}
+          registry: gcr.io
           context: .
-          file: ./nlp.Dockerfile
+          file: ./aiplatform.Dockerfile
           push: true
-          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ steps.vars.outputs.tag }}-pt_br-SPACY
+          tags: bothub-273521/bothub-nlp-ai-platform:${{ steps.vars.outputs.tag }}-pt_br-SPACY
           no-cache: true
           build-args: |
             DOWNLOAD_MODELS=pt_br-SPACY
