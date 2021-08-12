@@ -1,5 +1,4 @@
-
-name: Build Develop Worker NLP - es
+name: Build Develop Worker NLP - fr
 on:
   push:
     tags:
@@ -32,8 +31,8 @@ jobs:
           context: .
           file: ./nlp.Dockerfile
           push: true
-          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-es
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-fr
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=es:es_core_news_md
+            DOWNLOAD_MODELS=fr:fr_core_news_md
       # FINISH LOOP

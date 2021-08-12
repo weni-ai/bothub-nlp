@@ -1,5 +1,4 @@
-
-name: Build Develop Worker NLP - es
+name: Build Develop Worker NLP - hr
 on:
   push:
     tags:
@@ -32,8 +31,8 @@ jobs:
           context: .
           file: ./nlp.Dockerfile
           push: true
-          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-es
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-hr
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=es:es_core_news_md
+            DOWNLOAD_MODELS=hr:pip+hr_vectors_web_md:https://s3.amazonaws.com/bothub-models/spacy-2.1.9/hr_vectors_web_md-1.1.0.tar.gz
       # FINISH LOOP

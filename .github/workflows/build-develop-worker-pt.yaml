@@ -1,5 +1,5 @@
 
-name: Build Develop Bothub-NLP Image pt
+name: Build Develop Worker NLP - pt
 on:
   push:
     tags:

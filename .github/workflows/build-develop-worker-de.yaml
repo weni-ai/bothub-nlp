@@ -1,5 +1,5 @@
 
-name: Build Develop Bothub-NLP Image de
+name: Build Develop Worker NLP - de
 on:
   push:
     tags:
@@ -28,12 +28,12 @@ jobs:
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
-        no-cache: true
         with:
           context: .
           file: ./nlp.Dockerfile
           push: true
           tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-de
+          no-cache: true
           build-args: |
             DOWNLOAD_MODELS=de
       # FINISH LOOP

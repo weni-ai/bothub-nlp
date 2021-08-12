@@ -1,5 +1,4 @@
-
-name: Build Develop Worker NLP - es
+name: Build Develop Worker NLP - kk
 on:
   push:
     tags:
@@ -32,8 +31,8 @@ jobs:
           context: .
           file: ./nlp.Dockerfile
           push: true
-          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-es
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-kk
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=es:es_core_news_md
+            DOWNLOAD_MODELS=kk:pip+kk_bothub_sm:https://s3.amazonaws.com/bothub-models/spacy-2.1.9/kk_bothub_sm-1.0.0.zip
       # FINISH LOOP
