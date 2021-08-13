@@ -2,7 +2,7 @@ name: Build develop Worker NLP - en-BERT
 on:
   push:
     tags:
-      - 'develop-v*.*.*'
+      - 'develops-v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
