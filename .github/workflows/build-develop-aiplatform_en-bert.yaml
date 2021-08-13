@@ -2,7 +2,7 @@ name: Build develop AI-Platform NLP - en-BERT
 on:
   push:
     tags:
-      - 'develops-v*.*.*'
+      - 'develop-v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -12,7 +12,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: $environment
+          ref: develop
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
