@@ -2,11 +2,11 @@ name: Build production AI-Platform NLP - pt_br-BERT
 on:
   push:
     tags:
-      - 'production-v*.*.*'
+      - 'v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: production
     steps:
       - name: Check out the repo
