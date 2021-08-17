@@ -188,7 +188,7 @@ tzlocal==2.0.0
 ujson==1.35
 Unidecode==1.1.1
 uritemplate==3.0.1
-urllib3==1.24.3
+urllib3==1.26.5
 uvloop==0.14.0
 vine==5.0.0
 wasabi==0.6.0
