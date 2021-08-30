@@ -95,7 +95,7 @@ def download_models(languages=None, debug=False):
         model = lang[1] if len(lang) > 1 else None
         value = lang_to_model.get(lang_slug, {}).get(model, None)
 
-        if model == "SPACY":
+        if model.startswith("SPACY"):
             if value.startswith("pip+"):
                 model_name, pip_package = value[4:].split(":", 1)
                 logger.debug("model name: {}".format(model_name))
