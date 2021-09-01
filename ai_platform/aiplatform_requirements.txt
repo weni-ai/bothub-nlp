@@ -1,5 +1,5 @@
 git+https://github.com/bothub-it/bothub-backend.git@1.0.22
-git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.35
+git+https://github.com/bothub-it/bothub-nlp-celery.git@develop-0.1.37
 rasa==1.10.6
 transformers==2.11.0
 emoji==0.6.0

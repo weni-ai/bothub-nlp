@@ -11,7 +11,7 @@ attrs==19.3.0
 billiard==3.6.4.0
 black==19.3b0
 blis==0.2.4
-git+https://github.com/bothub-it/bothub-nlp-celery.git@0.1.35
+git+https://github.com/bothub-it/bothub-nlp-celery.git@develop-0.1.37
 git+https://github.com/bothub-it/bothub-backend.git@1.0.22
 boto3==1.12.25
 botocore==1.15.25
