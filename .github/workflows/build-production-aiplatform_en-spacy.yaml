@@ -1,22 +1,18 @@
-name: Manual AI-Platform Build
+name: Build production AI-Platform NLP - en-SPACY
 on:
-  workflow_dispatch:
-    inputs:
-      language_model:
-        required: true
-        default: 'pt_br-BERT'
-        description: 'Language and model pattern'
-      version:
-        required: true
-        description: 'Image version'
+  push:
+    tags:
+      - 'v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
     environment:
-      name: develop
+      name: production
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+        with:
+          ref: master
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -37,8 +33,7 @@ jobs:
           context: .
           file: ./aiplatform.Dockerfile
           push: true
-          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ github.event.inputs.version }}-${{ github.event.inputs.language_model }}
+          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ steps.vars.outputs.tag }}-en-SPACY
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=${{ github.event.inputs.language_model }}
-
+            DOWNLOAD_MODELS=en-SPACY
