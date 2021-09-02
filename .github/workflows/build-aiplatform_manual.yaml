@@ -12,6 +12,8 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    environment:
+      name: develop
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -39,3 +41,4 @@ jobs:
           no-cache: true
           build-args: |
             DOWNLOAD_MODELS=${{ github.event.inputs.language_model }}
+

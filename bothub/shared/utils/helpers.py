@@ -1,8 +1,6 @@
 from bothub.shared.utils.backend import backend
 
 
-SPACY_LANGUAGES = ["en", "pt_br", "xx", "es", "fr", "ru"]
-
 ALGORITHM_TO_LANGUAGE_MODEL = {
     "neural_network_internal": None,
     "neural_network_external": "SPACY",

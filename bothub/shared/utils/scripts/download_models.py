@@ -33,6 +33,7 @@ lang_to_model = {
     "en": {"SPACY": "en_core_web_lg", "BERT": "bert_english"},
     "pt_br": {
         "SPACY": "pip+pt_nilc_word2vec_cbow_600:https://bothub-nlp-models.s3.amazonaws.com/pt_br-spacy/pt_nilc_word2vec_cbow_600-1.0.0.tar.gz",
+        "SPACY_SUGGESTION": "pip+pt_nilc_wang2vec_cbow_300:https://bothub-nlp-models.s3.amazonaws.com/pt_br-spacy/pt_nilc_wang2vec_cbow_300-1.0.0.tar.gz",
         "BERT": "bert_portuguese",
     },
     "es": {"SPACY": "es_core_news_md"},
@@ -94,7 +95,7 @@ def download_models(languages=None, debug=False):
         model = lang[1] if len(lang) > 1 else None
         value = lang_to_model.get(lang_slug, {}).get(model, None)
 
-        if model == "SPACY":
+        if model.startswith("SPACY"):
             if value.startswith("pip+"):
                 model_name, pip_package = value[4:].split(":", 1)
                 logger.debug("model name: {}".format(model_name))
