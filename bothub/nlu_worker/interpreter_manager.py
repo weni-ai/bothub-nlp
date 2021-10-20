@@ -107,5 +107,6 @@ class InterpreterManager:
         for interpreter in to_remove:
             del self.cached_interpreters[interpreter]
 
+        logger.info(f"{len(to_remove)} interpreters cleaned")
         objects_collected = gc.collect()
         logger.info(f"{objects_collected} objects collected")
