@@ -59,7 +59,7 @@ class InterpreterManager:
         )
 
         repository_name = (
-            f"{update_request.get('version_id')}_" f"{update_request.get('language')}"
+            f"{update_request.get('version_id')}_{update_request.get('language')}"
         )
         last_training = f"{update_request.get('total_training_end')}"
 
@@ -99,7 +99,8 @@ class InterpreterManager:
 
         to_remove = []
         for interpreter in self.cached_interpreters:
-            idle_time = (cur_time - self.cached_interpreters[interpreter]['last_request']).total_seconds()
+            last_request = self.cached_interpreters[interpreter]['last_request']
+            idle_time = (cur_time - last_request).total_seconds()
             if idle_time > settings.INTERPRETER_CACHE_IDLE_LIMIT:
                 to_remove.append(interpreter)
 
