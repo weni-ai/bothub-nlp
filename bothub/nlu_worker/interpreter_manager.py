@@ -8,7 +8,7 @@ from rasa.nlu import components
 from tempfile import mkdtemp
 from datetime import datetime
 
-from bothub.nlu_worker import settings
+from bothub import settings
 from bothub.shared.utils.persistor import BothubPersistor
 from bothub.shared.utils.backend import backend
 from bothub.shared.utils.rasa_components.bothub_interpreter import BothubInterpreter
