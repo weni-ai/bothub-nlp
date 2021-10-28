@@ -46,9 +46,8 @@ RUN pip install -U pip setuptools
 
 RUN pip install --find-links=${PYTHON_WHEELS_PATH} ${PIP_REQUIREMENTS}
 
-COPY bothub/nlu_worker ${WORKDIR}/bothub/nlu_worker
-COPY bothub/shared ${WORKDIR}/bothub/shared
-COPY bothub/__init__.py ${WORKDIR}/bothub
+COPY bothub ${WORKDIR}/bothub
+
 COPY start_celery.py .
 COPY celery_app.py .
 
