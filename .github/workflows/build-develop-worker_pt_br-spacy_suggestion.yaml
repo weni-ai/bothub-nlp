@@ -1,14 +1,8 @@
-name: Manual AI-Platform Build
+name: Build develop Worker NLP - pt_br-SPACY_SUGGESTION
 on:
-  workflow_dispatch:
-    inputs:
-      language_model:
-        required: true
-        default: 'pt_br-BERT'
-        description: 'Language and model pattern'
-      version:
-        required: true
-        description: 'Image version'
+  push:
+    tags:
+      - 'develop-v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -17,6 +11,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+        with:
+          ref: develop
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -24,21 +20,19 @@ jobs:
       - name: Set output
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Login to GCR
+      - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          registry: us.gcr.io
-          username: _json_key
-          password: ${{ secrets.GCR_JSON_KEY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./aiplatform.Dockerfile
+          file: ./nlp.Dockerfile
           push: true
-          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ github.event.inputs.version }}-${{ github.event.inputs.language_model }}
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-pt_br-SPACY_SUGGESTION
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=${{ github.event.inputs.language_model }}
-
+            DOWNLOAD_MODELS=pt_br-SPACY_SUGGESTION
