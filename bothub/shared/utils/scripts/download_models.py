@@ -41,7 +41,7 @@ lang_to_model = {
     "ru": {
         "SPACY": "pip+ru_vectors_web_md:https://bothub-nlp-models.s3.amazonaws.com/ru-spacy/ru_vectors_web_md-1.1.0.tar.gz"
     },
-    "xx": {"SPACY": "xx", "BERT": "bert_multilang"},
+    "xx": {"BERT": "bert_multilang"},
 }
 
 
@@ -93,8 +93,11 @@ def download_models(languages=None, debug=False):
 
         lang_slug = lang[0]
         model = lang[1] if len(lang) > 1 else None
-        value = lang_to_model.get(lang_slug, {}).get(model, None)
 
+        if not model or model == "NONE":
+            continue
+
+        value = lang_to_model.get(lang_slug, {}).get(model, None)
         if model.startswith("SPACY"):
             if value.startswith("pip+"):
                 model_name, pip_package = value[4:].split(":", 1)
