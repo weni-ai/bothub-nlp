@@ -80,14 +80,8 @@ model_embeddings_post_processors = {
     "bert_multilang": bert_embeddings_post_processor,
 }
 
-model_config_url = {
-    "bert_portuguese": "https://bothub-nlp-models.s3.amazonaws.com/bert-portuguese/config.json",
-    "bert_english": "https://bothub-nlp-models.s3.amazonaws.com/bert-english/config.json",
-    "bert_multilang": "https://bothub-nlp-models.s3.amazonaws.com/bert_multilang/config.json"
-}
-
-model_download_url = {
-    "bert_portuguese": "https://bothub-nlp-models.s3.amazonaws.com/bert-portuguese/pytorch_model.bin",
-    "bert_english": "https://bothub-nlp-models.s3.amazonaws.com/bert-english/tf_model.h5",
-    "bert_multilang": "https://bothub-nlp-models.s3.amazonaws.com/bert_multilang/tf_model.h5"
+model_url = {
+    "bert_portuguese": "https://bothub-nlp-models.s3.amazonaws.com/bert/bert_portuguese.zip",
+    "bert_english": "https://bothub-nlp-models.s3.amazonaws.com/bert/bert_english.zip",
+    "bert_multilang": "https://bothub-nlp-models.s3.amazonaws.com/bert/bert_multilang.zip"
 }
