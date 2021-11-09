@@ -78,14 +78,12 @@ def cast_supported_languages(languages):
     languages=plac.Annotation(help="Languages to download"),
     debug=plac.Annotation(help="Enable debug", kind="flag", abbrev="D"),
 )
-def download_models(languages=None, debug=False):
+def download_models(languages="", debug=False):
     logging.basicConfig(
         format="%(name)s - %(levelname)s - %(message)s",
         level=logging.DEBUG if debug else logging.INFO,
     )
 
-    if not languages:
-        languages = config("SUPPORTED_LANGUAGES", default="", cast=str)
     languages = cast_supported_languages(languages)
 
     for lang in languages:
