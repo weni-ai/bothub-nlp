@@ -42,7 +42,6 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-
 | BOTHUB_ENGINE_URL | `str` | `https://api.bothub.it` | Web service url |
 
 ### nlp-nlu-worker / nlp-ai-platform
@@ -51,8 +50,6 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-
-
 | WORKER_CACHE_CLEANING_PERIOD | `float` | `3*3600` | Period of time (seconds) the worker will look for idle interpreters to clean cache |
 | INTERPRETER_CACHE_IDLE_LIMIT | `float` | `24*3600` | Idle limit of time (seconds) the interpreter cache will keep cache |
 | BOTHUB_NLP_AWS_ACCESS_KEY_ID | `str` | `` | AWS bucket access to save trained models and evaluation results |
@@ -64,12 +61,10 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 
 | Variable | Type | Default | Description |
 |--|--|--|--|
-
 | BOTHUB_NLP_CELERY_BROKER_URL | `string` | `redis://localhost:6379/0` | Celery Broker URL, check usage instructions in [Celery Docs](http://docs.celeryproject.org/en/latest/index.html) |
 | BOTHUB_NLP_CELERY_BACKEND_URL | `string` | `BOTHUB_NLP_CELERY_BROKER_URL` value | Celery Backend URL, check usage instructions in [Celery Docs](http://docs.celeryproject.org/en/latest/index.html) |
 | BOTHUB_NLP_CELERY_SENTRY_CLIENT | `bool` | `False` | Enable Sentry |
 | BOTHUB_NLP_CELERY_SENTRY | `str` | `None` | Set URL Sentry Server |
-
 | BOTHUB_NLP_LANGUAGE_QUEUE | `string` | `en` | Set language of model that will be loaded in celery and will define its queue |
 | BOTHUB_LANGUAGE_MODEL | `string` | `None` | Set type of model (BERT/SPACY/NONE) |
 | TASK_GENERAL_TIME_LIMIT | `int` | `120` | Time limit of celery tasks |
