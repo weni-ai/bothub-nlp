@@ -25,7 +25,7 @@
 
 ## Development
 
-Use ```make``` commands to ```lint```, ```init_env```, ```start_development```.
+Use ```make``` commands
 
 | Command | Description |
 |--|--|
