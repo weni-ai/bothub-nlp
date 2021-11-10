@@ -52,10 +52,10 @@ You can set environment variables in your OS, write on ```.env``` file or pass v
 |--|--|--|--|
 | WORKER_CACHE_CLEANING_PERIOD | `float` | `3*3600` | Period of time (seconds) the worker will look for idle interpreters to clean cache |
 | INTERPRETER_CACHE_IDLE_LIMIT | `float` | `24*3600` | Idle limit of time (seconds) the interpreter cache will keep cache |
-| BOTHUB_NLP_AWS_ACCESS_KEY_ID | `str` | `` | AWS bucket access to save trained models and evaluation results |
-| BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | `str` | `` | AWS bucket access to save trained models and evaluation results |
-| BOTHUB_NLP_AWS_S3_BUCKET_NAME | `str` | `` | AWS bucket access to save trained models and evaluation results |
-| BOTHUB_NLP_AWS_REGION_NAME | `str` | `` | AWS bucket access to save trained models and evaluation results |
+| BOTHUB_NLP_AWS_ACCESS_KEY_ID | `str` | | AWS bucket access to save trained models and evaluation results |
+| BOTHUB_NLP_AWS_SECRET_ACCESS_KEY | `str` | | AWS bucket access to save trained models and evaluation results |
+| BOTHUB_NLP_AWS_S3_BUCKET_NAME | `str` | | AWS bucket access to save trained models and evaluation results |
+| BOTHUB_NLP_AWS_REGION_NAME | `str` | | AWS bucket access to save trained models and evaluation results |
 
 ### bothub-celery
 
@@ -76,4 +76,4 @@ You need to set --build-arg when you are building docker-compose
 
 | Argument | Type | Default | Description |
 |--|--|--|--|
-| DOWNLOAD_MODELS | ```string```|  ```en-BERT``` | Set supported languages. Separate languages using ```\|```. You can set location follow the format: ```[LANGUAGE_CODE]-[LANGUAGE_MODEL]```.
+| DOWNLOAD_MODELS | ```string```|  ```en-BERT``` | Set language and model in build time. Following the format: ```[LANGUAGE_CODE]-[LANGUAGE_MODEL]```.
