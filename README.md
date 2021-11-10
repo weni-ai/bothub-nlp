@@ -23,15 +23,16 @@
 * Docker
 * Docker-Compose
 
-## Development (deprecated)
+## Development
 
 Use ```make``` commands to ```lint```, ```init_env```, ```start_development```.
 
 | Command | Description |
 |--|--|
-| make lint | Show lint warnings and errors
-| make init_env | Init file .env with variables environment
-| make start_development | Create .env with variable environment and start build docker
+| make init_development_env | Init file .env with variables environment |
+| make start_development | Start build docker |
+| make install_development_requirements | Install some default models |
+| make start_celery | Run celery application |
 
 
 ## Environment Variables
