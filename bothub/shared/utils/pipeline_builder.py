@@ -170,7 +170,7 @@ class PipelineBuilder:
 
     def _build_model_requirements(self):
         model = ALGORITHM_TO_LANGUAGE_MODEL[self.algorithm]
-        if model == "SPACY" and self.language not in settings.SPACY_LANGUAGES:
+        if model == "SPACY" and self.language not in settings.AVAILABLE_SPACY_MODELS:
             model = None
             if self.algorithm == "neural_network_external":
                 self.algorithm = "neural_network_internal"
@@ -185,7 +185,7 @@ class PipelineBuilder:
         if (
             self.use_name_entities
             and self.algorithm != "transformer_network_diet_bert"
-            and self.language in settings.SPACY_LANGUAGES
+            and self.language in settings.AVAILABLE_SPACY_MODELS
         ) or self.algorithm in [
             "neural_network_external",
             "transformer_network_diet_word_embedding",
@@ -206,7 +206,7 @@ class PipelineBuilder:
         if (
             self.use_name_entities
             and self.algorithm != "transformer_network_diet_bert"
-            and self.language in settings.SPACY_LANGUAGES
+            and self.language in settings.AVAILABLE_SPACY_MODELS
         ):
             pipeline.append({"name": "SpacyEntityExtractor"})
 

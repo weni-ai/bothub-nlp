@@ -7,10 +7,10 @@ PARSER.add_argument(
     "--operation", help='What operation will be done, "train" or "evaluate"'
 )
 PARSER.add_argument(
-    "--repository-version", help="The version of repository.", type=int
+    "--repository-version", help="The id of repository-version.", type=int
 )
 PARSER.add_argument(
-    "--by-id", help=".", type=int
+    "--by-id", help="User id sending the job", type=int
 )
 PARSER.add_argument(
     "--repository-authorization", help="Repository authorization string."

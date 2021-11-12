@@ -12,13 +12,12 @@ services:
       context: .
       dockerfile: nlp.Dockerfile
       args:
-        DOWNLOAD_MODELS: xx-SPACY
+        DOWNLOAD_MODELS: xx-NONE
     depends_on:
       - bothub-nlp-celery-redis
     networks:
       - default
     environment:
-      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
       # bothub-nlp aws to save charts
       - BOTHUB_NLP_AWS_S3_BUCKET_NAME=${BOTHUB_NLP_AWS_S3_BUCKET_NAME}
       - BOTHUB_NLP_AWS_ACCESS_KEY_ID=${BOTHUB_NLP_AWS_ACCESS_KEY_ID}
@@ -28,21 +27,17 @@ services:
       # bothub-nlp-celery env vars
       - BOTHUB_NLP_CELERY_BROKER_URL=${BOTHUB_NLP_CELERY_BROKER_URL:-redis://bothub-nlp-celery-redis:6379/0}
       - BOTHUB_NLP_CELERY_BACKEND_URL=${BOTHUB_NLP_CELERY_BACKEND_URL:-redis://bothub-nlp-celery-redis:6379/0}
-      - BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE=${BOTHUB_NLP_NLU_AGROUP_LANGUAGE_QUEUE:-True}
       - BOTHUB_ENGINE_URL=${BOTHUB_ENGINE_URL:-https://api.bothub.it}
       - BOTHUB_NLP_LANGUAGE_QUEUE=${BOTHUB_NLP_LANGUAGE_QUEUE:-en}
-      - BOTHUB_NLP_SERVICE_WORKER=${BOTHUB_NLP_SERVICE_WORKER:-true}
   bothub-ai-platform:
     image: ${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_NAME:-ilha/bothub-ai-platform}:${BOTHUB_NLP_NLU_WORKER_DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: aiplatform.Dockerfile
       args:
-        DOWNLOAD_MODELS: xx-SPACY
+        DOWNLOAD_MODELS: xx-NONE
     networks:
       - default
-    environment:
-      - SUPPORTED_LANGUAGES=${SUPPORTED_LANGUAGES:-en|pt}
 
   bothub-nlp-celery-redis:
     image: redis

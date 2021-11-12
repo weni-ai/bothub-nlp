@@ -32,7 +32,7 @@ jobs:
           context: .
           file: ./nlp.Dockerfile
           push: true
-          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-xx-SPACY
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-xx-NONE
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=xx-SPACY
+            DOWNLOAD_MODELS=xx-NONE
