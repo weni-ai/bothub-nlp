@@ -186,7 +186,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
 
             if len(tokens_out) + len(split_token_strings) >= model_size:
                 logger.warning(
-                    f"Sentence number of tokens overflowing model size. Skipping exceeded tokens. "
+                    f"Sentence number of tokens overflowing model size. Skipping sentence exceeded tokens... "
                     f"Sentence text: '{message.text[:50]}...' "
                 )
                 break
