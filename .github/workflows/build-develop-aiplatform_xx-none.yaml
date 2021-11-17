@@ -1,4 +1,4 @@
-name: Build develop AI-Platform NLP - xx-SPACY
+name: Build develop AI-Platform NLP - xx-None
 on:
   push:
     tags:

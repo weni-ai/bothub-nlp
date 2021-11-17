@@ -1,4 +1,4 @@
-name: Build production AI-Platform NLP - xx-SPACY
+name: Build production AI-Platform NLP - xx-NONE
 on:
   push:
     tags:

@@ -1,4 +1,4 @@
-name: Build production Worker NLP - xx-SPACY
+name: Build production Worker NLP - xx-NONE
 on:
   push:
     tags:

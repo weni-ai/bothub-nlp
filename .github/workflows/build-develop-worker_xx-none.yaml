@@ -1,4 +1,4 @@
-name: Build develop Worker NLP - xx-SPACY
+name: Build develop Worker NLP - xx-None
 on:
   push:
     tags:
