@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import List, Callable, Optional
 
 from bothub.shared.utils.helpers import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings
@@ -19,26 +19,26 @@ class PipelineBuilder:
         self.pipeline = self._build_pipeline()
 
     @staticmethod
-    def _add_spacy_nlp():
+    def _add_spacy_nlp() -> dict:
         return {"name": "bothub.shared.utils.pipeline_components.spacy_nlp.SpacyNLP"}
 
     @staticmethod
-    def _add_whitespace_tokenizer():
+    def _add_whitespace_tokenizer() -> dict:
         return {"name": "WhitespaceTokenizer"}
 
-    def _add_preprocessing(self):
+    def _add_preprocessing(self) -> dict:
         return {
             "name": "bothub.shared.utils.pipeline_components.preprocessing.Preprocessing",
             "language": self.language,
         }
 
     @staticmethod
-    def _add_regex_entity_extractor():
+    def _add_regex_entity_extractor() -> dict:
         return {
             "name": "bothub.shared.utils.pipeline_components.regex_entity_extractor.RegexEntityExtractorCustom"
         }
 
-    def _add_countvectors_featurizer(self):
+    def _add_countvectors_featurizer(self) -> List[dict]:
         featurizers = []
 
         if self.use_analyze_char:
@@ -57,7 +57,7 @@ class PipelineBuilder:
 
         return featurizers
 
-    def _add_legacy_countvectors_featurizer(self):
+    def _add_legacy_countvectors_featurizer(self) -> dict:
         if self.use_analyze_char:
             return {
                 "name": "CountVectorsFeaturizer",
@@ -68,7 +68,7 @@ class PipelineBuilder:
         else:
             return {"name": "CountVectorsFeaturizer", "token_pattern": r"(?u)\b\w+\b"}
 
-    def _add_microsoft_entity_extractor(self):
+    def _add_microsoft_entity_extractor(self) -> dict:
         return {
             "name": "bothub.shared.utils.pipeline_components.microsoft_recognizers_extractor.MicrosoftRecognizersExtractor",
             "dimensions": self.prebuilt_entities,
@@ -76,7 +76,7 @@ class PipelineBuilder:
         }
 
     @staticmethod
-    def _add_embedding_intent_classifier():
+    def _add_embedding_intent_classifier() -> dict:
         return {
             "name": "bothub.shared.utils.pipeline_components.diet_classifier.DIETClassifierCustom",
             "hidden_layers_sizes": {"text": [256, 128]},
@@ -89,7 +89,7 @@ class PipelineBuilder:
         }
 
     @staticmethod
-    def _epoch_factor_function1(examples_qnt: int, min_threshold: int = 10000) -> float:
+    def _epoch_factor_function1(examples_qnt: int, min_threshold: int) -> float:
         """
         :param examples_qnt: Number of examples in dataset
         :param min_threshold: Minimum number of examples needed to have a factor > 1
@@ -97,13 +97,15 @@ class PipelineBuilder:
 
         Example:
         min_threshold = 10000
-          examples_qnt = 10000  -> (10*(10000-10000) + 100*10000)//10000   = 100 -> 100/100 = 1.0 (base case)
-          examples_qnt = 11000  -> (10*(11000-10000) + 100*10000)//11000   =  91 -> 100/91  = 1.09
-          examples_qnt = 15000  -> (10*(15000-10000) + 100*10000)//15000   =  70 -> 100/70  = 1,42
-          examples_qnt = 30000  -> (10*(30000-10000) + 100*10000)//30000   =  40 -> 100/40  = 2,5
-          examples_qnt = 33000  -> (10*(33000-10000) + 100*10000)//33000   =  37 -> 100/37  = 2,7
-          examples_qnt = 50000  -> (10*(50000-10000) + 100*10000)//50000   =  28 -> 100/28  = 3,57
-          examples_qnt = 100000 -> (10*(100000-10000) + 100*10000)//100000 =  19 -> 100/19  = 5,26
+          examples_qnt = 10000 -> (10*(10000-10000) + 100*10000)//10000 = 100 -> 100/100 = 1.0 (base case)
+          examples_qnt = 11000 -> (10*(11000-10000) + 100*10000)//11000 =  91 -> 100/91  = 1.09
+          examples_qnt = 30000 -> (10*(30000-10000) + 100*10000)//30000 =  40 -> 100/40  = 2,5
+          examples_qnt = 50000 -> (10*(50000-10000) + 100*10000)//50000 =  28 -> 100/28  = 3,57
+
+        min_threshold = 8000
+          examples_qnt = 8000  -> (10*(8000-8000) + 100*8000)//8000   = 100 -> 100/100 = 1.0 (base case)
+          examples_qnt = 10000 -> (10*(10000-8000) + 100*8000)//10000 = 82  -> 100/82  = 1.21
+          examples_qnt = 15000 -> (10*(15000-8000) + 100*8000)//15000 = 58  -> 100/58  = 1,72
 
         min_threshold = 5000
           examples_qnt = 5000  -> (10*(5000-5000) + 100*5000)//5000   = 100 -> 100/100 = 1.0 (base case)
@@ -139,7 +141,7 @@ class PipelineBuilder:
         epochs = int(max_epochs // factor)
         return epochs
 
-    def _add_diet_classifier(self, max_epochs=300, bert=False):
+    def _add_diet_classifier(self, max_epochs=300, bert=False) -> dict:
         epochs = self._calculate_epochs_number(max_epochs, self._epoch_factor_function1)
 
         model = {
@@ -154,7 +156,7 @@ class PipelineBuilder:
 
         return model
 
-    def _legacy_internal_config(self):
+    def _legacy_internal_config(self) -> List[dict]:
         partial_pipeline = [
             self._add_whitespace_tokenizer(),  # Tokenizer
             self._add_legacy_countvectors_featurizer(),  # Featurizer
@@ -162,7 +164,7 @@ class PipelineBuilder:
         ]
         return partial_pipeline
 
-    def _legacy_external_config(self):
+    def _legacy_external_config(self) -> List[dict]:
         partial_pipeline = [
             {"name": "SpacyTokenizer"},  # Tokenizer
             {"name": "SpacyFeaturizer"},  # Spacy Featurizer
@@ -171,7 +173,7 @@ class PipelineBuilder:
         ]
         return partial_pipeline
 
-    def _transformer_network_diet_config(self):
+    def _transformer_network_diet_config(self) -> List[dict]:
         partial_pipeline = [self._add_whitespace_tokenizer()]
 
         # partial_pipeline.append(add_regex_entity_extractor())
@@ -186,7 +188,7 @@ class PipelineBuilder:
 
         return partial_pipeline
 
-    def _transformer_network_diet_word_embedding_config(self):
+    def _transformer_network_diet_word_embedding_config(self) -> List[dict]:
         partial_pipeline = [
             {"name": "SpacyTokenizer"},  # Tokenizer
             {"name": "SpacyFeaturizer"},  # Spacy Featurizer
@@ -200,7 +202,7 @@ class PipelineBuilder:
 
         return partial_pipeline
 
-    def _transformer_network_diet_bert_config(self):
+    def _transformer_network_diet_bert_config(self) -> List[dict]:
         partial_pipeline = [
             {  # NLP
                 "name": "bothub.shared.utils.pipeline_components.hf_transformer.HFTransformersNLPCustom",
@@ -228,7 +230,7 @@ class PipelineBuilder:
 
         return partial_pipeline
 
-    def _build_model_requirements(self):
+    def _build_model_requirements(self) -> Optional[str]:
         model = ALGORITHM_TO_LANGUAGE_MODEL[self.algorithm]
         if model == "SPACY" and self.language not in settings.AVAILABLE_SPACY_MODELS:
             model = None
@@ -239,7 +241,7 @@ class PipelineBuilder:
 
         return model
 
-    def _build_pipeline(self):
+    def _build_pipeline(self) -> List[dict]:
         pipeline = [self._add_preprocessing()]
 
         if (
@@ -272,14 +274,14 @@ class PipelineBuilder:
 
         return pipeline
 
-    def print_pipeline(self):
+    def print_pipeline(self) -> None:
         import json
 
         print(f"Pipeline Config:")
         for component in self.pipeline:
             print(json.dumps(component, indent=2))
 
-    def get_nlu_model(self):
+    def get_nlu_model(self) -> RasaNLUModelConfig:
         return RasaNLUModelConfig(
             {"language": self.language, "pipeline": self.pipeline}
         )
