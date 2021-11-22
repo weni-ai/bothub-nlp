@@ -19,8 +19,10 @@ class TestPipelineBuilder(unittest.TestCase):
             'use_name_entities': False,
             'use_competing_intents': False,
             'use_analyze_char': False,
-            'total_training_end': 0
+            'total_training_end': 0,
+            'dataset_size': 15000,
         }
+
         self.pipeline_builder = PipelineBuilder(self.update)
 
         list_dir = os.listdir()
@@ -114,7 +116,8 @@ class TestPipelineBuilder(unittest.TestCase):
         update = {
             'language': 'unexisting',
             'algorithm': 'neural_network_external',
-            'use_name_entities': False
+            'use_name_entities': False,
+            'dataset_size': 15000,
         }
         pipeline_builder = PipelineBuilder(update)
         self.assertEqual(pipeline_builder.model, None)
@@ -130,7 +133,35 @@ class TestPipelineBuilder(unittest.TestCase):
         update = {
             'language': 'en',
             'algorithm': 'transformer_network_diet_bert',
-            'use_name_entities': True
+            'use_name_entities': True,
+            'dataset_size': 15000,
         }
         pipeline_builder = PipelineBuilder(update)
         self.assertEqual(pipeline_builder.model, 'BERT')
+
+    def test__dynamic_epochs(self):
+        self.update["dataset_size"] = 10000
+        self.pipeline_builder = PipelineBuilder(self.update)
+        result_epochs = self.pipeline_builder._calculate_epochs_number(
+            100,
+            self.pipeline_builder._epoch_factor_function1
+        )
+        self.assertEqual(result_epochs, 100)
+
+        self.update["dataset_size"] = 15000
+        self.pipeline_builder = PipelineBuilder(self.update)
+        result_epochs = self.pipeline_builder._calculate_epochs_number(
+            100,
+            self.pipeline_builder._epoch_factor_function1
+        )
+        self.assertLess(result_epochs, 100)
+        self.assertGreater(result_epochs, 0)
+
+        self.update["dataset_size"] = 0
+        self.pipeline_builder = PipelineBuilder(self.update)
+        result_epochs = self.pipeline_builder._calculate_epochs_number(
+            100,
+            self.pipeline_builder._epoch_factor_function1
+        )
+        self.assertEqual(result_epochs, 100)
+
