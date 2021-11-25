@@ -43,9 +43,12 @@ def train_update(
                     )
                 )
 
+            update_request["dataset_size"] = len(examples)
+
             pipeline_builder = PipelineBuilder(update_request)
             pipeline_builder.print_pipeline()
             rasa_nlu_config = pipeline_builder.get_nlu_model()
+
             trainer = Trainer(rasa_nlu_config, ComponentBuilder(use_cache=False))
             training_data = TrainingData(
                 training_examples=examples, lookup_tables=None
