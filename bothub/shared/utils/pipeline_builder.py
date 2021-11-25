@@ -1,7 +1,8 @@
 from typing import List, Callable, Optional
 
+from bothub import settings
 from bothub.shared.utils.helpers import ALGORITHM_TO_LANGUAGE_MODEL
-from bothub_nlp_celery import settings
+from bothub_nlp_celery import settings as celery_settings
 from bothub.shared.utils.rasa_components.registry import language_to_model
 from rasa.nlu.config import RasaNLUModelConfig
 
@@ -123,7 +124,7 @@ class PipelineBuilder:
         :param factor_function: Function that returns the division factor
         :return: Calculated number of epochs (max_epochs/calculated_factor)
         """
-        min_threshold = 10000
+        min_threshold = settings.DYNAMIC_EPOCHS_THRESHOLD
 
         if self.dataset_size < min_threshold:
             return max_epochs
@@ -223,7 +224,7 @@ class PipelineBuilder:
 
     def _build_model_requirements(self) -> Optional[str]:
         model = ALGORITHM_TO_LANGUAGE_MODEL[self.algorithm]
-        if model == "SPACY" and self.language not in settings.AVAILABLE_SPACY_MODELS:
+        if model == "SPACY" and self.language not in celery_settings.AVAILABLE_SPACY_MODELS:
             model = None
             if self.algorithm == "neural_network_external":
                 self.algorithm = "neural_network_internal"
@@ -238,7 +239,7 @@ class PipelineBuilder:
         if (
             self.use_name_entities
             and self.algorithm != "transformer_network_diet_bert"
-            and self.language in settings.AVAILABLE_SPACY_MODELS
+            and self.language in celery_settings.AVAILABLE_SPACY_MODELS
         ) or self.algorithm in [
             "neural_network_external",
             "transformer_network_diet_word_embedding",
@@ -259,7 +260,7 @@ class PipelineBuilder:
         if (
             self.use_name_entities
             and self.algorithm != "transformer_network_diet_bert"
-            and self.language in settings.AVAILABLE_SPACY_MODELS
+            and self.language in celery_settings.AVAILABLE_SPACY_MODELS
         ):
             pipeline.append({"name": "SpacyEntityExtractor"})
 
