@@ -151,7 +151,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
         )
 
     def _tokenize_example(
-        self, message: Message, attribute: Text, model_size: int = 512
+        self, message: Message, attribute: Text, model_size: int = 384
     ) -> Tuple[List[Token], List[int]]:
         """Tokenize a single message example.
 
@@ -187,7 +187,7 @@ class HFTransformersNLPCustom(HFTransformersNLP):
             if len(tokens_out) + len(split_token_strings) >= model_size:
                 logger.warning(
                     f"Sentence number of tokens overflowing model size. Skipping sentence exceeded tokens... "
-                    f"Sentence text: '{message.text[:50]}...' "
+                    f"Sentence text: '{message.text[:50]} ...' "
                 )
                 break
 
