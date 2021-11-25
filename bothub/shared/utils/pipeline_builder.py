@@ -97,28 +97,19 @@ class PipelineBuilder:
 
         Example:
         min_threshold = 10000
-          examples_qnt = 10000 -> (10*(10000-10000) + 100*10000)//10000 = 100 -> 100/100 = 1.0 (base case)
-          examples_qnt = 11000 -> (10*(11000-10000) + 100*10000)//11000 =  91 -> 100/91  = 1.09
-          examples_qnt = 30000 -> (10*(30000-10000) + 100*10000)//30000 =  40 -> 100/40  = 2,5
-          examples_qnt = 50000 -> (10*(50000-10000) + 100*10000)//50000 =  28 -> 100/28  = 3,57
-
-        min_threshold = 8000
-          examples_qnt = 8000  -> (10*(8000-8000) + 100*8000)//8000   = 100 -> 100/100 = 1.0 (base case)
-          examples_qnt = 10000 -> (10*(10000-8000) + 100*8000)//10000 = 82  -> 100/82  = 1.21
-          examples_qnt = 15000 -> (10*(15000-8000) + 100*8000)//15000 = 58  -> 100/58  = 1,72
-
-        min_threshold = 5000
-          examples_qnt = 5000  -> (10*(5000-5000) + 100*5000)//5000   = 100 -> 100/100 = 1.0 (base case)
-          examples_qnt = 10000 -> (10*(10000-5000) + 100*5000)//10000 = 55  -> 100/55  = 1.81
-          examples_qnt = 15000 -> (10*(15000-5000) + 100*5000)//15000 = 40  -> 100/40  = 2,5
+          examples_qnt = 10000 -> (25*(10000-10000) + 100*10000)//10000 = 100,0 -> 100/100,0 = 1.00 (base case)
+          examples_qnt = 15000 -> (25*(15000-10000) + 100*10000)//15000 = 75,00 -> 100/75,00 = 1,33
+          examples_qnt = 30000 -> (25*(30000-10000) + 100*10000)//30000 = 50,00 -> 100/50,00 = 2,00
+          examples_qnt = 60000 -> (25*(60000-10000) + 100*10000)//60000 = 37,50 -> 100/37,50 = 2,66
+          examples_qnt = 90000 -> (25*(90000-10000) + 100*10000)//90000 = 33,33 -> 100/33,33 = 3,00
 
         """
         if examples_qnt <= min_threshold:
             return 1.0
 
         over_qnt = examples_qnt - min_threshold
-        epochs_fraction = ((10*over_qnt) + (100*min_threshold)) // examples_qnt
-        factor = 100 / epochs_fraction
+        epochs_ratio = ((25*over_qnt) + (100*min_threshold)) / examples_qnt
+        factor = 100 / epochs_ratio
 
         return factor
 
