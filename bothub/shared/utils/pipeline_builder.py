@@ -1,6 +1,6 @@
 from typing import List, Callable, Optional
 
-from bothub import settings
+from bothub.shared import settings
 from bothub.shared.utils.helpers import ALGORITHM_TO_LANGUAGE_MODEL
 from bothub_nlp_celery import settings as celery_settings
 from bothub.shared.utils.rasa_components.registry import language_to_model
