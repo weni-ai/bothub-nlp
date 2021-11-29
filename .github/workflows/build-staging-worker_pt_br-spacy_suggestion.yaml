@@ -1,4 +1,4 @@
-name: Build staging Worker NLP - xx-SPACY
+name: Build staging Worker NLP - pt_br-SPACY_SUGGESTION
 on:
   push:
     tags:
@@ -6,7 +6,7 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: staging
     steps:
       - name: Check out the repo
@@ -21,7 +21,7 @@ jobs:
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Login to DockerHub
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -32,7 +32,7 @@ jobs:
           context: .
           file: ./nlp.Dockerfile
           push: true
-          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-xx-SPACY
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-pt_br-SPACY_SUGGESTION
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=xx-SPACY
+            DOWNLOAD_MODELS=pt_br-SPACY_SUGGESTION

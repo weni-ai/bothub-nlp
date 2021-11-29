@@ -1,4 +1,4 @@
-name: Build develop AI-Platform NLP - xx-SPACY
+name: Build develop AI-Platform NLP - xx-None
 on:
   push:
     tags:
@@ -6,7 +6,7 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: develop
     steps:
       - name: Check out the repo
@@ -33,7 +33,7 @@ jobs:
           context: .
           file: ./aiplatform.Dockerfile
           push: true
-          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ steps.vars.outputs.tag }}-xx-SPACY
+          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ steps.vars.outputs.tag }}-xx-NONE
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=xx-SPACY
+            DOWNLOAD_MODELS=xx-NONE
