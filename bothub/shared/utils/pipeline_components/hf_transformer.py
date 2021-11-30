@@ -1,9 +1,12 @@
 import logging
 from typing import Any, Dict, List, Text, Tuple, Optional
 
-from rasa.nlu.tokenizers.whitespace_tokenizer import WhitespaceTokenizer
 import numpy as np
+import rasa.utils.train_utils as train_utils
 
+from rasa.nlu.tokenizers.whitespace_tokenizer import WhitespaceTokenizer
+from rasa.nlu.training_data import Message
+from rasa.nlu.tokenizers.tokenizer import Token
 from rasa.nlu.utils.hugging_face.hf_transformers import HFTransformersNLP
 
 logger = logging.getLogger(__name__)
@@ -146,3 +149,52 @@ class HFTransformersNLPCustom(HFTransformersNLP):
             np.array(sentence_embeddings),
             np.array(post_processed_sequence_embeddings),
         )
+
+    def _tokenize_example(
+        self, message: Message, attribute: Text, model_size: int = 384
+    ) -> Tuple[List[Token], List[int]]:
+        """Tokenize a single message example.
+
+        Many language models add a special char in front of (some) words and split words into
+        sub-words. To ensure the entity start and end values matches the token values,
+        tokenize the text first using the whitespace tokenizer. If individual tokens
+        are split up into multiple tokens, we make sure that the start and end value
+        of the first and last respective tokens stay the same.
+
+        Args:
+            message: Single message object to be processed.
+            attribute: Property of message to be processed, one of ``TEXT`` or ``RESPONSE``.
+            model_size: Limit of tokens the model can handle (BERT = 512)
+
+        Returns:
+            List of token strings and token ids for the corresponding attribute of the message.
+        """
+
+        tokens_in = self.whitespace_tokenizer.tokenize(message, attribute)
+
+        tokens_out = []
+
+        token_ids_out = []
+
+        for token in tokens_in:
+            # use lm specific tokenizer to further tokenize the text
+            split_token_ids, split_token_strings = self._lm_tokenize(token.text)
+
+            split_token_ids, split_token_strings = self._lm_specific_token_cleanup(
+                split_token_ids, split_token_strings
+            )
+
+            if len(tokens_out) + len(split_token_strings) >= model_size:
+                logger.warning(
+                    f"Sentence number of tokens overflowing model size. Skipping sentence exceeded tokens... "
+                    f"Sentence text: '{message.text[:50]} ...' "
+                )
+                break
+
+            token_ids_out += split_token_ids
+
+            tokens_out += train_utils.align_tokens(
+                split_token_strings, token.end, token.start
+            )
+
+        return tokens_out, token_ids_out

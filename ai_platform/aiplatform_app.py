@@ -1,5 +1,3 @@
-import argparse
-
 from bothub.shared.train import train_update as train
 from bothub.shared.evaluate_crossval import (
     evaluate_crossval_update as evaluate_crossval,

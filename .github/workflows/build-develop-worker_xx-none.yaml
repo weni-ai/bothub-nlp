@@ -1,18 +1,18 @@
-name: Build staging AI-Platform NLP - xx-SPACY
+name: Build develop Worker NLP - xx-None
 on:
   push:
     tags:
-      - 'staging-v*.*.*'
+      - 'develop-v*.*.*'
 jobs:
   docker:
     runs-on: ubuntu-latest
-    environment: 
-      name: staging
+    environment:
+      name: develop
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
-          ref: staging
+          ref: develop
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -20,20 +20,19 @@ jobs:
       - name: Set output
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Login to GCR
+      - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          registry: us.gcr.io
-          username: _json_key
-          password: ${{ secrets.GCR_JSON_KEY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./aiplatform.Dockerfile
+          file: ./nlp.Dockerfile
           push: true
-          tags: us.gcr.io/bothub-273521/bothub-nlp-ai-platform:${{ steps.vars.outputs.tag }}-xx-SPACY
+          tags: bothubit/bothub-nlp:${{ steps.vars.outputs.tag }}-xx-NONE
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=xx-SPACY
+            DOWNLOAD_MODELS=xx-NONE
