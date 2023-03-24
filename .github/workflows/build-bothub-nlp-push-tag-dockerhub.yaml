@@ -101,15 +101,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Check out Kubernetes Manifests
-        uses: actions/checkout@master
-        with:
-          ref: main
-          repository: "${{ env.MANIFESTS_REPOSITORY }}"
-          token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
-          path: ./kubernetes-manifests/
-
-      - name: Build and push - Bothub NLP Image
+      - name: Build and push - Bothub NLP Model ( ${{ env.MODEL }} ) Image
+        if: ${{ () || () }}
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -123,7 +116,14 @@ jobs:
           no-cache: true
           build-args: |
             DOWNLOAD_MODELS=${{ env.MODEL }}
-
+            
+      - name: Check out Kubernetes Manifests
+        uses: actions/checkout@master
+        with:
+          ref: main
+          repository: "${{ env.MANIFESTS_REPOSITORY }}"
+          token: "${{ secrets.DEVOPS_GITHUB_PERMANENT_TOKEN }}"
+          path: ./kubernetes-manifests/
 
       - name: Update image on deployment
         run: |
