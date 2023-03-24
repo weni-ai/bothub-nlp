@@ -40,34 +40,45 @@ jobs:
             echo "MATRIXIN=${{ matrix.deployment }}"
             echo "MANIFESTS_PATCH_TARGET=${{ matrix.deployment }}" | tee -a "${GITHUB_ENV}"
             if [[ "${{ matrix.deployment }}" == "deployment-bert-english.json" ]]; then
+              MODEL=enBERT
               echo "MODEL=enBERT" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-bert-multilang.json" ]]; then
+              MODEL=xx-BERT
               echo "MODEL=xx-BERT" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-bert-ptbr.json" ]]; then
+              MODEL=pt_br-BERT
               echo "MODEL=pt_br-BERT" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-internal-en.json" ]]; then
+              MODEL=xx-NONE
               echo "MODEL=xx-NONE" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-internal-multilang.json" ]]; then
+              MODEL=xx-NONE
               echo "MODEL=xx-NONE" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-internal-ptbr.json" ]]; then
+              MODEL=xx-NONE
               echo "MODEL=xx-NONE" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-spacy-en.json" ]]; then
+              MODEL=en-SPACY
               echo "MODEL=en-SPACY" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-spacy-es.json" ]]; then
+              MODEL=es-SPACY
               echo "MODEL=es-SPACY" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-spacy-fr.json" ]]; then
+              MODEL=fr-SPACY
               echo "MODEL=fr-SPACY" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-spacy-ptbr.json" ]]; then
+              MODEL=pt_br-SPACY
               echo "MODEL=pt_br-SPACY" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-spacy-ru.json" ]]; then
+              MODEL=ru-SPACY
               echo "MODEL=ru-SPACY" | tee -a "${GITHUB_ENV}"
             else
               echo "Unknown model"
               exit 1
             fi
             
-            echo "${{ env.MODEL }}"
-            echo "IMAGE_TAG=bothubit/bothub-nlp:${TAG}-${{ env.MODEL }}" | tee -a "${GITHUB_ENV}"
+            echo "${MODEL}"
+            echo "IMAGE_TAG=bothubit/bothub-nlp:${TAG}-${MODEL}" | tee -a "${GITHUB_ENV}"
             
             echo "IMAGE_SOURCE_URL=https://github.com/weni-ai/bothub-nlp" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_REPOSITORY=Ilhasoft/kubernetes-manifests-artificial-intelligence" | tee -a "${GITHUB_ENV}"
