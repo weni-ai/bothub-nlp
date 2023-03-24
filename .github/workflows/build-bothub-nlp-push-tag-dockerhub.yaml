@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     
     strategy:
-    matrix:
-      deployment: [deployment-bert-english.json, deployment-bert-multilang.json, deployment-bert-ptbr.json, deployment-internal-en.json, deployment-internal-multilang.json, deployment-internal-ptbr.json, deployment-spacy-en.json, deployment-spacy-es.json, deployment-spacy-fr.json, deployment-spacy-ptbr.json, deployment-spacy-ru.json]
+      matrix:
+        deployment: [deployment-bert-english.json, deployment-bert-multilang.json, deployment-bert-ptbr.json, deployment-internal-en.json, deployment-internal-multilang.json, deployment-internal-ptbr.json, deployment-spacy-en.json, deployment-spacy-es.json, deployment-spacy-fr.json, deployment-spacy-ptbr.json, deployment-spacy-ru.json]
 
     steps:
       - name: Set variables
@@ -65,15 +65,13 @@ jobs:
               echo "Unknown model"
               exit 1
             fi
-
+            
+            echo "${{ env.MODEL }}"
             echo "IMAGE_TAG=bothubit/bothub-nlp:${TAG}-${{ env.MODEL }}" | tee -a "${GITHUB_ENV}"
+            
             echo "IMAGE_SOURCE_URL=https://github.com/weni-ai/bothub-nlp" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_REPOSITORY=Ilhasoft/kubernetes-manifests-artificial-intelligence" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_APPLICATION=nlp-workers" | tee -a "${GITHUB_ENV}"
-           
-
-
-            
 
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -113,7 +111,7 @@ jobs:
           tags: "${{env.IMAGE_TAG}}"
           no-cache: true
           build-args: |
-            DOWNLOAD_MODELS=${{ env.MODEL }
+            DOWNLOAD_MODELS=${{ env.MODEL }}
 
 
       - name: Update image on deployment
