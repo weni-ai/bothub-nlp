@@ -40,8 +40,8 @@ jobs:
             echo "MATRIXIN=${{ matrix.deployment }}"
             echo "MANIFESTS_PATCH_TARGET=${{ matrix.deployment }}" | tee -a "${GITHUB_ENV}"
             if [[ "${{ matrix.deployment }}" == "deployment-bert-english.json" ]]; then
-              MODEL=enBERT
-              echo "MODEL=enBERT" | tee -a "${GITHUB_ENV}"
+              MODEL=en-BERT
+              echo "MODEL=en-BERT" | tee -a "${GITHUB_ENV}"
             elif [[ "${{ matrix.deployment }}" == "deployment-bert-multilang.json" ]]; then
               MODEL=xx-BERT
               echo "MODEL=xx-BERT" | tee -a "${GITHUB_ENV}"
