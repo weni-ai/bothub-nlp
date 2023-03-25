@@ -102,7 +102,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push - Bothub NLP Model ( ${{ env.MODEL }} ) Image
-        if: ${{ () || () }}
+        if: ${{ !( matrix.deployment == 'deployment-internal-ptbr.json' || matrix.deployment == 'deployment-internal-multilang.json' ) }}
         uses: docker/build-push-action@v3
         with:
           context: .
