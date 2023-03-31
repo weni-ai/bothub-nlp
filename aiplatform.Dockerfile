@@ -6,7 +6,7 @@ FROM nvidia/cuda${ARCH:+-$ARCH}:${CUDA}-base-ubuntu${UBUNTU_VERSION} as base
 # ARCH and CUDA are specified again because the FROM directive resets ARGs
 # (but their default value is retained if set previously)
 ARG ARCH
-ARG CUDA=12.0
+ARG CUDA
 ARG CUDNN=8.8.1.3-1
 ARG CUDNN_MAJOR_VERSION=7
 ARG LIB_DIR_PREFIX=x86_64
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         git \
         wget \
-        libcudnn7=${CUDNN}+cuda${CUDA} \
+        libcudnn7=${CUDNN}+cuda12.0 \
         libfreetype6-dev \
         libhdf5-serial-dev \
         libzmq3-dev \
