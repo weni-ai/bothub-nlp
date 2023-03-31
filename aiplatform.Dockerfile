@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         git \
         wget \
-        libcudnn7=${CUDNN}+cuda12.0 \
+        libcudnn8=${CUDNN}+cuda12.0 \
         libfreetype6-dev \
         libhdf5-serial-dev \
         libzmq3-dev \
