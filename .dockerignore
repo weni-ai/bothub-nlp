@@ -23,5 +23,7 @@ settings.ini
 # dev
 db.sqlite3
 
+.git
+
 # spacy-langs
 bothub-nlp-nlu-worker/spacy-langs
