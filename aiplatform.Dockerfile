@@ -74,7 +74,7 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda-10.1/extras/CUPTI/lib64:/usr/local/cuda-10.1
   PYTHONIOENCODING=UTF-8 \
   PIP_DISABLE_PIP_VERSION_CHECK=1 \
   PATH="/install/bin:${PATH}" \
-  PYTHONPATH="/usr/local/lib/python:/usr/lib/python:/usr/local/lib/python3:/usr/lib/python3:/usr/local/lib/python3.6:/usr/lib/python3.6" \
+  PYTHONPATH="/usr/local/lib/python/site-packages/:/usr/lib/python/site-packages/:/usr/local/lib/python3/site-packages/:/usr/lib/python3/site-packages/:/usr/local/lib/python3.6/site-packages/:/usr/lib/python3.6/site-packages/" \
   LANG=C.UTF-8 \
   LC_ALL=C.UTF-8
 # See http://bugs.python.org/issue19846
