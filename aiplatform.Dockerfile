@@ -55,6 +55,7 @@ ARG RUNTIME_DEPS="\
   libfreetype6 \
   libhdf5-100 \
   libzmq5 \
+  python3-pip \
   software-properties-common \
   ttf-mscorefonts-installer \
   curl \
@@ -73,6 +74,7 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda-10.1/extras/CUPTI/lib64:/usr/local/cuda-10.1
   PYTHONIOENCODING=UTF-8 \
   PIP_DISABLE_PIP_VERSION_CHECK=1 \
   PATH="/install/bin:${PATH}" \
+  PYTHONPATH="/usr/local/lib/python:/usr/lib/python:/usr/local/lib/python3:/usr/lib/python3:/usr/local/lib/python3.6:/usr/lib/python3.6" \
   LANG=C.UTF-8 \
   LC_ALL=C.UTF-8
 # See http://bugs.python.org/issue19846
@@ -111,6 +113,7 @@ RUN apt-get update \
   && ln -s /usr/local/cuda-${CUDA}/lib64/stubs/libcuda.so /usr/local/cuda-${CUDA}/lib64/stubs/libcuda.so.1 \
   && echo "/usr/local/cuda-${CUDA}/lib64/stubs" > /etc/ld.so.conf.d/z-cuda-stubs.conf \
   && ldconfig \
+  && pip3 --no-cache-dir install --upgrade pip setuptools \
   && ln -s $(which python3) /usr/local/bin/python \
   && rm -rf /usr/share/man \
   && apt-get clean \
@@ -130,8 +133,8 @@ RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
         pip3 install --no-cache-dir torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html; \
     fi ; \
     if [ ${DOWNLOAD_MODELS} ]; then \
-        python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
+        python3 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
     fi
 
-ENTRYPOINT ["python3.6", "aiplatform_app.py"]
+ENTRYPOINT ["python3", "aiplatform_app.py"]
 
