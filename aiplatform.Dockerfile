@@ -90,8 +90,8 @@ COPY ai_platform/aiplatform_requirements.txt .
 RUN mkdir /install && \
   apt-get update && apt-get install -y --no-install-recommends $( echo "${BUILD_DEPS}" | sed "s/-${CUDA} /-${CUDA/./-} /g" ) && \
   if [[ "${ARCH}" != "ppc64le" ]] ; then apt-get install -y --no-install-recommends libnvinfer${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda12.0 libnvinfer-plugin${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda12.0 ; fi && \
-  python3 -m pip --no-cache-dir install --upgrade pip setuptools && \
-  pip install --no-cache-dir --prefix=/install -r aiplatform_requirements.txt && \
+  pip3 --no-cache-dir install --upgrade pip setuptools && \
+  pip3 install --no-cache-dir --prefix=/install -r aiplatform_requirements.txt && \
   ln -s /usr/local/cuda-${CUDA}/lib64/stubs/libcuda.so /usr/local/cuda-10.1/lib64/stubs/libcuda.so.1 && \
   echo "/usr/local/cuda-${CUDA}/lib64/stubs" > /etc/ld.so.conf.d/z-cuda-stubs.conf && \
   ldconfig && \
@@ -127,7 +127,7 @@ COPY bothub/__init__.py bothub
 ARG DOWNLOAD_MODELS
 #Install torch with cuda 10.1
 RUN if [ "${DOWNLOAD_MODELS}" = "pt_br-BERT" ]; then \
-        pip install --no-cache-dir torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html; \
+        pip3 install --no-cache-dir torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html; \
     fi ; \
     if [ ${DOWNLOAD_MODELS} ]; then \
         python3.6 bothub/shared/utils/scripts/download_models.py ${DOWNLOAD_MODELS}; \
