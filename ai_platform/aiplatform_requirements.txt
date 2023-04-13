@@ -13,3 +13,6 @@ requests==2.23.0
 pymorphy2==0.8
 python-decouple==3.3
 h5py==2.10.0
+gevent==1.4.0
+greenlet==0.4.15
+

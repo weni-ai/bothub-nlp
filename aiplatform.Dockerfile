@@ -94,7 +94,7 @@ RUN mkdir /install && \
   if [[ "${ARCH}" != "ppc64le" ]] ; then apt-get install -y --no-install-recommends libnvinfer${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda12.0 libnvinfer-plugin${LIBNVINFER_MAJOR_VERSION}=${LIBNVINFER}+cuda12.0 ; fi && \
   pip3 --no-cache-dir install --upgrade pip setuptools && \
   pip3 install --no-cache-dir --prefix=/install -r aiplatform_requirements.txt && \
-  ln -s /usr/local/cuda-${CUDA}/lib64/stubs/libcuda.so /usr/local/cuda-10.1/lib64/stubs/libcuda.so.1 && \
+  ln -s /usr/local/cuda-${CUDA}/lib64/stubs/libcuda.so /usr/local/cuda-${CUDA}/lib64/stubs/libcuda.so.1 && \
   echo "/usr/local/cuda-${CUDA}/lib64/stubs" > /etc/ld.so.conf.d/z-cuda-stubs.conf && \
   ldconfig && \
   apt-get autoremove -y && \
