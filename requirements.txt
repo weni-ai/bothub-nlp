@@ -136,7 +136,7 @@ python-socketio==4.4.0
 python-telegram-bot==11.1.0
 pytz==2019.3
 PyWavelets==1.1.1
-PyYAML==5.3.1
+PyYAML==5.4
 questionary==1.5.1
 redis==3.4.1
 requests==2.23.0
