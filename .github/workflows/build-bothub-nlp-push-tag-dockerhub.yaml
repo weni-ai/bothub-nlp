@@ -80,7 +80,7 @@ jobs:
             echo "IMAGE_TAG=bothubit/bothub-nlp:${TAG}-${MODEL}" | tee -a "${GITHUB_ENV}"
             
             echo "IMAGE_SOURCE_URL=https://github.com/weni-ai/bothub-nlp" | tee -a "${GITHUB_ENV}"
-            echo "MANIFESTS_REPOSITORY=Ilhasoft/kubernetes-manifests-artificial-intelligence" | tee -a "${GITHUB_ENV}"
+            echo "MANIFESTS_REPOSITORY=weni-ai/kubernetes-manifests-artificial-intelligence" | tee -a "${GITHUB_ENV}"
             echo "MANIFESTS_APPLICATION=nlp-workers" | tee -a "${GITHUB_ENV}"
       - name: Check out the repo
         uses: actions/checkout@v3
